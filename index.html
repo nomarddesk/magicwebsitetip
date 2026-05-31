@@ -50,10 +50,22 @@
         .page-h1 { font-size:30px; font-weight:700; letter-spacing:-.6px; line-height:1; margin-bottom:4px; }
         .page-sub { font-size:13px; color:var(--t3); }
 
-        .stats { display:grid; grid-template-columns:repeat(4,1fr); gap:9px; margin-bottom:28px; }
+        .stats { display:grid; grid-template-columns:repeat(4,1fr); gap:9px; margin-bottom:18px; }
         .stat { background:var(--surface); border-radius:var(--r); box-shadow:var(--card-shadow); padding:14px 10px; text-align:center; }
         .stat-n { font-size:22px; font-weight:700; letter-spacing:-.5px; line-height:1; margin-bottom:3px; }
         .stat-l { font-size:10px; font-weight:500; color:var(--t3); text-transform:uppercase; letter-spacing:.3px; }
+
+        /* Home filter tabs (Live / Upcoming / Past) */
+        .home-tabs { display:flex; gap:8px; margin-bottom:20px; }
+        .home-tab { flex:1; padding:12px 10px; border-radius:14px; font-size:14px; font-weight:600; letter-spacing:-.2px; border:none; cursor:pointer; white-space:nowrap; transition:all .18s; background:var(--surface); color:var(--t2); box-shadow:var(--card-shadow); display:flex; align-items:center; justify-content:center; gap:6px; -webkit-tap-highlight-color:transparent; }
+        .home-tab.on { background:var(--t1); color:#fff; box-shadow:0 4px 16px rgba(0,0,0,0.18); transform:translateY(-1px); }
+        .home-tab:not(.on):hover { background:#E8E8ED; }
+        .home-tab-count { font-size:11px; font-weight:600; opacity:.7; }
+
+        /* Tab loading state */
+        .tab-loading { display:flex; flex-direction:column; align-items:center; gap:18px; padding:54px 20px; background:var(--surface); border-radius:var(--r); box-shadow:var(--card-shadow); margin-bottom:9px; animation:pgIn .25s ease forwards; }
+        .tab-loading-spin { width:36px; height:36px; border:3px solid var(--sep2); border-top-color:var(--t1); border-radius:50%; animation:rot .8s linear infinite; }
+        .tab-loading-msg { font-size:14px; color:var(--t2); font-weight:500; text-align:center; max-width:280px; line-height:1.45; min-height:40px; transition:opacity .3s ease; }
 
         .grp { display:flex; align-items:center; gap:10px; margin:24px 0 10px; }
         .grp-line { flex:1; height:.5px; background:var(--sep2); }
@@ -202,17 +214,26 @@
         .splash-inner { animation:splPop .55s cubic-bezier(.34,1.56,.64,1) forwards; display:flex; flex-direction:column; align-items:center; gap:14px; }
         @keyframes splPop { from{opacity:0;transform:scale(.82)} to{opacity:1;transform:scale(1)} }
 
-        .empty-state { background:var(--surface); border-radius:var(--r); box-shadow:var(--card-shadow); padding:28px 20px; text-align:center; margin-bottom:9px; }
-        .empty-state-title { font-size:14px; font-weight:600; color:var(--t2); }
+        .empty-state { background:var(--surface); border-radius:var(--r); box-shadow:var(--card-shadow); padding:36px 22px; text-align:center; margin-bottom:9px; }
+        .empty-state-title { font-size:14px; font-weight:600; color:var(--t2); line-height:1.5; }
         .empty-state-sub { font-size:12px; color:var(--t3); margin-top:3px; }
     </style>
 </head>
 <body>
 <div id="root"></div>
 <script type="text/babel">
-const { useState, useEffect, useMemo, useCallback } = React;
+const { useState, useEffect, useMemo, useCallback, useRef } = React;
 
 const BACKEND_URL = "https://sportprediction-production.up.railway.app";
+
+/* Cycling loading messages shown while a Home tab "loads" (max 6 s). */
+const LOADING_MSGS = [
+    "We are fetching data...",
+    "We are working on it...",
+    "Looking into the API to fetch data...",
+    "We are almost there..."
+];
+const EMPTY_TAB_MSG = "Oh... please check other tabs for matches, there are no matches here at the moment";
 
 /* ── Status helpers ── */
 const FIN_SET = new Set(['FT','AET','PEN','Pen.']);
@@ -249,7 +270,6 @@ const statusBadgeLabel = (m, c) => {
     return statusLabel(m.status);
 };
 
-/* ── Score helper — reads the field names actually returned by /api/scores ── */
 const getGoals = m => {
     const h = m.home?.score;
     const a = m.away?.score;
@@ -259,9 +279,6 @@ const getGoals = m => {
 
 const fid = m => m?.id || m?.static_id || m?.fixture?.id || null;
 
-/* ── Prediction helper — reads the prediction fields actually returned by /api/scores
-       (the old code called a non-existent /api/get-predictions endpoint and then
-       fabricated fake predictions on failure, which is why nothing matched reality) ── */
 const matchToPred = m => {
     if (!m || !m.prediction) return null;
     const label = m.prediction === '1' ? 'Home Win'
@@ -280,7 +297,6 @@ const matchToPred = m => {
     };
 };
 
-/* ── Generate a short analysis sentence from the prediction data ── */
 const generateAnalysis = m => {
     if (!m?.prediction) return null;
     const subject = m.prediction === '1' ? `${m.home?.name || 'the home side'} to win`
@@ -292,8 +308,7 @@ const generateAnalysis = m => {
         parseInt(m.probabilities?.away) || 0,
     );
     const score  = m.correctScore ? ` Most likely scoreline: ${m.correctScore}.` : '';
-    const advice = m.advice && !m.advice.toLowerCase().startsWith(subject.split(' ')[0].toLowerCase())
-                   ? ` Tip: ${m.advice}.` : (m.advice ? ` Tip: ${m.advice}.` : '');
+    const advice = m.advice ? ` Tip: ${m.advice}.` : '';
     return `Model favours ${subject}${pct ? ` (${pct}% confidence)` : ''}.${score}${advice}`;
 };
 
@@ -362,10 +377,6 @@ const EmptyState = ({ title, sub }) => (
         <div className="empty-state-title">{title}</div>
         {sub && <div className="empty-state-sub">{sub}</div>}
     </div>
-);
-
-const Grp = ({label}) => (
-    <div className="grp"><div className="grp-line"/><span className="grp-txt">{label}</span><div className="grp-line"/></div>
 );
 
 const SocialHome = () => (
@@ -589,28 +600,33 @@ const DetailSheet = ({ match, pred, onClose }) => {
 
 /* ── App ── */
 function App() {
-    const [splash,      setSplash]      = useState(true);
-    const [calOpen,     setCalOpen]     = useState(false);
-    const [tab,         setTab]         = useState('Home');
-    const [sport,       setSport]       = useState('Football');
-    const [csSport,     setCsSport]     = useState(null);
-    const [favs,        setFavs]        = useState(() => {
+    const [splash,         setSplash]         = useState(true);
+    const [calOpen,        setCalOpen]        = useState(false);
+    const [tab,            setTab]            = useState('Home');
+    const [sport,          setSport]          = useState('Football');
+    const [csSport,        setCsSport]        = useState(null);
+    const [favs,           setFavs]           = useState(() => {
         try { return JSON.parse(localStorage.getItem('magic-favs') || '[]'); } catch { return []; }
     });
-    const [matches,     setMatches]     = useState([]);
-    const [loading,     setLoading]     = useState(true);
-    const [waking,      setWaking]      = useState(false);
-    const [err,         setErr]         = useState(null);
-    const [showToast,   setShowToast]   = useState(false);
-    const [detailMatch, setDetailMatch] = useState(null);
-    const [updatedAt,   setUpdatedAt]   = useState(null);
+    const [matches,        setMatches]        = useState([]);
+    const [loading,        setLoading]        = useState(true);
+    const [waking,         setWaking]         = useState(false);
+    const [err,            setErr]            = useState(null);
+    const [showToast,      setShowToast]      = useState(false);
+    const [detailMatch,    setDetailMatch]    = useState(null);
+    const [updatedAt,      setUpdatedAt]      = useState(null);
+
+    /* Home sub-tabs (Live / Upcoming / Past) with their own loading state. */
+    const [homeTab,        setHomeTab]        = useState('Upcoming');
+    const [tabLoading,     setTabLoading]     = useState(false);
+    const [loadingMsgIdx,  setLoadingMsgIdx]  = useState(0);
 
     /* Persist favourites between visits */
     useEffect(() => {
         try { localStorage.setItem('magic-favs', JSON.stringify(favs)); } catch {}
     }, [favs]);
 
-    /* Fetch /api/scores. silent=true skips the loading skeleton (used for 60s polling). */
+    /* Fetch /api/scores. silent=true skips the loading skeleton (used for polling). */
     const load = useCallback(async (silent = false) => {
         if (!silent) {
             setLoading(true);
@@ -643,12 +659,29 @@ function App() {
         }
     }, []);
 
-    /* Initial load + refresh every 60 seconds so live status/scores reach the page. */
+    /* Initial load + auto-refresh every 20 minutes (matches the backend's scrape interval). */
     useEffect(() => {
         const t  = setTimeout(() => setSplash(false), 3000);
         load(false);
-        const iv = setInterval(() => load(true), 60000);
+        const iv = setInterval(() => load(true), 20 * 60 * 1000);
         return () => { clearTimeout(t); clearInterval(iv); };
+    }, [load]);
+
+    /* When tabLoading turns on, cycle messages every 1.5 s and end the spinner after 6 s. */
+    useEffect(() => {
+        if (!tabLoading) return;
+        const cycle = setInterval(() => {
+            setLoadingMsgIdx(i => (i + 1) % LOADING_MSGS.length);
+        }, 1500);
+        const done = setTimeout(() => setTabLoading(false), 6000);
+        return () => { clearInterval(cycle); clearTimeout(done); };
+    }, [tabLoading]);
+
+    const handleHomeTabClick = useCallback((t) => {
+        setHomeTab(t);
+        setTabLoading(true);
+        setLoadingMsgIdx(0);
+        load(true); // silent refresh while the spinner is showing
     }, [load]);
 
     const openDetail = useCallback(m => setDetailMatch(m), []);
@@ -673,6 +706,24 @@ function App() {
             isFav={favs.includes(fid(m))}
         />
     );
+
+    /* What to render under the Home filter tabs. */
+    const renderHomeBody = () => {
+        if (tabLoading) {
+            return (
+                <div className="tab-loading">
+                    <div className="tab-loading-spin"/>
+                    <div className="tab-loading-msg">{LOADING_MSGS[loadingMsgIdx]}</div>
+                </div>
+            );
+        }
+        if (loading) return [1,2,3].map(i => <Skel key={i}/>);
+        const active = homeTab === 'Live'    ? liveMatches
+                     : homeTab === 'Past'    ? pastMatches
+                     :                          upcomingMatches;
+        if (active.length === 0) return <EmptyState title={EMPTY_TAB_MSG}/>;
+        return active.map(m => card(m));
+    };
 
     const today  = new Date().toLocaleDateString('en-US', {weekday:'long',month:'long',day:'numeric'});
     const sports = [['Football','⚽'],['Basketball','🏀'],['Tennis','🎾'],['Hockey','🏒'],['Baseball','⚾']];
@@ -739,6 +790,20 @@ function App() {
                                 </div>
                             ))}
                         </div>
+
+                        {/* Home filter tabs — click to swap the body without scrolling */}
+                        <div className="home-tabs">
+                            <button className={`home-tab${homeTab==='Live'?' on':''}`} onClick={()=>handleHomeTabClick('Live')}>
+                                🔴 Live <span className="home-tab-count">({liveMatches.length})</span>
+                            </button>
+                            <button className={`home-tab${homeTab==='Upcoming'?' on':''}`} onClick={()=>handleHomeTabClick('Upcoming')}>
+                                🔵 Upcoming <span className="home-tab-count">({upcomingMatches.length})</span>
+                            </button>
+                            <button className={`home-tab${homeTab==='Past'?' on':''}`} onClick={()=>handleHomeTabClick('Past')}>
+                                ✅ Past <span className="home-tab-count">({pastMatches.length})</span>
+                            </button>
+                        </div>
+
                         {waking && (
                             <div className="wake-bar">
                                 <div className="spin" style={{flexShrink:0}}/>
@@ -752,29 +817,7 @@ function App() {
                             </div>
                         )}
 
-                        <Grp label="🔴 Live Picks"/>
-                        {loading
-                            ? [1,2,3].map(i=><Skel key={i}/>)
-                            : liveMatches.length > 0
-                                ? liveMatches.map(m => card(m))
-                                : <EmptyState title="No live matches right now" sub="Matches in play will appear here automatically."/>
-                        }
-
-                        {!loading && <>
-                            <Grp label="🔵 Upcoming Picks"/>
-                            {upcomingMatches.length > 0
-                                ? upcomingMatches.map(m => card(m))
-                                : <EmptyState title="No upcoming matches scheduled"/>
-                            }
-                        </>}
-
-                        {!loading && <>
-                            <Grp label="✅ Recent Results"/>
-                            {pastMatches.length > 0
-                                ? pastMatches.map(m => card(m))
-                                : <EmptyState title="No recent results yet"/>
-                            }
-                        </>}
+                        {renderHomeBody()}
 
                         <SocialHome/>
                     </div>
@@ -831,7 +874,7 @@ function App() {
                             </a>
                         </div>
                         <div style={{textAlign:'center',paddingTop:8}}>
-                            <div style={{fontSize:12,color:'var(--t3)'}}>Magic Analysis · v2.2</div>
+                            <div style={{fontSize:12,color:'var(--t3)'}}>Magic Analysis · v2.3</div>
                         </div>
                         <Social/>
                     </div>
