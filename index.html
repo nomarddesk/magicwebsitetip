@@ -692,7 +692,7 @@ function App() {
 
     const liveMatches     = useMemo(() => matches.filter(m => cat(m.status) === 'live'),     [matches]);
     const upcomingMatches = useMemo(() => matches.filter(m => cat(m.status) === 'upcoming'), [matches]);
-    const pastMatches     = useMemo(() => matches.filter(m => cat(m.status) === 'finished'), [matches]);
+    const pastMatches     = useMemo(() => matches.filter(m => cat(m.status) === 'finished' && getGoals(m)), [matches]);
     const savedMatches    = useMemo(() => matches.filter(m => favs.includes(fid(m))),        [matches, favs]);
     const alertMatches    = useMemo(() => matches.filter(m => { const n=parseInt(m.status); return !isNaN(n)&&n>=75&&n<120; }), [matches]);
 
@@ -874,7 +874,7 @@ function App() {
                             </a>
                         </div>
                         <div style={{textAlign:'center',paddingTop:8}}>
-                            <div style={{fontSize:12,color:'var(--t3)'}}>Magic Analysis · v2.3</div>
+                            <div style={{fontSize:12,color:'var(--t3)'}}>Magic Analysis · v2.4</div>
                         </div>
                         <Social/>
                     </div>
