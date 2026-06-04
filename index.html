@@ -4,6 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Magic Analysis</title>
+
+    <!-- Google Analytics (GA4) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-RNQZZENL62"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-RNQZZENL62');
+    </script>
+
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -14,6 +24,7 @@
             --t1:#1D1D1F; --t2:#6E6E73; --t3:#86868B;
             --sep:rgba(0,0,0,0.08); --sep2:rgba(0,0,0,0.14);
             --live:#FF3B30; --blue:#007AFF; --gold:#FF9500;
+            --navy:#0B1929;
             --r:16px; --r2:24px;
             --card-shadow:0 1px 1px rgba(0,0,0,0.04),0 2px 8px rgba(0,0,0,0.05),0 0 0 0.5px rgba(0,0,0,0.05);
             --modal-shadow:0 24px 64px rgba(0,0,0,0.22);
@@ -21,11 +32,12 @@
         body { font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue',Arial,sans-serif; background:var(--bg); color:var(--t1); overflow-x:hidden; }
         ::-webkit-scrollbar { display:none; } * { scrollbar-width:none; }
 
-        .hdr { position:sticky; top:0; z-index:100; height:56px; background:rgba(255,255,255,0.88); backdrop-filter:blur(24px) saturate(180%); -webkit-backdrop-filter:blur(24px) saturate(180%); border-bottom:0.5px solid var(--sep); display:flex; align-items:center; padding:0 16px; }
-        .hdr-btn { width:34px; height:34px; border-radius:50%; background:none; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--t1); transition:background .15s; flex-shrink:0; }
-        .hdr-btn:hover { background:rgba(0,0,0,0.06); }
+        /* Header — premium dark-navy matching the Magic Betting Tips logo */
+        .hdr { position:sticky; top:0; z-index:100; height:56px; background:var(--navy); color:#fff; border-bottom:0.5px solid rgba(255,255,255,0.06); display:flex; align-items:center; padding:0 16px; }
+        .hdr-btn { width:34px; height:34px; border-radius:50%; background:none; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; color:#fff; transition:background .15s; flex-shrink:0; }
+        .hdr-btn:hover { background:rgba(255,255,255,0.10); }
         .hdr-center { flex:1; display:flex; align-items:center; justify-content:center; gap:8px; }
-        .hdr-title { font-size:16px; font-weight:600; letter-spacing:-.3px; }
+        .hdr-title { font-size:16px; font-weight:600; letter-spacing:-.3px; color:#fff; }
 
         .top-ad-banner { width:100%; background:var(--surface); border-bottom:0.5px solid var(--sep); padding:10px 14px; display:flex; align-items:center; justify-content:center; min-height:70px; overflow:hidden; }
 
@@ -61,9 +73,9 @@
         .home-tab:not(.on):hover { background:#E8E8ED; }
         .home-tab-count { font-size:11px; font-weight:600; opacity:.7; }
 
-        .tab-loading { display:flex; flex-direction:column; align-items:center; gap:18px; padding:54px 20px; background:var(--surface); border-radius:var(--r); box-shadow:var(--card-shadow); margin-bottom:9px; animation:pgIn .25s ease forwards; }
-        .tab-loading-spin { width:36px; height:36px; border:3px solid var(--sep2); border-top-color:var(--t1); border-radius:50%; animation:rot .8s linear infinite; }
-        .tab-loading-msg { font-size:14px; color:var(--t2); font-weight:500; text-align:center; max-width:280px; line-height:1.45; min-height:40px; transition:opacity .3s ease; }
+        .tab-loading { display:flex; flex-direction:column; align-items:center; gap:18px; padding:60px 20px; background:var(--surface); border-radius:var(--r); box-shadow:var(--card-shadow); margin-bottom:9px; animation:pgIn .2s ease forwards; min-height:240px; justify-content:center; }
+        .tab-loading-spin { width:34px; height:34px; border:3px solid var(--sep2); border-top-color:var(--t1); border-radius:50%; animation:rot .8s linear infinite; }
+        .tab-loading-msg { font-size:14px; color:var(--t2); font-weight:500; text-align:center; letter-spacing:-.1px; }
 
         .grp { display:flex; align-items:center; gap:10px; margin:24px 0 10px; }
         .grp-line { flex:1; height:.5px; background:var(--sep2); }
@@ -212,9 +224,12 @@
         .splash-inner { animation:splPop .55s cubic-bezier(.34,1.56,.64,1) forwards; display:flex; flex-direction:column; align-items:center; gap:14px; }
         @keyframes splPop { from{opacity:0;transform:scale(.82)} to{opacity:1;transform:scale(1)} }
 
-        .empty-state { background:var(--surface); border-radius:var(--r); box-shadow:var(--card-shadow); padding:36px 22px; text-align:center; margin-bottom:9px; }
-        .empty-state-title { font-size:14px; font-weight:600; color:var(--t2); line-height:1.5; }
-        .empty-state-sub { font-size:12px; color:var(--t3); margin-top:3px; }
+        .empty-state { background:var(--surface); border-radius:var(--r); box-shadow:var(--card-shadow); padding:60px 28px; text-align:center; margin-bottom:9px; min-height:300px; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+        .empty-state-title { font-size:15px; font-weight:500; color:var(--t2); line-height:1.65; max-width:320px; margin:0 auto; }
+        .empty-state-sub { font-size:12px; color:var(--t3); margin-top:6px; }
+
+        /* Wrapper for lazy-mounted cards — reserves height before mount */
+        .lazy-slot { min-height:175px; }
     </style>
 </head>
 <body>
@@ -223,15 +238,10 @@
 const { useState, useEffect, useMemo, useCallback, useRef } = React;
 
 const BACKEND_URL = "https://sportprediction-production.up.railway.app";
-const REFRESH_MS  = 10 * 60 * 1000; // poll backend every 10 minutes (matches REFRESH_MINUTES=10)
-
-const LOADING_MSGS = [
-    "We are fetching data...",
-    "We are working on it...",
-    "Looking into the API to fetch data...",
-    "We are almost there..."
-];
-const EMPTY_TAB_MSG = "Oh... please check other tabs for matches, there are no matches here at the moment";
+const REFRESH_MS  = 20 * 60 * 1000;             // auto-refresh every 20 minutes
+const TAB_LOADING_MAX_MS = 3000;                 // spinner can show for at most 3 seconds
+const LOADING_MSG = "Just 1 sec...";
+const EMPTY_TAB_MSG = "Oh... please check other tabs for matches, there are no matches here at the moment.";
 
 const FIN_SET = new Set(['FT','AET','PEN','Pen.']);
 const UPC_SET = new Set(['NS','TBD']);
@@ -309,6 +319,32 @@ const generateAnalysis = m => {
     return `Model favours ${subject}${pct ? ` (${pct}% confidence)` : ''}.${score}${advice}`;
 };
 
+/* ── Virtualization: lazy-mount cards via IntersectionObserver ──
+   Each LazySlot reserves vertical space (min-height) until the slot scrolls
+   within 800px of the viewport. Off-screen cards are unmounted entirely,
+   keeping the React tree tiny even when hundreds of matches are loaded. */
+const LazySlot = ({ children, minHeight = 175 }) => {
+    const ref = useRef(null);
+    const [visible, setVisible] = useState(false);
+
+    useEffect(() => {
+        const el = ref.current;
+        if (!el) return;
+        const observer = new IntersectionObserver(
+            ([entry]) => setVisible(entry.isIntersecting),
+            { rootMargin: '800px 0px' }
+        );
+        observer.observe(el);
+        return () => observer.disconnect();
+    }, []);
+
+    return (
+        <div ref={ref} className="lazy-slot" style={{ minHeight }}>
+            {visible ? children : null}
+        </div>
+    );
+};
+
 const IcoHome    = () => <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>;
 const IcoBell    = () => <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>;
 const IcoHeart   = ({on}) => <svg width="17" height="17" viewBox="0 0 24 24" fill={on?"currentColor":"none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>;
@@ -372,6 +408,13 @@ const EmptyState = ({ title, sub }) => (
     <div className="empty-state">
         <div className="empty-state-title">{title}</div>
         {sub && <div className="empty-state-sub">{sub}</div>}
+    </div>
+);
+
+const TabLoading = () => (
+    <div className="tab-loading">
+        <div className="tab-loading-spin"/>
+        <div className="tab-loading-msg">{LOADING_MSG}</div>
     </div>
 );
 
@@ -611,7 +654,6 @@ function App() {
 
     const [homeTab,        setHomeTab]        = useState('Upcoming');
     const [tabLoading,     setTabLoading]     = useState(false);
-    const [loadingMsgIdx,  setLoadingMsgIdx]  = useState(0);
 
     useEffect(() => {
         try { localStorage.setItem('magic-favs', JSON.stringify(favs)); } catch {}
@@ -649,7 +691,7 @@ function App() {
         }
     }, []);
 
-    /* Initial load + auto-refresh every REFRESH_MS (10 min to match the backend scrape). */
+    /* Initial load + auto-refresh every 20 minutes. */
     useEffect(() => {
         const t  = setTimeout(() => setSplash(false), 3000);
         load(false);
@@ -657,20 +699,17 @@ function App() {
         return () => { clearTimeout(t); clearInterval(iv); };
     }, [load]);
 
+    /* Spinner never shows for more than TAB_LOADING_MAX_MS. */
     useEffect(() => {
         if (!tabLoading) return;
-        const cycle = setInterval(() => {
-            setLoadingMsgIdx(i => (i + 1) % LOADING_MSGS.length);
-        }, 1500);
-        const done = setTimeout(() => setTabLoading(false), 6000);
-        return () => { clearInterval(cycle); clearTimeout(done); };
+        const done = setTimeout(() => setTabLoading(false), TAB_LOADING_MAX_MS);
+        return () => clearTimeout(done);
     }, [tabLoading]);
 
-    const handleHomeTabClick = useCallback((t) => {
+    const handleHomeTabClick = useCallback(async (t) => {
         setHomeTab(t);
         setTabLoading(true);
-        setLoadingMsgIdx(0);
-        load(true);
+        try { await load(true); } finally { setTabLoading(false); }
     }, [load]);
 
     const openDetail = useCallback(m => setDetailMatch(m), []);
@@ -685,32 +724,30 @@ function App() {
     const savedMatches    = useMemo(() => matches.filter(m => favs.includes(fid(m))),        [matches, favs]);
     const alertMatches    = useMemo(() => matches.filter(m => { const n=parseInt(m.status); return !isNaN(n)&&n>=75&&n<120; }), [matches]);
 
-    const card = m => (
-        <MatchCard
-            key={fid(m) || `${m.home?.name}${m.away?.name}${m.status}`}
-            match={m}
-            pred={matchToPred(m)}
-            onOpen={openDetail}
-            onToggleFav={toggleFav}
-            isFav={favs.includes(fid(m))}
-        />
-    );
+    /* Lazy-mounted card — keeps DOM tiny even with hundreds of matches. */
+    const renderCard = m => {
+        const k = fid(m) || `${m.home?.name}${m.away?.name}${m.status}`;
+        return (
+            <LazySlot key={k} minHeight={175}>
+                <MatchCard
+                    match={m}
+                    pred={matchToPred(m)}
+                    onOpen={openDetail}
+                    onToggleFav={toggleFav}
+                    isFav={favs.includes(fid(m))}
+                />
+            </LazySlot>
+        );
+    };
 
     const renderHomeBody = () => {
-        if (tabLoading) {
-            return (
-                <div className="tab-loading">
-                    <div className="tab-loading-spin"/>
-                    <div className="tab-loading-msg">{LOADING_MSGS[loadingMsgIdx]}</div>
-                </div>
-            );
-        }
+        if (tabLoading) return <TabLoading/>;
         if (loading) return [1,2,3].map(i => <Skel key={i}/>);
         const active = homeTab === 'Live'    ? liveMatches
                      : homeTab === 'Past'    ? pastMatches
                      :                          upcomingMatches;
         if (active.length === 0) return <EmptyState title={EMPTY_TAB_MSG}/>;
-        return active.map(m => card(m));
+        return active.map(renderCard);
     };
 
     const today  = new Date().toLocaleDateString('en-US', {weekday:'long',month:'long',day:'numeric'});
@@ -817,8 +854,8 @@ function App() {
                             <p className="page-sub">Matches past the 75 minute mark</p>
                         </div>
                         {alertMatches.length > 0
-                            ? alertMatches.map(m => card(m))
-                            : <EmptyState title="No alerts right now" sub="Matches in the 75th minute or later appear here."/>
+                            ? alertMatches.map(renderCard)
+                            : <EmptyState title={EMPTY_TAB_MSG}/>
                         }
                         <Social/>
                     </div>
@@ -831,7 +868,7 @@ function App() {
                             <p className="page-sub">Your saved matches</p>
                         </div>
                         {savedMatches.length > 0
-                            ? savedMatches.map(m => card(m))
+                            ? savedMatches.map(renderCard)
                             : (
                                 <div style={{paddingTop:56,textAlign:'center'}}>
                                     <div style={{fontSize:36,color:'var(--sep2)',marginBottom:10}}>♡</div>
@@ -861,7 +898,7 @@ function App() {
                             </a>
                         </div>
                         <div style={{textAlign:'center',paddingTop:8}}>
-                            <div style={{fontSize:12,color:'var(--t3)'}}>Magic Analysis · v2.5</div>
+                            <div style={{fontSize:12,color:'var(--t3)'}}>Magic Analysis · v2.7</div>
                         </div>
                         <Social/>
                     </div>
