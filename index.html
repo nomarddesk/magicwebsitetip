@@ -32,7 +32,6 @@
         body { font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue',Arial,sans-serif; background:var(--bg); color:var(--t1); overflow-x:hidden; }
         ::-webkit-scrollbar { display:none; } * { scrollbar-width:none; }
 
-        /* Header — premium dark-navy matching the Magic Betting Tips logo */
         .hdr { position:sticky; top:0; z-index:100; height:56px; background:var(--navy); color:#fff; border-bottom:0.5px solid rgba(255,255,255,0.06); display:flex; align-items:center; padding:0 16px; }
         .hdr-btn { width:34px; height:34px; border-radius:50%; background:none; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; color:#fff; transition:background .15s; flex-shrink:0; }
         .hdr-btn:hover { background:rgba(255,255,255,0.10); }
@@ -94,7 +93,7 @@
         .fav.on { color:var(--live); }
 
         .card-logo-col { display:flex; flex-direction:column; gap:5px; justify-content:center; width:28px; flex-shrink:0; }
-        .team-logo-sm { width:24px; height:24px; object-fit:contain; border-radius:4px; }
+        .team-logo-img { width:24px; height:24px; object-fit:contain; border-radius:4px; background:#fff; }
         .team-logo-ph { width:24px; height:24px; background:var(--bg); border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:10px; color:var(--t3); font-weight:700; }
         .card-teams { flex:1; display:flex; flex-direction:column; gap:5px; min-width:0; }
         .team-nm { font-size:15px; font-weight:600; letter-spacing:-.2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
@@ -143,6 +142,7 @@
         .detail-league { font-size:11px; font-weight:600; color:var(--t3); text-transform:uppercase; letter-spacing:.5px; margin-bottom:6px; }
         .detail-teams { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; gap:10px; }
         .detail-team { flex:1; text-align:center; }
+        .detail-logo-img { width:64px; height:64px; object-fit:contain; border-radius:16px; margin:0 auto 8px; display:block; background:#fff; }
         .detail-logo-ph { width:64px; height:64px; background:var(--bg); border-radius:16px; margin:0 auto 8px; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:700; color:var(--t2); }
         .detail-team-nm { font-size:13px; font-weight:600; letter-spacing:-.1px; }
         .detail-vs { font-size:12px; color:var(--t3); font-weight:600; flex-shrink:0; }
@@ -228,7 +228,6 @@
         .empty-state-title { font-size:15px; font-weight:500; color:var(--t2); line-height:1.65; max-width:320px; margin:0 auto; }
         .empty-state-sub { font-size:12px; color:var(--t3); margin-top:6px; }
 
-        /* Wrapper for lazy-mounted cards — reserves height before mount */
         .lazy-slot { min-height:175px; }
     </style>
 </head>
@@ -238,8 +237,8 @@
 const { useState, useEffect, useMemo, useCallback, useRef } = React;
 
 const BACKEND_URL = "https://sportprediction-production.up.railway.app";
-const REFRESH_MS  = 20 * 60 * 1000;             // auto-refresh every 20 minutes
-const TAB_LOADING_MAX_MS = 3000;                 // spinner can show for at most 3 seconds
+const REFRESH_MS  = 20 * 60 * 1000;
+const TAB_LOADING_MAX_MS = 3000;
 const LOADING_MSG = "Just 1 sec...";
 const EMPTY_TAB_MSG = "Oh... please check other tabs for matches, there are no matches here at the moment.";
 
@@ -319,14 +318,9 @@ const generateAnalysis = m => {
     return `Model favours ${subject}${pct ? ` (${pct}% confidence)` : ''}.${score}${advice}`;
 };
 
-/* ── Virtualization: lazy-mount cards via IntersectionObserver ──
-   Each LazySlot reserves vertical space (min-height) until the slot scrolls
-   within 800px of the viewport. Off-screen cards are unmounted entirely,
-   keeping the React tree tiny even when hundreds of matches are loaded. */
 const LazySlot = ({ children, minHeight = 175 }) => {
     const ref = useRef(null);
     const [visible, setVisible] = useState(false);
-
     useEffect(() => {
         const el = ref.current;
         if (!el) return;
@@ -337,7 +331,6 @@ const LazySlot = ({ children, minHeight = 175 }) => {
         observer.observe(el);
         return () => observer.disconnect();
     }, []);
-
     return (
         <div ref={ref} className="lazy-slot" style={{ minHeight }}>
             {visible ? children : null}
@@ -379,8 +372,21 @@ const MagicLogo = ({size=26}) => {
     );
 };
 
-const TeamLogoPh = ({ name, big=false }) => {
-    const initials = (name||'?').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+/* Real team logo with graceful fallback to initials when the image fails to load. */
+const TeamLogo = ({ name, url, big = false }) => {
+    const [err, setErr] = useState(false);
+    if (url && !err) {
+        return (
+            <img
+                src={url}
+                alt={name || ''}
+                className={big ? 'detail-logo-img' : 'team-logo-img'}
+                onError={() => setErr(true)}
+                loading="lazy"
+            />
+        );
+    }
+    const initials = (name || '?').split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
     if (big) return <div className="detail-logo-ph">{initials}</div>;
     return <div className="team-logo-ph">{initials}</div>;
 };
@@ -422,7 +428,7 @@ const SocialHome = () => (
     <div className="social-home">
         <div className="social-home-lbl">Join Our Community</div>
         <div className="social-home-row">
-            <a href="https://t.me/footballnisight" target="_blank" rel="noopener noreferrer" className="social-home-item" title="Telegram">
+            <a href="https://t.me/footballinsight01" target="_blank" rel="noopener noreferrer" className="social-home-item" title="Telegram">
                 <div className="social-home-ico"><IcoTGLg/></div>
                 <span className="social-home-nm">Telegram</span>
             </a>
@@ -438,7 +444,7 @@ const Social = () => (
     <div className="social">
         <div className="social-lbl">Follow Us</div>
         <div className="social-row">
-            <a href="https://t.me/footballnisight" target="_blank" rel="noopener noreferrer" className="social-ico" title="Telegram"><IcoTG/></a>
+            <a href="https://t.me/footballinsight01" target="_blank" rel="noopener noreferrer" className="social-ico" title="Telegram"><IcoTG/></a>
             <a href="https://x.com/tipsmagic30849" target="_blank" rel="noopener noreferrer" className="social-ico" title="X / Twitter"><IcoX/></a>
             <a href="https://www.threads.com/@magicbetting" target="_blank" rel="noopener noreferrer" className="social-ico" title="Threads"><IcoThreads/></a>
             <a href="https://www.instagram.com/magicbetting" target="_blank" rel="noopener noreferrer" className="social-ico" title="Instagram"><IcoIG/></a>
@@ -471,8 +477,8 @@ const MatchCard = ({ match, onOpen, onToggleFav, isFav, pred=null }) => {
                 <div className="card-row">
                     <div className="card-left">
                         <div className="card-logo-col">
-                            <TeamLogoPh name={match.home?.name}/>
-                            <TeamLogoPh name={match.away?.name}/>
+                            <TeamLogo name={match.home?.name} url={match.home?.logo}/>
+                            <TeamLogo name={match.away?.name} url={match.away?.logo}/>
                         </div>
                         <div className="card-teams">
                             <span className="team-nm">{match.home?.name||'—'}</span>
@@ -557,12 +563,12 @@ const DetailSheet = ({ match, pred, onClose }) => {
                 </div>
                 <div className="detail-teams">
                     <div className="detail-team">
-                        <TeamLogoPh name={match.home?.name} big/>
+                        <TeamLogo name={match.home?.name} url={match.home?.logo} big/>
                         <div className="detail-team-nm">{match.home?.name}</div>
                     </div>
                     <div className="detail-vs">vs</div>
                     <div className="detail-team">
-                        <TeamLogoPh name={match.away?.name} big/>
+                        <TeamLogo name={match.away?.name} url={match.away?.logo} big/>
                         <div className="detail-team-nm">{match.away?.name}</div>
                     </div>
                 </div>
@@ -691,7 +697,6 @@ function App() {
         }
     }, []);
 
-    /* Initial load + auto-refresh every 20 minutes. */
     useEffect(() => {
         const t  = setTimeout(() => setSplash(false), 3000);
         load(false);
@@ -699,7 +704,6 @@ function App() {
         return () => { clearTimeout(t); clearInterval(iv); };
     }, [load]);
 
-    /* Spinner never shows for more than TAB_LOADING_MAX_MS. */
     useEffect(() => {
         if (!tabLoading) return;
         const done = setTimeout(() => setTabLoading(false), TAB_LOADING_MAX_MS);
@@ -724,7 +728,6 @@ function App() {
     const savedMatches    = useMemo(() => matches.filter(m => favs.includes(fid(m))),        [matches, favs]);
     const alertMatches    = useMemo(() => matches.filter(m => { const n=parseInt(m.status); return !isNaN(n)&&n>=75&&n<120; }), [matches]);
 
-    /* Lazy-mounted card — keeps DOM tiny even with hundreds of matches. */
     const renderCard = m => {
         const k = fid(m) || `${m.home?.name}${m.away?.name}${m.status}`;
         return (
@@ -898,7 +901,7 @@ function App() {
                             </a>
                         </div>
                         <div style={{textAlign:'center',paddingTop:8}}>
-                            <div style={{fontSize:12,color:'var(--t3)'}}>Magic Analysis · v2.7</div>
+                            <div style={{fontSize:12,color:'var(--t3)'}}>Magic Analysis · v2.8</div>
                         </div>
                         <Social/>
                     </div>
