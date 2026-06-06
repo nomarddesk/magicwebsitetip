@@ -23,7 +23,7 @@
             --bg:#F5F5F7; --surface:#FFFFFF;
             --t1:#1D1D1F; --t2:#6E6E73; --t3:#86868B;
             --sep:rgba(0,0,0,0.08); --sep2:rgba(0,0,0,0.14);
-            --live:#FF3B30; --blue:#007AFF; --gold:#FF9500;
+            --live:#FF3B30; --blue:#007AFF; --gold:#FF9500; --green:#34C759;
             --navy:#0B1929;
             --r:16px; --r2:24px;
             --card-shadow:0 1px 1px rgba(0,0,0,0.04),0 2px 8px rgba(0,0,0,0.05),0 0 0 0.5px rgba(0,0,0,0.05);
@@ -149,6 +149,7 @@
         .detail-score-box { background:var(--t1); border-radius:var(--r); padding:18px 20px; margin-bottom:14px; text-align:center; }
         .detail-score-big { font-size:40px; font-weight:700; color:#fff; letter-spacing:-1px; line-height:1; margin-bottom:6px; }
         .detail-score-sub { font-size:12px; color:rgba(255,255,255,.5); font-weight:500; }
+        .detail-live-min { font-size:14px; font-weight:800; color:var(--live); margin-top:4px; font-variant-numeric:tabular-nums; letter-spacing:.5px; }
         .detail-status-row { display:flex; justify-content:center; margin-bottom:16px; }
         .detail-info-grid { display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-bottom:16px; }
         .detail-info-cell { background:var(--bg); border-radius:12px; padding:12px; text-align:center; }
@@ -229,6 +230,69 @@
         .empty-state-sub { font-size:12px; color:var(--t3); margin-top:6px; }
 
         .lazy-slot { min-height:175px; }
+
+        /* ===== NEW: Live timer pill (inside card status badge & detail) ===== */
+        .live-pill-min { font-weight:800; font-variant-numeric:tabular-nums; letter-spacing:.4px; }
+
+        /* ===== NEW: Smartlink banner inside detail sheet ===== */
+        .smartlink-banner {
+            display:block; background:linear-gradient(135deg,#FF9500 0%,#FF3B30 100%);
+            color:#fff; text-align:center; padding:13px 16px; border-radius:14px;
+            text-decoration:none; margin-bottom:16px; font-size:14px; font-weight:700;
+            letter-spacing:-.1px; box-shadow:0 4px 16px rgba(255,149,0,.28);
+            transition:transform .15s, box-shadow .15s;
+        }
+        .smartlink-banner:hover { transform:translateY(-1px); box-shadow:0 6px 22px rgba(255,149,0,.4); }
+        .smartlink-banner small {
+            display:block; font-size:9px; opacity:.85; letter-spacing:.5px;
+            text-transform:uppercase; margin-bottom:3px; font-weight:600;
+        }
+
+        /* ===== NEW: Last Matches / H2H / Form sections ===== */
+        .detail-section-title {
+            font-size:11px; font-weight:700; color:var(--t3);
+            text-transform:uppercase; letter-spacing:.5px;
+            margin:20px 0 10px; padding:0 2px;
+        }
+        .lm-row {
+            display:grid; grid-template-columns:28px 1fr auto auto; gap:10px;
+            align-items:center; background:var(--bg); border-radius:12px;
+            padding:10px 12px; margin-bottom:6px;
+        }
+        .result-chip {
+            width:26px; height:26px; border-radius:50%;
+            display:flex; align-items:center; justify-content:center;
+            font-weight:800; font-size:11px; color:#fff;
+        }
+        .result-W { background:var(--green); }
+        .result-D { background:var(--t3); }
+        .result-L { background:var(--live); }
+        .lm-vs { font-size:13px; font-weight:600; line-height:1.2; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        .lm-comp { font-size:10px; color:var(--t3); margin-top:1px; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        .lm-score { font-size:14px; font-weight:700; font-variant-numeric:tabular-nums; }
+        .lm-date { font-size:11px; color:var(--t3); }
+        .detail-empty {
+            background:var(--bg); border-radius:12px; padding:24px 16px;
+            text-align:center; font-size:13px; color:var(--t3); margin-bottom:12px;
+        }
+        .detail-empty .ico { font-size:28px; opacity:.5; margin-bottom:6px; }
+        .h2h-stat-row {
+            display:grid; grid-template-columns:repeat(5,1fr); gap:6px; margin-bottom:14px;
+        }
+        .h2h-stat-card {
+            background:var(--bg); border-radius:12px; padding:10px 6px; text-align:center;
+        }
+        .h2h-stat-v { font-size:18px; font-weight:800; letter-spacing:-.3px; font-variant-numeric:tabular-nums; }
+        .h2h-stat-l { font-size:9px; font-weight:600; color:var(--t3); text-transform:uppercase; letter-spacing:.3px; margin-top:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        .detail-note {
+            background:#FFFBEB; border-left:3px solid var(--gold);
+            border-radius:8px; padding:10px 12px; font-size:12px;
+            color:#92400E; line-height:1.5; margin:12px 0;
+        }
+        .detail-loading {
+            padding:30px 16px; text-align:center; color:var(--t3); font-size:13px;
+            display:flex; flex-direction:column; align-items:center; gap:10px;
+        }
     </style>
 </head>
 <body>
@@ -238,9 +302,15 @@ const { useState, useEffect, useMemo, useCallback, useRef } = React;
 
 const BACKEND_URL = "https://sportprediction-production.up.railway.app";
 const REFRESH_MS  = 20 * 60 * 1000;
+const TIMER_TICK_MS = 1000;
 const TAB_LOADING_MAX_MS = 3000;
 const LOADING_MSG = "Just 1 sec...";
 const EMPTY_TAB_MSG = "Oh... please check other tabs for matches, there are no matches here at the moment.";
+
+/* === Monetization (detail sheet only) === */
+const SMARTLINK_URL = "https://www.effectivecpmnetwork.com/mmgwyksvk?key=36e68235e91415ba8fdb9b60cb69ed02";
+const POPUNDER_SRC  = "https://pl29653100.effectivecpmnetwork.com/cb/77/c3/cb77c374ec87eb65c8a404f23d228467.js";
+const POPUNDER_SESSION_KEY = "mbt_popunder_loaded";
 
 const FIN_SET = new Set(['FT','AET','PEN','Pen.']);
 const UPC_SET = new Set(['NS','TBD']);
@@ -268,8 +338,46 @@ const statusLabel = s => {
     return s;
 };
 
+/* === LIVE MINUTE EXTRAPOLATION ===
+   Backend stores match.elapsed (number) + match.elapsedAt (ms timestamp of the scrape).
+   Between scrapes we tick the displayed minute forward second-by-second.       */
+const liveMinute = (m) => {
+    if (!m) return '';
+    const raw = String(m.statusRaw || '').toUpperCase();
+    if (['FT','AET','PEN','PEN.'].includes(raw)) return 'FT';
+    if (raw === 'HT' || raw === 'BT') return 'HT';
+    if (m.elapsed == null) return '';
+    const sinceMin = m.elapsedAt ? (Date.now() - m.elapsedAt) / 60000 : 0;
+    let now = m.elapsed + Math.max(0, sinceMin);
+    if (now > 95) now = 95;
+    const whole = Math.floor(now);
+    if (whole <= 45) return `${String(whole).padStart(2,'0')}'`;
+    if (whole <= 50) {
+        const add = whole - 45;
+        return add === 0 ? "45'" : `45+${add}'`;
+    }
+    if (whole <= 60 && (raw === '1H' || raw === '')) return 'HT';
+    if (whole <= 90) return `${String(whole).padStart(2,'0')}'`;
+    const add = whole - 90;
+    return add === 0 ? "90'" : `90+${add}'`;
+};
+
+/* Re-render hook — fires every second while `active` is true. */
+const useTickingNow = (active) => {
+    const [, setTick] = useState(0);
+    useEffect(() => {
+        if (!active) return;
+        const id = setInterval(() => setTick(t => t + 1), TIMER_TICK_MS);
+        return () => clearInterval(id);
+    }, [active]);
+};
+
 const statusBadgeLabel = (m, c) => {
-    if (c === 'live')      return statusLabel(m.status) === 'LIVE' ? 'LIVE' : `LIVE  ${statusLabel(m.status)}`;
+    if (c === 'live') {
+        const min = liveMinute(m);
+        if (min && min !== 'FT') return `LIVE  ${min}`;
+        return 'LIVE';
+    }
     if (c === 'finished')  return 'Full Time';
     if (c === 'upcoming')  return m.time ? `KO ${m.time}` : 'Upcoming';
     if (c === 'cancelled') return statusLabel(m.status) || 'Cancelled';
@@ -372,7 +480,6 @@ const MagicLogo = ({size=26}) => {
     );
 };
 
-/* Real team logo with graceful fallback to initials when the image fails to load. */
 const TeamLogo = ({ name, url, big = false }) => {
     const [err, setErr] = useState(false);
     if (url && !err) {
@@ -461,6 +568,9 @@ const MatchCard = ({ match, onOpen, onToggleFav, isFav, pred=null }) => {
     const badgeClass = c==='live'?'s-live':c==='finished'?'s-fin':c==='upcoming'?'s-upc':'s-canc';
     const leagueTxt  = [match.country, match.leagueName].filter(Boolean).join(' · ');
 
+    // Tick every second so the LIVE minute display advances.
+    useTickingNow(c === 'live');
+
     return (
         <div className={`card${hasManual?' card-premium':''}`} onClick={()=>onOpen(match)}>
             <div className="card-inner">
@@ -540,6 +650,108 @@ const MatchCard = ({ match, onOpen, onToggleFav, isFav, pred=null }) => {
     );
 };
 
+/* === Last Matches section inside the detail sheet ====================== */
+const LastMatchesBlock = ({ teamName, matches }) => {
+    if (!teamName) return null;
+    return (
+        <>
+            <div className="detail-section-title">{teamName} — Last {matches?.length || 0} matches</div>
+            {(!matches || matches.length === 0) ? (
+                <div className="detail-empty">
+                    <div className="ico">📊</div>
+                    No finished matches for this team in our records yet.
+                </div>
+            ) : matches.map((g, i) => (
+                <div className="lm-row" key={i}>
+                    <div className={`result-chip result-${g.result}`}>{g.result}</div>
+                    <div style={{minWidth:0}}>
+                        <div className="lm-vs">{g.isHome ? 'vs' : '@'} {g.opponent}</div>
+                        <div className="lm-comp">{g.competition || '—'}</div>
+                    </div>
+                    <div className="lm-score">{g.score}</div>
+                    <div className="lm-date">{(g.date || '').slice(5)}</div>
+                </div>
+            ))}
+        </>
+    );
+};
+
+/* === H2H section inside the detail sheet =============================== */
+const H2HBlock = ({ details }) => {
+    const list = (details.h2h && details.h2h.matches) || [];
+    const s    = (details.h2h && details.h2h.stats)   || {};
+    const homeName = details.home?.name || '';
+    const awayName = details.away?.name || '';
+    if (list.length === 0) {
+        return (
+            <>
+                <div className="detail-section-title">Head-to-Head</div>
+                <div className="detail-empty">
+                    <div className="ico">🤝</div>
+                    <div style={{fontWeight:600,color:'var(--t2)',marginBottom:4}}>No past meetings on record.</div>
+                    <div style={{fontSize:11,opacity:.85}}>H2H grows as more matches finish — window: last {details.historyDays || 60} days.</div>
+                </div>
+            </>
+        );
+    }
+    return (
+        <>
+            <div className="detail-section-title">Head-to-Head Stats</div>
+            <div className="h2h-stat-row">
+                <div className="h2h-stat-card"><div className="h2h-stat-v">{s.played}</div><div className="h2h-stat-l">Played</div></div>
+                <div className="h2h-stat-card"><div className="h2h-stat-v" style={{color:'var(--green)'}}>{s.homeWins}</div><div className="h2h-stat-l">{homeName.slice(0,7)}</div></div>
+                <div className="h2h-stat-card"><div className="h2h-stat-v" style={{color:'var(--t3)'}}>{s.draws}</div><div className="h2h-stat-l">Draws</div></div>
+                <div className="h2h-stat-card"><div className="h2h-stat-v" style={{color:'var(--blue)'}}>{s.awayWins}</div><div className="h2h-stat-l">{awayName.slice(0,7)}</div></div>
+                <div className="h2h-stat-card"><div className="h2h-stat-v">{s.avgGoals}</div><div className="h2h-stat-l">Goals/M</div></div>
+            </div>
+            <div className="detail-section-title">Past Meetings</div>
+            {list.map((g, i) => (
+                <div className="lm-row" key={i}>
+                    <div className={`result-chip ${g.winner === 'home' ? 'result-W' : g.winner === 'away' ? 'result-L' : 'result-D'}`}>
+                        {g.winner === 'home' ? 'H' : g.winner === 'away' ? 'A' : 'D'}
+                    </div>
+                    <div style={{minWidth:0}}>
+                        <div className="lm-vs">{g.homeName} vs {g.awayName}</div>
+                        <div className="lm-comp">{g.competition || '—'}</div>
+                    </div>
+                    <div className="lm-score">{g.score}</div>
+                    <div className="lm-date">{(g.date || '').slice(5)}</div>
+                </div>
+            ))}
+        </>
+    );
+};
+
+/* === Form summary section ============================================== */
+const FormBlock = ({ details }) => {
+    const hf = details.home?.form;
+    const af = details.away?.form;
+    if (!hf && !af) return null;
+    return (
+        <>
+            <div className="detail-section-title">Aggregated Form (Recent Season)</div>
+            <div className="detail-info-grid">
+                <div className="detail-info-cell">
+                    <div className="detail-info-val">{hf ? hf.avgScored : '—'}</div>
+                    <div className="detail-info-lbl">{details.home?.name?.slice(0,12)} avg scored</div>
+                </div>
+                <div className="detail-info-cell">
+                    <div className="detail-info-val">{hf ? hf.avgConceded : '—'}</div>
+                    <div className="detail-info-lbl">{details.home?.name?.slice(0,12)} avg conceded</div>
+                </div>
+                <div className="detail-info-cell">
+                    <div className="detail-info-val">{af ? af.avgScored : '—'}</div>
+                    <div className="detail-info-lbl">{details.away?.name?.slice(0,12)} avg scored</div>
+                </div>
+                <div className="detail-info-cell">
+                    <div className="detail-info-val">{af ? af.avgConceded : '—'}</div>
+                    <div className="detail-info-lbl">{details.away?.name?.slice(0,12)} avg conceded</div>
+                </div>
+            </div>
+        </>
+    );
+};
+
 const DetailSheet = ({ match, pred, onClose }) => {
     const c          = cat(match.status);
     const g          = getGoals(match);
@@ -548,10 +760,49 @@ const DetailSheet = ({ match, pred, onClose }) => {
     const leagueTxt  = [match.country, match.leagueName].filter(Boolean).join(' · ') || (match.leagueName || '');
     const analysis   = generateAnalysis(match);
 
+    // Live timer ticks every second while sheet is open
+    useTickingNow(c === 'live');
+    const liveMin = c === 'live' ? liveMinute(match) : '';
+
+    // Fetch full Last Matches + H2H + Form
+    const [details, setDetails]       = useState(null);
+    const [detailsErr, setDetailsErr] = useState(null);
+    const [detailsLoading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const id = fid(match);
+        if (!id) { setLoading(false); return; }
+        setLoading(true); setDetails(null); setDetailsErr(null);
+        fetch(`${BACKEND_URL}/api/match/${encodeURIComponent(id)}/details`)
+            .then(r => r.json())
+            .then(d => { if (d.error) setDetailsErr(d.error); else setDetails(d); })
+            .catch(e => setDetailsErr(e.message))
+            .finally(() => setLoading(false));
+    }, [match]);
+
+    // Inject popunder script ONCE per session (only when a detail sheet opens).
+    useEffect(() => {
+        try {
+            if (sessionStorage.getItem(POPUNDER_SESSION_KEY)) return;
+            sessionStorage.setItem(POPUNDER_SESSION_KEY, '1');
+            const s = document.createElement('script');
+            s.src   = POPUNDER_SRC;
+            s.async = true;
+            document.body.appendChild(s);
+        } catch (e) { /* sessionStorage may be unavailable */ }
+    }, []);
+
     return (
         <div className="overlay" onClick={onClose}>
             <div className="sheet" onClick={e=>e.stopPropagation()}>
                 <div className="handle"/>
+
+                {/* === Smartlink banner (detail sheet only) === */}
+                <a href={SMARTLINK_URL} target="_blank" rel="noopener noreferrer nofollow" className="smartlink-banner">
+                    <small>Sponsored</small>
+                    🎁 Boost Your Bets — Tap to Claim Today's Top Bonus 🎁
+                </a>
+
                 {hasManual && (
                     <div className="manual-pred-box">
                         <div className="manual-pred-label"><IcoStar/> Official Professional Analysis</div>
@@ -576,6 +827,8 @@ const DetailSheet = ({ match, pred, onClose }) => {
                     <div className="detail-score-big">{g ? `${g.h}  —  ${g.a}` : '—  vs  —'}</div>
                     {c==='upcoming' && match.time && <div className="detail-score-sub">Kick-off at {match.time}</div>}
                     {c==='upcoming' && !match.time && <div className="detail-score-sub">Match not started yet</div>}
+                    {c==='live' && liveMin && <div className="detail-live-min">● {liveMin}</div>}
+                    {match.htScore && <div className="detail-score-sub" style={{marginTop:4}}>HT: {match.htScore}</div>}
                 </div>
                 <div className="detail-status-row">
                     <span className={`s-badge ${badgeClass}`} style={{fontSize:12,padding:'5px 14px'}}>
@@ -635,7 +888,31 @@ const DetailSheet = ({ match, pred, onClose }) => {
                 {!hasManual && !pred && (
                     <div style={{background:'var(--bg)',borderRadius:'var(--r)',padding:'13px 14px',marginBottom:14,textAlign:'center',fontSize:12,color:'var(--t3)'}}>Prediction not available.</div>
                 )}
-                <button className="btn-secondary" onClick={onClose}>Close</button>
+
+                {/* === NEW: Last Matches + H2H + Form (lazy-loaded) === */}
+                {detailsLoading && (
+                    <div className="detail-loading">
+                        <div className="spin-sm"/>
+                        <div>Loading match history…</div>
+                    </div>
+                )}
+                {detailsErr && (
+                    <div className="detail-empty">
+                        <div className="ico">⚠️</div>
+                        Could not load history: {detailsErr}
+                    </div>
+                )}
+                {details && (
+                    <>
+                        <LastMatchesBlock teamName={details.home?.name} matches={details.home?.lastMatches}/>
+                        <LastMatchesBlock teamName={details.away?.name} matches={details.away?.lastMatches}/>
+                        <H2HBlock details={details}/>
+                        <FormBlock details={details}/>
+                        {details.note && <div className="detail-note">ℹ️ {details.note}</div>}
+                    </>
+                )}
+
+                <button className="btn-secondary" style={{marginTop:14}} onClick={onClose}>Close</button>
             </div>
         </div>
     );
@@ -726,7 +1003,7 @@ function App() {
     const upcomingMatches = useMemo(() => matches.filter(m => cat(m.status) === 'upcoming'), [matches]);
     const pastMatches     = useMemo(() => matches.filter(m => cat(m.status) === 'finished' && getGoals(m)), [matches]);
     const savedMatches    = useMemo(() => matches.filter(m => favs.includes(fid(m))),        [matches, favs]);
-    const alertMatches    = useMemo(() => matches.filter(m => { const n=parseInt(m.status); return !isNaN(n)&&n>=75&&n<120; }), [matches]);
+    const alertMatches    = useMemo(() => matches.filter(m => { const n=parseInt(m.statusRaw||m.status); return !isNaN(n)&&n>=75&&n<120; }), [matches]);
 
     const renderCard = m => {
         const k = fid(m) || `${m.home?.name}${m.away?.name}${m.status}`;
@@ -901,7 +1178,7 @@ function App() {
                             </a>
                         </div>
                         <div style={{textAlign:'center',paddingTop:8}}>
-                            <div style={{fontSize:12,color:'var(--t3)'}}>Magic Analysis · v2.8</div>
+                            <div style={{fontSize:12,color:'var(--t3)'}}>Magic Analysis · v2.9</div>
                         </div>
                         <Social/>
                     </div>
