@@ -307,10 +307,11 @@ const TAB_LOADING_MAX_MS = 3000;
 const LOADING_MSG = "Just 1 sec...";
 const EMPTY_TAB_MSG = "Oh... please check other tabs for matches, there are no matches here at the moment.";
 
-/* === Monetization (detail sheet only) === */
+/* === Monetization (detail sheet only) ===
+   Smartlink banner only — popunder removed at user request because it was
+   redirecting visitors off the site. The banner is a normal link opened in a
+   NEW tab, so users stay on Magic Analysis. */
 const SMARTLINK_URL = "https://www.effectivecpmnetwork.com/mmgwyksvk?key=36e68235e91415ba8fdb9b60cb69ed02";
-const POPUNDER_SRC  = "https://pl29653100.effectivecpmnetwork.com/cb/77/c3/cb77c374ec87eb65c8a404f23d228467.js";
-const POPUNDER_SESSION_KEY = "mbt_popunder_loaded";
 
 const FIN_SET = new Set(['FT','AET','PEN','Pen.']);
 const UPC_SET = new Set(['NS','TBD']);
@@ -779,18 +780,6 @@ const DetailSheet = ({ match, pred, onClose }) => {
             .catch(e => setDetailsErr(e.message))
             .finally(() => setLoading(false));
     }, [match]);
-
-    // Inject popunder script ONCE per session (only when a detail sheet opens).
-    useEffect(() => {
-        try {
-            if (sessionStorage.getItem(POPUNDER_SESSION_KEY)) return;
-            sessionStorage.setItem(POPUNDER_SESSION_KEY, '1');
-            const s = document.createElement('script');
-            s.src   = POPUNDER_SRC;
-            s.async = true;
-            document.body.appendChild(s);
-        } catch (e) { /* sessionStorage may be unavailable */ }
-    }, []);
 
     return (
         <div className="overlay" onClick={onClose}>
