@@ -231,10 +231,10 @@
 
         .lazy-slot { min-height:175px; }
 
-        /* ===== NEW: Live timer pill (inside card status badge & detail) ===== */
+        /* ===== Live timer pill (inside card status badge & detail) ===== */
         .live-pill-min { font-weight:800; font-variant-numeric:tabular-nums; letter-spacing:.4px; }
 
-        /* ===== NEW: Smartlink banner inside detail sheet ===== */
+        /* ===== Smartlink banner inside detail sheet ===== */
         .smartlink-banner {
             display:block; background:linear-gradient(135deg,#FF9500 0%,#FF3B30 100%);
             color:#fff; text-align:center; padding:13px 16px; border-radius:14px;
@@ -248,7 +248,7 @@
             text-transform:uppercase; margin-bottom:3px; font-weight:600;
         }
 
-        /* ===== NEW: Last Matches / H2H / Form sections ===== */
+        /* ===== Last Matches / H2H / Form sections ===== */
         .detail-section-title {
             font-size:11px; font-weight:700; color:var(--t3);
             text-transform:uppercase; letter-spacing:.5px;
@@ -878,7 +878,7 @@ const DetailSheet = ({ match, pred, onClose }) => {
                     <div style={{background:'var(--bg)',borderRadius:'var(--r)',padding:'13px 14px',marginBottom:14,textAlign:'center',fontSize:12,color:'var(--t3)'}}>Prediction not available.</div>
                 )}
 
-                {/* === NEW: Last Matches + H2H + Form (lazy-loaded) === */}
+                {/* === Last Matches + H2H + Form (lazy-loaded) === */}
                 {detailsLoading && (
                     <div className="detail-loading">
                         <div className="spin-sm"/>
