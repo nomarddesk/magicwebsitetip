@@ -231,10 +231,8 @@
 
         .lazy-slot { min-height:175px; }
 
-        /* ===== Live timer pill (inside card status badge & detail) ===== */
         .live-pill-min { font-weight:800; font-variant-numeric:tabular-nums; letter-spacing:.4px; }
 
-        /* ===== Smartlink banner inside detail sheet ===== */
         .smartlink-banner {
             display:block; background:linear-gradient(135deg,#FF9500 0%,#FF3B30 100%);
             color:#fff; text-align:center; padding:13px 16px; border-radius:14px;
@@ -248,22 +246,9 @@
             text-transform:uppercase; margin-bottom:3px; font-weight:600;
         }
 
-        /* ===== Last Matches / H2H / Form sections ===== */
-        .detail-section-title {
-            font-size:11px; font-weight:700; color:var(--t3);
-            text-transform:uppercase; letter-spacing:.5px;
-            margin:20px 0 10px; padding:0 2px;
-        }
-        .lm-row {
-            display:grid; grid-template-columns:28px 1fr auto auto; gap:10px;
-            align-items:center; background:var(--bg); border-radius:12px;
-            padding:10px 12px; margin-bottom:6px;
-        }
-        .result-chip {
-            width:26px; height:26px; border-radius:50%;
-            display:flex; align-items:center; justify-content:center;
-            font-weight:800; font-size:11px; color:#fff;
-        }
+        .detail-section-title { font-size:11px; font-weight:700; color:var(--t3); text-transform:uppercase; letter-spacing:.5px; margin:20px 0 10px; padding:0 2px; }
+        .lm-row { display:grid; grid-template-columns:28px 1fr auto auto; gap:10px; align-items:center; background:var(--bg); border-radius:12px; padding:10px 12px; margin-bottom:6px; }
+        .result-chip { width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:11px; color:#fff; }
         .result-W { background:var(--green); }
         .result-D { background:var(--t3); }
         .result-L { background:var(--live); }
@@ -271,28 +256,34 @@
         .lm-comp { font-size:10px; color:var(--t3); margin-top:1px; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
         .lm-score { font-size:14px; font-weight:700; font-variant-numeric:tabular-nums; }
         .lm-date { font-size:11px; color:var(--t3); }
-        .detail-empty {
-            background:var(--bg); border-radius:12px; padding:24px 16px;
-            text-align:center; font-size:13px; color:var(--t3); margin-bottom:12px;
-        }
+        .detail-empty { background:var(--bg); border-radius:12px; padding:24px 16px; text-align:center; font-size:13px; color:var(--t3); margin-bottom:12px; }
         .detail-empty .ico { font-size:28px; opacity:.5; margin-bottom:6px; }
-        .h2h-stat-row {
-            display:grid; grid-template-columns:repeat(5,1fr); gap:6px; margin-bottom:14px;
-        }
-        .h2h-stat-card {
-            background:var(--bg); border-radius:12px; padding:10px 6px; text-align:center;
-        }
+        .h2h-stat-row { display:grid; grid-template-columns:repeat(5,1fr); gap:6px; margin-bottom:14px; }
+        .h2h-stat-card { background:var(--bg); border-radius:12px; padding:10px 6px; text-align:center; }
         .h2h-stat-v { font-size:18px; font-weight:800; letter-spacing:-.3px; font-variant-numeric:tabular-nums; }
         .h2h-stat-l { font-size:9px; font-weight:600; color:var(--t3); text-transform:uppercase; letter-spacing:.3px; margin-top:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-        .detail-note {
-            background:#FFFBEB; border-left:3px solid var(--gold);
-            border-radius:8px; padding:10px 12px; font-size:12px;
-            color:#92400E; line-height:1.5; margin:12px 0;
-        }
-        .detail-loading {
-            padding:30px 16px; text-align:center; color:var(--t3); font-size:13px;
-            display:flex; flex-direction:column; align-items:center; gap:10px;
-        }
+        .detail-note { background:#FFFBEB; border-left:3px solid var(--gold); border-radius:8px; padding:10px 12px; font-size:12px; color:#92400E; line-height:1.5; margin:12px 0; }
+        .detail-loading { padding:30px 16px; text-align:center; color:var(--t3); font-size:13px; display:flex; flex-direction:column; align-items:center; gap:10px; }
+
+        /* ===== NEW: H2H Unlock CTA (Smartlink-monetized button) ===== */
+        .unlock-card { background:linear-gradient(135deg,#1D1D1F 0%,#2C2C2E 100%); border-radius:16px; padding:18px 16px; margin:22px 0 14px; text-align:center; position:relative; overflow:hidden; border:1px solid rgba(255,149,0,.15); }
+        .unlock-card::before { content:''; position:absolute; top:-30%; right:-20%; width:160px; height:160px; background:radial-gradient(circle,rgba(255,149,0,.18) 0%,transparent 70%); pointer-events:none; }
+        .unlock-icon { font-size:32px; margin-bottom:6px; }
+        .unlock-title { color:#fff; font-size:17px; font-weight:700; letter-spacing:-.2px; margin-bottom:6px; }
+        .unlock-sub { color:rgba(255,255,255,.65); font-size:12px; line-height:1.45; margin-bottom:14px; padding:0 4px; }
+        .unlock-features { display:flex; justify-content:center; gap:14px; flex-wrap:wrap; margin-bottom:14px; }
+        .unlock-feature { font-size:11px; color:rgba(255,255,255,.7); font-weight:500; display:flex; align-items:center; gap:4px; }
+        .unlock-feature::before { content:'✓'; color:var(--green); font-weight:800; font-size:12px; }
+        .unlock-btn { display:block; width:100%; background:linear-gradient(135deg,#FF9500 0%,#FF3B30 100%); color:#fff; border:none; border-radius:12px; padding:14px 16px; font-size:15px; font-weight:700; letter-spacing:-.1px; cursor:pointer; text-decoration:none; text-align:center; box-shadow:0 4px 16px rgba(255,149,0,.32); transition:transform .15s, box-shadow .15s; font-family:inherit; }
+        .unlock-btn:hover { transform:translateY(-1px); box-shadow:0 6px 22px rgba(255,149,0,.45); }
+        .unlock-btn:active { transform:translateY(0); }
+        .unlock-disclosure { font-size:10px; color:rgba(255,255,255,.4); margin-top:8px; letter-spacing:.3px; text-transform:uppercase; font-weight:600; }
+
+        /* ===== NEW: Interstitial Smartlink ad (between H2H matches) ===== */
+        .inter-ad { display:block; background:linear-gradient(90deg,#FFF7ED 0%,#FFEDD5 100%); border:1px solid #FED7AA; border-radius:12px; padding:11px 14px; margin:6px 0; text-decoration:none; color:#9A3412; text-align:center; font-size:12px; font-weight:600; letter-spacing:-.05px; transition:transform .12s, box-shadow .12s; position:relative; }
+        .inter-ad:hover { transform:translateY(-1px); box-shadow:0 3px 10px rgba(255,149,0,.18); }
+        .inter-ad small { display:block; font-size:9px; color:#C2410C; opacity:.65; letter-spacing:.4px; text-transform:uppercase; margin-bottom:2px; font-weight:700; }
+        .inter-ad .ia-arrow { margin-left:4px; }
     </style>
 </head>
 <body>
@@ -307,10 +298,6 @@ const TAB_LOADING_MAX_MS = 3000;
 const LOADING_MSG = "Just 1 sec...";
 const EMPTY_TAB_MSG = "Oh... please check other tabs for matches, there are no matches here at the moment.";
 
-/* === Monetization (detail sheet only) ===
-   Smartlink banner only — popunder removed at user request because it was
-   redirecting visitors off the site. The banner is a normal link opened in a
-   NEW tab, so users stay on Magic Analysis. */
 const SMARTLINK_URL = "https://www.effectivecpmnetwork.com/mmgwyksvk?key=36e68235e91415ba8fdb9b60cb69ed02";
 
 const FIN_SET = new Set(['FT','AET','PEN','Pen.']);
@@ -339,9 +326,6 @@ const statusLabel = s => {
     return s;
 };
 
-/* === LIVE MINUTE EXTRAPOLATION ===
-   Backend stores match.elapsed (number) + match.elapsedAt (ms timestamp of the scrape).
-   Between scrapes we tick the displayed minute forward second-by-second.       */
 const liveMinute = (m) => {
     if (!m) return '';
     const raw = String(m.statusRaw || '').toUpperCase();
@@ -353,17 +337,13 @@ const liveMinute = (m) => {
     if (now > 95) now = 95;
     const whole = Math.floor(now);
     if (whole <= 45) return `${String(whole).padStart(2,'0')}'`;
-    if (whole <= 50) {
-        const add = whole - 45;
-        return add === 0 ? "45'" : `45+${add}'`;
-    }
+    if (whole <= 50) { const add = whole - 45; return add === 0 ? "45'" : `45+${add}'`; }
     if (whole <= 60 && (raw === '1H' || raw === '')) return 'HT';
     if (whole <= 90) return `${String(whole).padStart(2,'0')}'`;
     const add = whole - 90;
     return add === 0 ? "90'" : `90+${add}'`;
 };
 
-/* Re-render hook — fires every second while `active` is true. */
 const useTickingNow = (active) => {
     const [, setTick] = useState(0);
     useEffect(() => {
@@ -398,17 +378,13 @@ const matchToPred = m => {
     if (!m || !m.prediction) return null;
     const label = m.prediction === '1' ? 'Home Win'
                 : m.prediction === '2' ? 'Away Win'
-                : m.prediction === 'X' ? 'Draw'
-                : '';
+                : m.prediction === 'X' ? 'Draw' : '';
     return {
-        loading: false,
-        code:    m.prediction,
-        label,
-        score:   m.correctScore || null,
-        advice:  m.advice || null,
-        hp:      m.probabilities?.home || '—',
-        dp:      m.probabilities?.draw || '—',
-        ap:      m.probabilities?.away || '—',
+        loading: false, code: m.prediction, label,
+        score: m.correctScore || null, advice: m.advice || null,
+        hp: m.probabilities?.home || '—',
+        dp: m.probabilities?.draw || '—',
+        ap: m.probabilities?.away || '—',
     };
 };
 
@@ -485,13 +461,8 @@ const TeamLogo = ({ name, url, big = false }) => {
     const [err, setErr] = useState(false);
     if (url && !err) {
         return (
-            <img
-                src={url}
-                alt={name || ''}
-                className={big ? 'detail-logo-img' : 'team-logo-img'}
-                onError={() => setErr(true)}
-                loading="lazy"
-            />
+            <img src={url} alt={name || ''} className={big ? 'detail-logo-img' : 'team-logo-img'}
+                onError={() => setErr(true)} loading="lazy"/>
         );
     }
     const initials = (name || '?').split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
@@ -568,10 +539,7 @@ const MatchCard = ({ match, onOpen, onToggleFav, isFav, pred=null }) => {
     const hasPred    = !!pred && !!pred.code;
     const badgeClass = c==='live'?'s-live':c==='finished'?'s-fin':c==='upcoming'?'s-upc':'s-canc';
     const leagueTxt  = [match.country, match.leagueName].filter(Boolean).join(' · ');
-
-    // Tick every second so the LIVE minute display advances.
     useTickingNow(c === 'live');
-
     return (
         <div className={`card${hasManual?' card-premium':''}`} onClick={()=>onOpen(match)}>
             <div className="card-inner">
@@ -584,7 +552,6 @@ const MatchCard = ({ match, onOpen, onToggleFav, isFav, pred=null }) => {
                         <IcoHeart on={isFav}/>
                     </button>
                 </div>
-
                 <div className="card-row">
                     <div className="card-left">
                         <div className="card-logo-col">
@@ -627,14 +594,12 @@ const MatchCard = ({ match, onOpen, onToggleFav, isFav, pred=null }) => {
                         )}
                     </div>
                 </div>
-
                 {hasManual && (
                     <div className="card-manual-pred">
                         <div className="card-manual-pred-lbl"><IcoStar/> EXPERT TIP</div>
                         <div className="card-manual-pred-txt">{match.manual_prediction}</div>
                     </div>
                 )}
-
                 <div className="card-foot">
                     <span className={`s-badge ${badgeClass}`}>
                         {c==='live' && <span className="dot"/>}
@@ -651,7 +616,6 @@ const MatchCard = ({ match, onOpen, onToggleFav, isFav, pred=null }) => {
     );
 };
 
-/* === Last Matches section inside the detail sheet ====================== */
 const LastMatchesBlock = ({ teamName, matches }) => {
     if (!teamName) return null;
     return (
@@ -677,7 +641,6 @@ const LastMatchesBlock = ({ teamName, matches }) => {
     );
 };
 
-/* === H2H section inside the detail sheet =============================== */
 const H2HBlock = ({ details }) => {
     const list = (details.h2h && details.h2h.matches) || [];
     const s    = (details.h2h && details.h2h.stats)   || {};
@@ -707,23 +670,31 @@ const H2HBlock = ({ details }) => {
             </div>
             <div className="detail-section-title">Past Meetings</div>
             {list.map((g, i) => (
-                <div className="lm-row" key={i}>
-                    <div className={`result-chip ${g.winner === 'home' ? 'result-W' : g.winner === 'away' ? 'result-L' : 'result-D'}`}>
-                        {g.winner === 'home' ? 'H' : g.winner === 'away' ? 'A' : 'D'}
+                <React.Fragment key={i}>
+                    <div className="lm-row">
+                        <div className={`result-chip ${g.winner === 'home' ? 'result-W' : g.winner === 'away' ? 'result-L' : 'result-D'}`}>
+                            {g.winner === 'home' ? 'H' : g.winner === 'away' ? 'A' : 'D'}
+                        </div>
+                        <div style={{minWidth:0}}>
+                            <div className="lm-vs">{g.homeName} vs {g.awayName}</div>
+                            <div className="lm-comp">{g.competition || '—'}</div>
+                        </div>
+                        <div className="lm-score">{g.score}</div>
+                        <div className="lm-date">{(g.date || '').slice(5)}</div>
                     </div>
-                    <div style={{minWidth:0}}>
-                        <div className="lm-vs">{g.homeName} vs {g.awayName}</div>
-                        <div className="lm-comp">{g.competition || '—'}</div>
-                    </div>
-                    <div className="lm-score">{g.score}</div>
-                    <div className="lm-date">{(g.date || '').slice(5)}</div>
-                </div>
+                    {/* Smartlink interstitial after every 2nd match */}
+                    {((i + 1) % 2 === 0 && i < list.length - 1) && (
+                        <a href={SMARTLINK_URL} target="_blank" rel="noopener noreferrer nofollow" className="inter-ad">
+                            <small>Sponsored</small>
+                            💰 Today's Top Sports Bonus — Tap to Claim<span className="ia-arrow">›</span>
+                        </a>
+                    )}
+                </React.Fragment>
             ))}
         </>
     );
 };
 
-/* === Form summary section ============================================== */
 const FormBlock = ({ details }) => {
     const hf = details.home?.form;
     const af = details.away?.form;
@@ -761,32 +732,43 @@ const DetailSheet = ({ match, pred, onClose }) => {
     const leagueTxt  = [match.country, match.leagueName].filter(Boolean).join(' · ') || (match.leagueName || '');
     const analysis   = generateAnalysis(match);
 
-    // Live timer ticks every second while sheet is open
     useTickingNow(c === 'live');
     const liveMin = c === 'live' ? liveMinute(match) : '';
 
-    // Fetch full Last Matches + H2H + Form
+    // Click-to-unlock H2H + Form (monetized via Smartlink)
     const [details, setDetails]       = useState(null);
     const [detailsErr, setDetailsErr] = useState(null);
-    const [detailsLoading, setLoading] = useState(true);
+    const [detailsLoading, setLoading] = useState(false);
+    const [unlocked, setUnlocked]     = useState(false);
 
+    // Reset unlock state every time a new match modal is opened
     useEffect(() => {
+        setDetails(null); setDetailsErr(null); setLoading(false); setUnlocked(false);
+    }, [match]);
+
+    // User clicks the unlock CTA:
+    //   1. Open Smartlink in NEW tab (revenue!) — user stays on Magic Analysis
+    //   2. Mark as unlocked and start fetching H2H + form
+    const handleUnlock = () => {
+        try { window.open(SMARTLINK_URL, '_blank', 'noopener,noreferrer'); } catch {}
         const id = fid(match);
-        if (!id) { setLoading(false); return; }
-        setLoading(true); setDetails(null); setDetailsErr(null);
+        if (!id) { setUnlocked(true); return; }
+        setUnlocked(true);
+        setLoading(true);
+        setDetails(null);
+        setDetailsErr(null);
         fetch(`${BACKEND_URL}/api/match/${encodeURIComponent(id)}/details`)
             .then(r => r.json())
             .then(d => { if (d.error) setDetailsErr(d.error); else setDetails(d); })
             .catch(e => setDetailsErr(e.message))
             .finally(() => setLoading(false));
-    }, [match]);
+    };
 
     return (
         <div className="overlay" onClick={onClose}>
             <div className="sheet" onClick={e=>e.stopPropagation()}>
                 <div className="handle"/>
 
-                {/* === Smartlink banner (detail sheet only) === */}
                 <a href={SMARTLINK_URL} target="_blank" rel="noopener noreferrer nofollow" className="smartlink-banner">
                     <small>Sponsored</small>
                     🎁 Boost Your Bets — Tap to Claim Today's Top Bonus 🎁
@@ -878,20 +860,38 @@ const DetailSheet = ({ match, pred, onClose }) => {
                     <div style={{background:'var(--bg)',borderRadius:'var(--r)',padding:'13px 14px',marginBottom:14,textAlign:'center',fontSize:12,color:'var(--t3)'}}>Prediction not available.</div>
                 )}
 
-                {/* === Last Matches + H2H + Form (lazy-loaded) === */}
-                {detailsLoading && (
+                {/* === H2H + Recent Form: click-to-unlock (monetized via Smartlink) === */}
+                {!unlocked && (
+                    <div className="unlock-card">
+                        <div className="unlock-icon">🔓</div>
+                        <div className="unlock-title">Unlock Full Match Insights</div>
+                        <div className="unlock-sub">
+                            See past meetings, recent form, and head-to-head stats for {match.home?.name} vs {match.away?.name}.
+                        </div>
+                        <div className="unlock-features">
+                            <span className="unlock-feature">Head-to-Head</span>
+                            <span className="unlock-feature">Last 6 results</span>
+                            <span className="unlock-feature">Form stats</span>
+                        </div>
+                        <button className="unlock-btn" onClick={handleUnlock}>
+                            🎁 Unlock H2H & Form — Free
+                        </button>
+                        <div className="unlock-disclosure">Sponsored · Opens partner offer in new tab</div>
+                    </div>
+                )}
+                {unlocked && detailsLoading && (
                     <div className="detail-loading">
                         <div className="spin-sm"/>
                         <div>Loading match history…</div>
                     </div>
                 )}
-                {detailsErr && (
+                {unlocked && detailsErr && (
                     <div className="detail-empty">
                         <div className="ico">⚠️</div>
                         Could not load history: {detailsErr}
                     </div>
                 )}
-                {details && (
+                {unlocked && details && (
                     <>
                         <LastMatchesBlock teamName={details.home?.name} matches={details.home?.lastMatches}/>
                         <LastMatchesBlock teamName={details.away?.name} matches={details.away?.lastMatches}/>
