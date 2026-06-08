@@ -12,6 +12,24 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
 
+    <!-- Web Push Notifications via OneSignal -->
+    <!-- Make sure OneSignalSDKWorker.js (from the ServiceWorker zip you downloaded)
+         is dropped next to index.html on Netlify. Without it, the bell icon
+         won't actually subscribe users. -->
+    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+    <script>
+      window.OneSignalDeferred = window.OneSignalDeferred || [];
+      OneSignalDeferred.push(async function(OneSignal) {
+        try {
+          await OneSignal.init({
+            appId: "fab78014-9e29-4947-a92b-cac367cb093b",
+            safari_web_id: "web.onesignal.auto.05737452-6fb0-4a74-aaf2-b68bc5a2ed6a",
+            notifyButton: { enable: true },
+          });
+        } catch (e) { /* OneSignal init failed — non-fatal */ }
+      });
+    </script>
+
     <!-- Google Analytics (GA4) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-RNQZZENL62"></script>
     <script>
@@ -36,8 +54,30 @@
             --card-shadow:0 1px 1px rgba(0,0,0,0.04),0 2px 8px rgba(0,0,0,0.05),0 0 0 0.5px rgba(0,0,0,0.05);
             --modal-shadow:0 24px 64px rgba(0,0,0,0.22);
         }
-        body { font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue',Arial,sans-serif; background:var(--bg); color:var(--t1); overflow-x:hidden; }
+        body { font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue',Arial,sans-serif; background:var(--bg); color:var(--t1); overflow-x:hidden; transition:background .2s,color .2s; }
         ::-webkit-scrollbar { display:none; } * { scrollbar-width:none; }
+
+        /* ===== Dark mode — overrides root vars when body.dark is set ===== */
+        body.dark {
+            --bg:#000000; --surface:#1C1C1E;
+            --t1:#FFFFFF; --t2:#C7C7CC; --t3:#8E8E93;
+            --sep:rgba(255,255,255,0.10); --sep2:rgba(255,255,255,0.18);
+            --navy:#000000;
+            --card-shadow:0 1px 1px rgba(0,0,0,0.4),0 2px 8px rgba(0,0,0,0.5),0 0 0 0.5px rgba(255,255,255,0.05);
+        }
+        body.dark .tab-off:hover { background:#2C2C2E; }
+        body.dark .home-tab:not(.on):hover { background:#2C2C2E; }
+        body.dark .splash { background:#000; }
+        body.dark .nav { background:rgba(28,28,30,0.92); }
+        body.dark .skel { background:linear-gradient(90deg,#2C2C2E 25%,#3A3A3C 50%,#2C2C2E 75%); background-size:200% 100%; }
+        body.dark .detail-note { background:#3A2E10; color:#FED7AA; border-left-color:var(--gold); }
+        body.dark .inter-ad { background:linear-gradient(90deg,#3A2410 0%,#4A2E15 100%); border-color:#7C2D12; color:#FED7AA; }
+        body.dark .inter-ad small { color:#FB923C; opacity:.9; }
+        body.dark .detail-score-box { background:#2C2C2E; }
+        body.dark .center-card,
+        body.dark .sheet { background:#1C1C1E; }
+        body.dark .detail-logo-img,
+        body.dark .team-logo-img { background:#fff; }
 
         .hdr { position:sticky; top:0; z-index:100; height:56px; background:var(--navy); color:#fff; border-bottom:0.5px solid rgba(255,255,255,0.06); display:flex; align-items:center; padding:0 16px; }
         .hdr-btn { width:34px; height:34px; border-radius:50%; background:none; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; color:#fff; transition:background .15s; flex-shrink:0; }
@@ -282,6 +322,18 @@
         .inter-ad:hover { transform:translateY(-1px); box-shadow:0 3px 10px rgba(255,149,0,.18); }
         .inter-ad small { display:block; font-size:9px; color:#C2410C; opacity:.65; letter-spacing:.4px; text-transform:uppercase; margin-bottom:2px; font-weight:700; }
         .inter-ad .ia-arrow { margin-left:4px; }
+
+        /* ===== Bookmaker Odds Comparison (Alerts tab only) ===== */
+        .odds-card { background:var(--surface); border-radius:var(--r); box-shadow:var(--card-shadow); padding:12px 14px; margin:-3px 0 12px; border-left:3px solid var(--gold); }
+        .odds-title { font-size:10px; font-weight:800; color:var(--gold); text-transform:uppercase; letter-spacing:.5px; margin-bottom:9px; display:flex; align-items:center; gap:4px; }
+        .odds-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:7px; margin-bottom:10px; }
+        .odds-cell { background:var(--bg); border-radius:10px; padding:8px 6px; text-align:center; }
+        .odds-lbl { font-size:9px; font-weight:700; color:var(--t3); text-transform:uppercase; letter-spacing:.3px; margin-bottom:3px; }
+        .odds-val { font-size:17px; font-weight:800; letter-spacing:-.3px; font-variant-numeric:tabular-nums; }
+        .odds-bks { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+        .odds-bk { display:flex; align-items:center; justify-content:center; padding:9px 8px; border-radius:9px; font-size:11px; font-weight:700; color:#fff; text-decoration:none; transition:transform .12s,filter .12s; letter-spacing:.2px; }
+        .odds-bk:hover { transform:translateY(-1px); filter:brightness(1.08); }
+        .odds-bk small { font-size:8px; opacity:.85; margin-right:4px; font-weight:600; }
     </style>
 </head>
 <body>
@@ -733,7 +785,6 @@ const DetailSheet = ({ match, pred, onClose }) => {
     useTickingNow(c === 'live');
     const liveMin = c === 'live' ? liveMinute(match) : '';
 
-    // Click-to-view H2H + Form (monetized via Smartlink)
     const [details, setDetails]       = useState(null);
     const [detailsErr, setDetailsErr] = useState(null);
     const [detailsLoading, setLoading] = useState(false);
@@ -854,7 +905,6 @@ const DetailSheet = ({ match, pred, onClose }) => {
                     <div style={{background:'var(--bg)',borderRadius:'var(--r)',padding:'13px 14px',marginBottom:14,textAlign:'center',fontSize:12,color:'var(--t3)'}}>Prediction not available.</div>
                 )}
 
-                {/* === H2H + Recent Form: click-to-view (monetized via Smartlink) === */}
                 {!unlocked && (
                     <div className="unlock-card">
                         <div className="unlock-icon">🤝</div>
@@ -901,6 +951,35 @@ const DetailSheet = ({ match, pred, onClose }) => {
     );
 };
 
+/* === Bookmaker Odds Comparison — Alerts tab only ============================ */
+const BOOKMAKERS = [
+    { name: 'Bet365',  bg: '#076C44', url: 'https://www.bet365.com'   },
+    { name: '1xBet',   bg: '#1C49E0', url: 'https://1xbet.com'        },
+    { name: 'Betway',  bg: '#00A826', url: 'https://betway.com'       },
+    { name: 'Bet9ja',  bg: '#1a8a3e', url: 'https://www.bet9ja.com'   },
+];
+const OddsCard = ({ match }) => {
+    const h = match.oddsHome, d = match.oddsDraw, a = match.oddsAway;
+    if (!h || !d || !a) return null;
+    return (
+        <div className="odds-card">
+            <div className="odds-title">⚡ Live Odds — Place Your Bet Now</div>
+            <div className="odds-grid">
+                <div className="odds-cell"><div className="odds-lbl">{(match.home?.name||'Home').slice(0,8)}</div><div className="odds-val">{h.toFixed(2)}</div></div>
+                <div className="odds-cell"><div className="odds-lbl">Draw</div><div className="odds-val">{d.toFixed(2)}</div></div>
+                <div className="odds-cell"><div className="odds-lbl">{(match.away?.name||'Away').slice(0,8)}</div><div className="odds-val">{a.toFixed(2)}</div></div>
+            </div>
+            <div className="odds-bks">
+                {BOOKMAKERS.map(b => (
+                    <a key={b.name} href={b.url} target="_blank" rel="noopener noreferrer nofollow" className="odds-bk" style={{background:b.bg}}>
+                        <small>BET ON</small>{b.name} ›
+                    </a>
+                ))}
+            </div>
+        </div>
+    );
+};
+
 function App() {
     const [splash,         setSplash]         = useState(true);
     const [calOpen,        setCalOpen]        = useState(false);
@@ -920,10 +999,30 @@ function App() {
 
     const [homeTab,        setHomeTab]        = useState('Upcoming');
     const [tabLoading,     setTabLoading]     = useState(false);
+    const [theme,          setTheme]          = useState(() => {
+        try { return localStorage.getItem('magic-theme') || 'light'; } catch { return 'light'; }
+    });
 
     useEffect(() => {
         try { localStorage.setItem('magic-favs', JSON.stringify(favs)); } catch {}
     }, [favs]);
+
+    // Dark mode — apply class to <body> + persist
+    useEffect(() => {
+        document.body.className = theme === 'dark' ? 'dark' : '';
+        try { localStorage.setItem('magic-theme', theme); } catch {}
+    }, [theme]);
+
+    // Hydrate from localStorage cache on first paint
+    useEffect(() => {
+        try {
+            const cached = JSON.parse(localStorage.getItem('magic-cache') || 'null');
+            if (cached && Array.isArray(cached.matches) && cached.matches.length) {
+                setMatches(cached.matches);
+                setUpdatedAt(cached.updatedAt);
+            }
+        } catch {}
+    }, []);
 
     const load = useCallback(async (silent = false) => {
         if (!silent) {
@@ -942,15 +1041,36 @@ function App() {
             setWaking(false);
             if (!res.ok) throw new Error(`${res.status}`);
             const data = await res.json();
-            setMatches(Array.isArray(data.matches) ? data.matches : []);
-            setUpdatedAt(data.updatedAt || new Date().toISOString());
+            const list = Array.isArray(data.matches) ? data.matches : [];
+            setMatches(list);
+            const stamp = data.updatedAt || new Date().toISOString();
+            setUpdatedAt(stamp);
+            try {
+                localStorage.setItem('magic-cache', JSON.stringify({
+                    matches: list, updatedAt: stamp, cachedAt: Date.now(),
+                }));
+            } catch {}
         } catch (e) {
             if (wt) clearTimeout(wt);
             setWaking(false);
-            if (!silent) {
-                setErr(e.name==='AbortError'
-                    ? "Server taking too long — retry in a moment."
-                    : "Could not load data. Check your connection.");
+            // Distinguish "no internet" vs "Railway is down / maintenance"
+            const isOffline = !navigator.onLine ||
+                              (e instanceof TypeError && /failed to fetch|network/i.test(e.message)) ||
+                              /networkerror/i.test(e.name || '');
+            const offlineMsg = "📡 Please connect or check your internet connection.";
+            const maintenanceMsg = "🛠️ Website maintenance in progress — some data may be delayed. We apologize in advance.";
+            let usedCache = false;
+            try {
+                const cached = JSON.parse(localStorage.getItem('magic-cache') || 'null');
+                if (cached && Array.isArray(cached.matches) && cached.matches.length) {
+                    setMatches(cached.matches);
+                    setUpdatedAt(cached.updatedAt);
+                    setErr(isOffline ? offlineMsg : maintenanceMsg);
+                    usedCache = true;
+                }
+            } catch {}
+            if (!silent && !usedCache) {
+                setErr(isOffline ? offlineMsg : maintenanceMsg);
             }
         } finally {
             if (!silent) setLoading(false);
@@ -1114,10 +1234,26 @@ function App() {
                     <div className="page-in">
                         <div className="page-head">
                             <h1 className="page-h1">Alerts</h1>
-                            <p className="page-sub">Matches past the 75 minute mark</p>
+                            <p className="page-sub">Matches past the 75 minute mark · in-play odds</p>
                         </div>
                         {alertMatches.length > 0
-                            ? alertMatches.map(renderCard)
+                            ? alertMatches.map(m => {
+                                const k = fid(m) || `${m.home?.name}${m.away?.name}${m.status}`;
+                                return (
+                                    <div key={k}>
+                                        <LazySlot minHeight={175}>
+                                            <MatchCard
+                                                match={m}
+                                                pred={matchToPred(m)}
+                                                onOpen={openDetail}
+                                                onToggleFav={toggleFav}
+                                                isFav={favs.includes(fid(m))}
+                                            />
+                                        </LazySlot>
+                                        <OddsCard match={m}/>
+                                    </div>
+                                );
+                            })
                             : <EmptyState title={EMPTY_TAB_MSG}/>
                         }
                         <Social/>
@@ -1148,6 +1284,15 @@ function App() {
                     <div className="page-in">
                         <div className="page-head"><h1 className="page-h1">More</h1></div>
                         <div className="settings-group">
+                            {/* Dark mode toggle */}
+                            <div className="settings-item" onClick={()=>setTheme(theme==='dark'?'light':'dark')} style={{cursor:'pointer',userSelect:'none'}}>
+                                <span style={{display:'flex',alignItems:'center',gap:10}}>
+                                    {theme==='dark' ? '🌙' : '☀️'} Dark Mode
+                                </span>
+                                <span style={{fontSize:13,fontWeight:600,color:theme==='dark'?'var(--green)':'var(--t3)'}}>
+                                    {theme==='dark' ? 'On' : 'Off'}
+                                </span>
+                            </div>
                             {[
                                 ['About Us','https://docs.google.com/document/d/1OaaYhaQi3FZzog6YLIoojh3CnX3aN0lrizXyQ5N9Dkw/edit?usp=sharing'],
                                 ['Terms of Use','https://docs.google.com/document/d/1wO92_LRf7q1vS90SdmHgArGITPkimnMa7g_U_VHFZo4/edit?usp=sharing'],
