@@ -233,18 +233,9 @@
 
         .live-pill-min { font-weight:800; font-variant-numeric:tabular-nums; letter-spacing:.4px; }
 
-        .smartlink-banner {
-            display:block; background:linear-gradient(135deg,#FF9500 0%,#FF3B30 100%);
-            color:#fff; text-align:center; padding:13px 16px; border-radius:14px;
-            text-decoration:none; margin-bottom:16px; font-size:14px; font-weight:700;
-            letter-spacing:-.1px; box-shadow:0 4px 16px rgba(255,149,0,.28);
-            transition:transform .15s, box-shadow .15s;
-        }
+        .smartlink-banner { display:block; background:linear-gradient(135deg,#FF9500 0%,#FF3B30 100%); color:#fff; text-align:center; padding:13px 16px; border-radius:14px; text-decoration:none; margin-bottom:16px; font-size:14px; font-weight:700; letter-spacing:-.1px; box-shadow:0 4px 16px rgba(255,149,0,.28); transition:transform .15s, box-shadow .15s; }
         .smartlink-banner:hover { transform:translateY(-1px); box-shadow:0 6px 22px rgba(255,149,0,.4); }
-        .smartlink-banner small {
-            display:block; font-size:9px; opacity:.85; letter-spacing:.5px;
-            text-transform:uppercase; margin-bottom:3px; font-weight:600;
-        }
+        .smartlink-banner small { display:block; font-size:9px; opacity:.85; letter-spacing:.5px; text-transform:uppercase; margin-bottom:3px; font-weight:600; }
 
         .detail-section-title { font-size:11px; font-weight:700; color:var(--t3); text-transform:uppercase; letter-spacing:.5px; margin:20px 0 10px; padding:0 2px; }
         .lm-row { display:grid; grid-template-columns:28px 1fr auto auto; gap:10px; align-items:center; background:var(--bg); border-radius:12px; padding:10px 12px; margin-bottom:6px; }
@@ -265,7 +256,7 @@
         .detail-note { background:#FFFBEB; border-left:3px solid var(--gold); border-radius:8px; padding:10px 12px; font-size:12px; color:#92400E; line-height:1.5; margin:12px 0; }
         .detail-loading { padding:30px 16px; text-align:center; color:var(--t3); font-size:13px; display:flex; flex-direction:column; align-items:center; gap:10px; }
 
-        /* ===== NEW: H2H Unlock CTA (Smartlink-monetized button) ===== */
+        /* ===== H2H View CTA (Smartlink-monetized button) ===== */
         .unlock-card { background:linear-gradient(135deg,#1D1D1F 0%,#2C2C2E 100%); border-radius:16px; padding:18px 16px; margin:22px 0 14px; text-align:center; position:relative; overflow:hidden; border:1px solid rgba(255,149,0,.15); }
         .unlock-card::before { content:''; position:absolute; top:-30%; right:-20%; width:160px; height:160px; background:radial-gradient(circle,rgba(255,149,0,.18) 0%,transparent 70%); pointer-events:none; }
         .unlock-icon { font-size:32px; margin-bottom:6px; }
@@ -279,7 +270,7 @@
         .unlock-btn:active { transform:translateY(0); }
         .unlock-disclosure { font-size:10px; color:rgba(255,255,255,.4); margin-top:8px; letter-spacing:.3px; text-transform:uppercase; font-weight:600; }
 
-        /* ===== NEW: Interstitial Smartlink ad (between H2H matches) ===== */
+        /* ===== Interstitial Smartlink ad (between H2H matches) ===== */
         .inter-ad { display:block; background:linear-gradient(90deg,#FFF7ED 0%,#FFEDD5 100%); border:1px solid #FED7AA; border-radius:12px; padding:11px 14px; margin:6px 0; text-decoration:none; color:#9A3412; text-align:center; font-size:12px; font-weight:600; letter-spacing:-.05px; transition:transform .12s, box-shadow .12s; position:relative; }
         .inter-ad:hover { transform:translateY(-1px); box-shadow:0 3px 10px rgba(255,149,0,.18); }
         .inter-ad small { display:block; font-size:9px; color:#C2410C; opacity:.65; letter-spacing:.4px; text-transform:uppercase; margin-bottom:2px; font-weight:700; }
@@ -735,20 +726,18 @@ const DetailSheet = ({ match, pred, onClose }) => {
     useTickingNow(c === 'live');
     const liveMin = c === 'live' ? liveMinute(match) : '';
 
-    // Click-to-unlock H2H + Form (monetized via Smartlink)
+    // Click-to-view H2H + Form (monetized via Smartlink)
     const [details, setDetails]       = useState(null);
     const [detailsErr, setDetailsErr] = useState(null);
     const [detailsLoading, setLoading] = useState(false);
     const [unlocked, setUnlocked]     = useState(false);
 
-    // Reset unlock state every time a new match modal is opened
     useEffect(() => {
         setDetails(null); setDetailsErr(null); setLoading(false); setUnlocked(false);
     }, [match]);
 
-    // User clicks the unlock CTA:
-    //   1. Open Smartlink in NEW tab (revenue!) — user stays on Magic Analysis
-    //   2. Mark as unlocked and start fetching H2H + form
+    // 1. Open Smartlink in NEW tab (revenue!) — user stays on Magic Analysis
+    // 2. Show H2H + last-6 inline
     const handleUnlock = () => {
         try { window.open(SMARTLINK_URL, '_blank', 'noopener,noreferrer'); } catch {}
         const id = fid(match);
@@ -860,21 +849,21 @@ const DetailSheet = ({ match, pred, onClose }) => {
                     <div style={{background:'var(--bg)',borderRadius:'var(--r)',padding:'13px 14px',marginBottom:14,textAlign:'center',fontSize:12,color:'var(--t3)'}}>Prediction not available.</div>
                 )}
 
-                {/* === H2H + Recent Form: click-to-unlock (monetized via Smartlink) === */}
+                {/* === H2H + Recent Form: click-to-view (monetized via Smartlink) === */}
                 {!unlocked && (
                     <div className="unlock-card">
-                        <div className="unlock-icon">🔓</div>
-                        <div className="unlock-title">Unlock Full Match Insights</div>
+                        <div className="unlock-icon">🤝</div>
+                        <div className="unlock-title">Head-to-Head & Recent Form</div>
                         <div className="unlock-sub">
-                            See past meetings, recent form, and head-to-head stats for {match.home?.name} vs {match.away?.name}.
+                            See past meetings and recent form for {match.home?.name} vs {match.away?.name}.
                         </div>
                         <div className="unlock-features">
-                            <span className="unlock-feature">Head-to-Head</span>
+                            <span className="unlock-feature">Past meetings</span>
                             <span className="unlock-feature">Last 6 results</span>
                             <span className="unlock-feature">Form stats</span>
                         </div>
                         <button className="unlock-btn" onClick={handleUnlock}>
-                            🎁 Unlock H2H & Form — Free
+                            View H2H
                         </button>
                         <div className="unlock-disclosure">Sponsored · Opens partner offer in new tab</div>
                     </div>
