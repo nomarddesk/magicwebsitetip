@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Magic Analysis</title>
 
-    <!-- Favicon (browser tab icon) — generated via realfavicongenerator.net -->
+    <!-- Favicon -->
     <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="shortcut icon" href="/favicon.ico" />
@@ -13,9 +13,6 @@
     <link rel="manifest" href="/site.webmanifest" />
 
     <!-- Web Push Notifications via OneSignal — LIVE MATCH ALERTS ONLY -->
-    <!-- Mobile-first: shows a slide-down popup (not a tiny floating bell) so 90%
-         of mobile users can actually see/tap it. Triggers 8 seconds after first
-         page view, framed around live match alerts (not ads/promos). -->
     <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
     <script>
       window.OneSignalDeferred = window.OneSignalDeferred || [];
@@ -71,7 +68,6 @@
         body { font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue',Arial,sans-serif; background:var(--bg); color:var(--t1); overflow-x:hidden; transition:background .2s,color .2s; }
         ::-webkit-scrollbar { display:none; } * { scrollbar-width:none; }
 
-        /* ===== Dark mode — overrides root vars when body.dark is set ===== */
         body.dark {
             --bg:#000000; --surface:#1C1C1E;
             --t1:#FFFFFF; --t2:#C7C7CC; --t3:#8E8E93;
@@ -93,7 +89,7 @@
         body.dark .detail-logo-img,
         body.dark .team-logo-img { background:#fff; }
 
-        .hdr { position:sticky; top:0; z-index:100; height:56px; background:var(--navy); color:#fff; border-bottom:0.5px solid rgba(255,255,255,0.06); display:flex; align-items:center; padding:0 12px; gap:2px; }
+        .hdr { position:sticky; top:0; z-index:100; height:56px; background:var(--navy); color:#fff; border-bottom:0.5px solid rgba(255,255,255,0.06); display:flex; align-items:center; padding:0 16px; }
         .hdr-btn { width:34px; height:34px; border-radius:50%; background:none; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; color:#fff; transition:background .15s; flex-shrink:0; }
         .hdr-btn:hover { background:rgba(255,255,255,0.10); }
         .hdr-center { flex:1; display:flex; align-items:center; justify-content:center; gap:8px; }
@@ -317,7 +313,6 @@
         .detail-note { background:#FFFBEB; border-left:3px solid var(--gold); border-radius:8px; padding:10px 12px; font-size:12px; color:#92400E; line-height:1.5; margin:12px 0; }
         .detail-loading { padding:30px 16px; text-align:center; color:var(--t3); font-size:13px; display:flex; flex-direction:column; align-items:center; gap:10px; }
 
-        /* ===== H2H View CTA (Smartlink-monetized button) ===== */
         .unlock-card { background:linear-gradient(135deg,#1D1D1F 0%,#2C2C2E 100%); border-radius:16px; padding:18px 16px; margin:22px 0 14px; text-align:center; position:relative; overflow:hidden; border:1px solid rgba(255,149,0,.15); }
         .unlock-card::before { content:''; position:absolute; top:-30%; right:-20%; width:160px; height:160px; background:radial-gradient(circle,rgba(255,149,0,.18) 0%,transparent 70%); pointer-events:none; }
         .unlock-icon { font-size:32px; margin-bottom:6px; }
@@ -331,13 +326,11 @@
         .unlock-btn:active { transform:translateY(0); }
         .unlock-disclosure { font-size:10px; color:rgba(255,255,255,.4); margin-top:8px; letter-spacing:.3px; text-transform:uppercase; font-weight:600; }
 
-        /* ===== Interstitial Smartlink ad (between H2H matches) ===== */
         .inter-ad { display:block; background:linear-gradient(90deg,#FFF7ED 0%,#FFEDD5 100%); border:1px solid #FED7AA; border-radius:12px; padding:11px 14px; margin:6px 0; text-decoration:none; color:#9A3412; text-align:center; font-size:12px; font-weight:600; letter-spacing:-.05px; transition:transform .12s, box-shadow .12s; position:relative; }
         .inter-ad:hover { transform:translateY(-1px); box-shadow:0 3px 10px rgba(255,149,0,.18); }
         .inter-ad small { display:block; font-size:9px; color:#C2410C; opacity:.65; letter-spacing:.4px; text-transform:uppercase; margin-bottom:2px; font-weight:700; }
         .inter-ad .ia-arrow { margin-left:4px; }
 
-        /* ===== Bookmaker Odds Comparison (Alerts tab only) ===== */
         .odds-card { background:var(--surface); border-radius:var(--r); box-shadow:var(--card-shadow); padding:12px 14px; margin:-3px 0 12px; border-left:3px solid var(--gold); }
         .odds-title { font-size:10px; font-weight:800; color:var(--gold); text-transform:uppercase; letter-spacing:.5px; margin-bottom:9px; display:flex; align-items:center; gap:4px; }
         .odds-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:7px; margin-bottom:10px; }
@@ -437,6 +430,13 @@ const getGoals = m => {
 };
 
 const fid = m => m?.id || m?.static_id || m?.fixture?.id || null;
+
+// Convert a match's date + time into a sortable UTC millisecond timestamp.
+const matchTimestamp = (m) => {
+    if (!m || !m.date) return 0;
+    const t = Date.parse(`${m.date}T${m.time || '00:00'}:00Z`);
+    return isNaN(t) ? 0 : t;
+};
 
 const matchToPred = m => {
     if (!m || !m.prediction) return null;
@@ -966,7 +966,6 @@ const DetailSheet = ({ match, pred, onClose }) => {
     );
 };
 
-/* === Bookmaker Odds Comparison — Alerts tab only ============================ */
 const BOOKMAKERS = [
     { name: 'Bet365',  bg: '#076C44', url: 'https://www.bet365.com'   },
     { name: '1xBet',   bg: '#1C49E0', url: 'https://1xbet.com'        },
@@ -1022,13 +1021,11 @@ function App() {
         try { localStorage.setItem('magic-favs', JSON.stringify(favs)); } catch {}
     }, [favs]);
 
-    // Dark mode — apply class to <body> + persist
     useEffect(() => {
         document.body.className = theme === 'dark' ? 'dark' : '';
         try { localStorage.setItem('magic-theme', theme); } catch {}
     }, [theme]);
 
-    // Hydrate from localStorage cache on first paint
     useEffect(() => {
         try {
             const cached = JSON.parse(localStorage.getItem('magic-cache') || 'null');
@@ -1116,11 +1113,21 @@ function App() {
         setFavs(p => p.includes(id) ? p.filter(f => f !== id) : [...p, id]);
     }, []);
 
-    const liveMatches     = useMemo(() => matches.filter(m => cat(m.status) === 'live'),     [matches]);
-    const upcomingMatches = useMemo(() => matches.filter(m => cat(m.status) === 'upcoming'), [matches]);
-    const pastMatches     = useMemo(() => matches.filter(m => cat(m.status) === 'finished' && getGoals(m)), [matches]);
-    const savedMatches    = useMemo(() => matches.filter(m => favs.includes(fid(m))),        [matches, favs]);
-    const alertMatches    = useMemo(() => matches.filter(m => { const n=parseInt(m.statusRaw||m.status); return !isNaN(n)&&n>=75&&n<120; }), [matches]);
+    // Sort order rationale:
+    //   - Live:     ascending by kickoff (earliest kickoff = longest into the game = top)
+    //   - Upcoming: ascending by kickoff (match starting in 3 min appears BEFORE one starting in 30 min)
+    //   - Past:     descending by kickoff (most recent finish at top)
+    //   - Saved/Alerts: ascending by kickoff (chronological)
+    const liveMatches     = useMemo(() => matches.filter(m => cat(m.status) === 'live')
+        .sort((a, b) => matchTimestamp(a) - matchTimestamp(b)), [matches]);
+    const upcomingMatches = useMemo(() => matches.filter(m => cat(m.status) === 'upcoming')
+        .sort((a, b) => matchTimestamp(a) - matchTimestamp(b)), [matches]);
+    const pastMatches     = useMemo(() => matches.filter(m => cat(m.status) === 'finished' && getGoals(m))
+        .sort((a, b) => matchTimestamp(b) - matchTimestamp(a)), [matches]);
+    const savedMatches    = useMemo(() => matches.filter(m => favs.includes(fid(m)))
+        .sort((a, b) => matchTimestamp(a) - matchTimestamp(b)), [matches, favs]);
+    const alertMatches    = useMemo(() => matches.filter(m => { const n=parseInt(m.statusRaw||m.status); return !isNaN(n)&&n>=75&&n<120; })
+        .sort((a, b) => matchTimestamp(a) - matchTimestamp(b)), [matches]);
 
     const renderCard = m => {
         const k = fid(m) || `${m.home?.name}${m.away?.name}${m.status}`;
