@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Magic Analysis</title>
 
-    <!-- Favicon -->
+    <!-- Favicon (browser tab icon) — generated via realfavicongenerator.net -->
     <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="shortcut icon" href="/favicon.ico" />
@@ -13,6 +13,9 @@
     <link rel="manifest" href="/site.webmanifest" />
 
     <!-- Web Push Notifications via OneSignal — LIVE MATCH ALERTS ONLY -->
+    <!-- Mobile-first: shows a slide-down popup (not a tiny floating bell) so 90%
+         of mobile users can actually see/tap it. Triggers 8 seconds after first
+         page view, framed around live match alerts (not ads/promos). -->
     <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
     <script>
       window.OneSignalDeferred = window.OneSignalDeferred || [];
@@ -21,18 +24,22 @@
           await OneSignal.init({
             appId: "fab78014-9e29-4947-a92b-cac367cb093b",
             safari_web_id: "web.onesignal.auto.05737452-6fb0-4a74-aaf2-b68bc5a2ed6a",
+            // Bell icon OFF — replaced by mobile-friendly slidedown popup below.
             notifyButton: { enable: false },
             promptOptions: {
               slidedown: {
                 prompts: [{
                   type: "push",
-                  autoPrompt: true,
+                  autoPrompt: true,                 // appears automatically
                   text: {
                     actionMessage: "🔴 Get instant alerts when matches go LIVE — never miss a goal.",
                     acceptButton: "🔔 Enable Live Alerts",
                     cancelButton: "Not now"
                   },
-                  delay: { pageViews: 1, timeDelay: 8 }
+                  delay: {
+                    pageViews: 1,                   // show after 1 page view
+                    timeDelay: 8                    // wait 8 seconds so user sees content first
+                  }
                 }]
               }
             }
@@ -68,6 +75,7 @@
         body { font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue',Arial,sans-serif; background:var(--bg); color:var(--t1); overflow-x:hidden; transition:background .2s,color .2s; }
         ::-webkit-scrollbar { display:none; } * { scrollbar-width:none; }
 
+        /* ===== Dark mode — overrides root vars when body.dark is set ===== */
         body.dark {
             --bg:#000000; --surface:#1C1C1E;
             --t1:#FFFFFF; --t2:#C7C7CC; --t3:#8E8E93;
@@ -288,15 +296,39 @@
 
         .lazy-slot { min-height:175px; }
 
+        /* ===== NEW: Live timer pill (inside card status badge & detail) ===== */
         .live-pill-min { font-weight:800; font-variant-numeric:tabular-nums; letter-spacing:.4px; }
 
-        .smartlink-banner { display:block; background:linear-gradient(135deg,#FF9500 0%,#FF3B30 100%); color:#fff; text-align:center; padding:13px 16px; border-radius:14px; text-decoration:none; margin-bottom:16px; font-size:14px; font-weight:700; letter-spacing:-.1px; box-shadow:0 4px 16px rgba(255,149,0,.28); transition:transform .15s, box-shadow .15s; }
+        /* ===== NEW: Smartlink banner inside detail sheet ===== */
+        .smartlink-banner {
+            display:block; background:linear-gradient(135deg,#FF9500 0%,#FF3B30 100%);
+            color:#fff; text-align:center; padding:13px 16px; border-radius:14px;
+            text-decoration:none; margin-bottom:16px; font-size:14px; font-weight:700;
+            letter-spacing:-.1px; box-shadow:0 4px 16px rgba(255,149,0,.28);
+            transition:transform .15s, box-shadow .15s;
+        }
         .smartlink-banner:hover { transform:translateY(-1px); box-shadow:0 6px 22px rgba(255,149,0,.4); }
-        .smartlink-banner small { display:block; font-size:9px; opacity:.85; letter-spacing:.5px; text-transform:uppercase; margin-bottom:3px; font-weight:600; }
+        .smartlink-banner small {
+            display:block; font-size:9px; opacity:.85; letter-spacing:.5px;
+            text-transform:uppercase; margin-bottom:3px; font-weight:600;
+        }
 
-        .detail-section-title { font-size:11px; font-weight:700; color:var(--t3); text-transform:uppercase; letter-spacing:.5px; margin:20px 0 10px; padding:0 2px; }
-        .lm-row { display:grid; grid-template-columns:28px 1fr auto auto; gap:10px; align-items:center; background:var(--bg); border-radius:12px; padding:10px 12px; margin-bottom:6px; }
-        .result-chip { width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:11px; color:#fff; }
+        /* ===== NEW: Last Matches / H2H / Form sections ===== */
+        .detail-section-title {
+            font-size:11px; font-weight:700; color:var(--t3);
+            text-transform:uppercase; letter-spacing:.5px;
+            margin:20px 0 10px; padding:0 2px;
+        }
+        .lm-row {
+            display:grid; grid-template-columns:28px 1fr auto auto; gap:10px;
+            align-items:center; background:var(--bg); border-radius:12px;
+            padding:10px 12px; margin-bottom:6px;
+        }
+        .result-chip {
+            width:26px; height:26px; border-radius:50%;
+            display:flex; align-items:center; justify-content:center;
+            font-weight:800; font-size:11px; color:#fff;
+        }
         .result-W { background:var(--green); }
         .result-D { background:var(--t3); }
         .result-L { background:var(--live); }
@@ -304,33 +336,95 @@
         .lm-comp { font-size:10px; color:var(--t3); margin-top:1px; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
         .lm-score { font-size:14px; font-weight:700; font-variant-numeric:tabular-nums; }
         .lm-date { font-size:11px; color:var(--t3); }
-        .detail-empty { background:var(--bg); border-radius:12px; padding:24px 16px; text-align:center; font-size:13px; color:var(--t3); margin-bottom:12px; }
+        .detail-empty {
+            background:var(--bg); border-radius:12px; padding:24px 16px;
+            text-align:center; font-size:13px; color:var(--t3); margin-bottom:12px;
+        }
         .detail-empty .ico { font-size:28px; opacity:.5; margin-bottom:6px; }
-        .h2h-stat-row { display:grid; grid-template-columns:repeat(5,1fr); gap:6px; margin-bottom:14px; }
-        .h2h-stat-card { background:var(--bg); border-radius:12px; padding:10px 6px; text-align:center; }
+        .h2h-stat-row {
+            display:grid; grid-template-columns:repeat(5,1fr); gap:6px; margin-bottom:14px;
+        }
+        .h2h-stat-card {
+            background:var(--bg); border-radius:12px; padding:10px 6px; text-align:center;
+        }
         .h2h-stat-v { font-size:18px; font-weight:800; letter-spacing:-.3px; font-variant-numeric:tabular-nums; }
         .h2h-stat-l { font-size:9px; font-weight:600; color:var(--t3); text-transform:uppercase; letter-spacing:.3px; margin-top:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-        .detail-note { background:#FFFBEB; border-left:3px solid var(--gold); border-radius:8px; padding:10px 12px; font-size:12px; color:#92400E; line-height:1.5; margin:12px 0; }
-        .detail-loading { padding:30px 16px; text-align:center; color:var(--t3); font-size:13px; display:flex; flex-direction:column; align-items:center; gap:10px; }
+        .detail-note {
+            background:#FFFBEB; border-left:3px solid var(--gold);
+            border-radius:8px; padding:10px 12px; font-size:12px;
+            color:#92400E; line-height:1.5; margin:12px 0;
+        }
+        .detail-loading {
+            padding:30px 16px; text-align:center; color:var(--t3); font-size:13px;
+            display:flex; flex-direction:column; align-items:center; gap:10px;
+        }
 
-        .unlock-card { background:linear-gradient(135deg,#1D1D1F 0%,#2C2C2E 100%); border-radius:16px; padding:18px 16px; margin:22px 0 14px; text-align:center; position:relative; overflow:hidden; border:1px solid rgba(255,149,0,.15); }
-        .unlock-card::before { content:''; position:absolute; top:-30%; right:-20%; width:160px; height:160px; background:radial-gradient(circle,rgba(255,149,0,.18) 0%,transparent 70%); pointer-events:none; }
+        /* ===== NEW: H2H Unlock CTA (Smartlink-monetized button) ===== */
+        .unlock-card {
+            background:linear-gradient(135deg,#1D1D1F 0%,#2C2C2E 100%);
+            border-radius:16px; padding:18px 16px; margin:22px 0 14px;
+            text-align:center; position:relative; overflow:hidden;
+            border:1px solid rgba(255,149,0,.15);
+        }
+        .unlock-card::before {
+            content:''; position:absolute; top:-30%; right:-20%; width:160px; height:160px;
+            background:radial-gradient(circle,rgba(255,149,0,.18) 0%,transparent 70%);
+            pointer-events:none;
+        }
         .unlock-icon { font-size:32px; margin-bottom:6px; }
-        .unlock-title { color:#fff; font-size:17px; font-weight:700; letter-spacing:-.2px; margin-bottom:6px; }
-        .unlock-sub { color:rgba(255,255,255,.65); font-size:12px; line-height:1.45; margin-bottom:14px; padding:0 4px; }
-        .unlock-features { display:flex; justify-content:center; gap:14px; flex-wrap:wrap; margin-bottom:14px; }
-        .unlock-feature { font-size:11px; color:rgba(255,255,255,.7); font-weight:500; display:flex; align-items:center; gap:4px; }
-        .unlock-feature::before { content:'✓'; color:var(--green); font-weight:800; font-size:12px; }
-        .unlock-btn { display:block; width:100%; background:linear-gradient(135deg,#FF9500 0%,#FF3B30 100%); color:#fff; border:none; border-radius:12px; padding:14px 16px; font-size:15px; font-weight:700; letter-spacing:-.1px; cursor:pointer; text-decoration:none; text-align:center; box-shadow:0 4px 16px rgba(255,149,0,.32); transition:transform .15s, box-shadow .15s; font-family:inherit; }
+        .unlock-title {
+            color:#fff; font-size:17px; font-weight:700; letter-spacing:-.2px;
+            margin-bottom:6px;
+        }
+        .unlock-sub {
+            color:rgba(255,255,255,.65); font-size:12px; line-height:1.45;
+            margin-bottom:14px; padding:0 4px;
+        }
+        .unlock-features {
+            display:flex; justify-content:center; gap:14px; flex-wrap:wrap;
+            margin-bottom:14px;
+        }
+        .unlock-feature {
+            font-size:11px; color:rgba(255,255,255,.7); font-weight:500;
+            display:flex; align-items:center; gap:4px;
+        }
+        .unlock-feature::before {
+            content:'✓'; color:var(--green); font-weight:800; font-size:12px;
+        }
+        .unlock-btn {
+            display:block; width:100%; background:linear-gradient(135deg,#FF9500 0%,#FF3B30 100%);
+            color:#fff; border:none; border-radius:12px; padding:14px 16px;
+            font-size:15px; font-weight:700; letter-spacing:-.1px; cursor:pointer;
+            text-decoration:none; text-align:center;
+            box-shadow:0 4px 16px rgba(255,149,0,.32);
+            transition:transform .15s, box-shadow .15s;
+            font-family:inherit;
+        }
         .unlock-btn:hover { transform:translateY(-1px); box-shadow:0 6px 22px rgba(255,149,0,.45); }
         .unlock-btn:active { transform:translateY(0); }
-        .unlock-disclosure { font-size:10px; color:rgba(255,255,255,.4); margin-top:8px; letter-spacing:.3px; text-transform:uppercase; font-weight:600; }
+        .unlock-disclosure {
+            font-size:10px; color:rgba(255,255,255,.4); margin-top:8px;
+            letter-spacing:.3px; text-transform:uppercase; font-weight:600;
+        }
 
-        .inter-ad { display:block; background:linear-gradient(90deg,#FFF7ED 0%,#FFEDD5 100%); border:1px solid #FED7AA; border-radius:12px; padding:11px 14px; margin:6px 0; text-decoration:none; color:#9A3412; text-align:center; font-size:12px; font-weight:600; letter-spacing:-.05px; transition:transform .12s, box-shadow .12s; position:relative; }
+        /* ===== NEW: Interstitial Smartlink ad (between H2H matches) ===== */
+        .inter-ad {
+            display:block; background:linear-gradient(90deg,#FFF7ED 0%,#FFEDD5 100%);
+            border:1px solid #FED7AA; border-radius:12px;
+            padding:11px 14px; margin:6px 0; text-decoration:none;
+            color:#9A3412; text-align:center;
+            font-size:12px; font-weight:600; letter-spacing:-.05px;
+            transition:transform .12s, box-shadow .12s;
+            position:relative;
+        }
         .inter-ad:hover { transform:translateY(-1px); box-shadow:0 3px 10px rgba(255,149,0,.18); }
-        .inter-ad small { display:block; font-size:9px; color:#C2410C; opacity:.65; letter-spacing:.4px; text-transform:uppercase; margin-bottom:2px; font-weight:700; }
+        .inter-ad small {
+            display:block; font-size:9px; color:#C2410C; opacity:.65;
+            letter-spacing:.4px; text-transform:uppercase; margin-bottom:2px; font-weight:700;
+        }
         .inter-ad .ia-arrow { margin-left:4px; }
 
+        /* ===== Bookmaker Odds Comparison (Alerts tab only) ===== */
         .odds-card { background:var(--surface); border-radius:var(--r); box-shadow:var(--card-shadow); padding:12px 14px; margin:-3px 0 12px; border-left:3px solid var(--gold); }
         .odds-title { font-size:10px; font-weight:800; color:var(--gold); text-transform:uppercase; letter-spacing:.5px; margin-bottom:9px; display:flex; align-items:center; gap:4px; }
         .odds-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:7px; margin-bottom:10px; }
@@ -341,6 +435,36 @@
         .odds-bk { display:flex; align-items:center; justify-content:center; padding:9px 8px; border-radius:9px; font-size:11px; font-weight:700; color:#fff; text-decoration:none; transition:transform .12s,filter .12s; letter-spacing:.2px; }
         .odds-bk:hover { transform:translateY(-1px); filter:brightness(1.08); }
         .odds-bk small { font-size:8px; opacity:.85; margin-right:4px; font-weight:600; }
+
+        /* ===== League Standings table inside detail sheet ===== */
+        .stand-wrap { background:var(--surface); border-radius:var(--r); box-shadow:var(--card-shadow); margin-bottom:12px; overflow:hidden; }
+        .stand-grp-name { font-size:10px; font-weight:700; color:var(--t3); text-transform:uppercase; letter-spacing:.5px; padding:10px 12px 6px; }
+        .stand-table { width:100%; border-collapse:collapse; font-size:12px; }
+        .stand-table th { font-size:9px; font-weight:700; color:var(--t3); text-transform:uppercase; letter-spacing:.3px; padding:8px 6px; text-align:left; background:var(--bg); border-bottom:.5px solid var(--sep); }
+        .stand-table td { padding:7px 6px; border-bottom:.5px solid var(--sep); font-variant-numeric:tabular-nums; }
+        .stand-table td.team-cell { font-weight:600; font-size:12px; }
+        .stand-table td.center { text-align:center; }
+        .stand-table td.right { text-align:right; }
+        .stand-table tr.this-home { background:rgba(0,122,255,.08); }
+        .stand-table tr.this-away { background:rgba(255,149,0,.08); }
+        .stand-table tr.this-home td.team-cell { color:var(--blue); }
+        .stand-table tr.this-away td.team-cell { color:var(--gold); }
+        .stand-form { display:inline-flex; gap:2px; margin-left:6px; vertical-align:middle; }
+        .stand-form-dot { width:14px; height:14px; border-radius:3px; display:inline-flex; align-items:center; justify-content:center; font-size:8px; font-weight:800; color:#fff; }
+        .stand-form-dot.W { background:var(--green); }
+        .stand-form-dot.D { background:var(--t3); }
+        .stand-form-dot.L { background:var(--live); }
+
+        /* ===== Calendar — 5-day strip ===== */
+        .cal-days-strip { display:grid; grid-template-columns:repeat(5,1fr); gap:7px; margin-bottom:14px; }
+        .cal-strip-day { background:var(--surface); border-radius:12px; padding:9px 4px; text-align:center; cursor:pointer; box-shadow:var(--card-shadow); transition:transform .12s,background .12s; border:1.5px solid transparent; }
+        .cal-strip-day:hover { transform:translateY(-1px); }
+        .cal-strip-day.on { background:var(--t1); color:#fff; border-color:var(--t1); }
+        .cal-strip-day.on .cal-strip-dd,.cal-strip-day.on .cal-strip-dn { color:#fff; }
+        .cal-strip-dd { font-size:9px; font-weight:600; color:var(--t3); text-transform:uppercase; letter-spacing:.3px; margin-bottom:2px; }
+        .cal-strip-dn { font-size:16px; font-weight:700; color:var(--t1); letter-spacing:-.3px; line-height:1; }
+        .cal-strip-cnt { font-size:9px; font-weight:600; color:var(--t3); margin-top:3px; }
+        .cal-strip-day.on .cal-strip-cnt { color:rgba(255,255,255,.65); }
     </style>
 </head>
 <body>
@@ -355,6 +479,10 @@ const TAB_LOADING_MAX_MS = 3000;
 const LOADING_MSG = "Just 1 sec...";
 const EMPTY_TAB_MSG = "Oh... please check other tabs for matches, there are no matches here at the moment.";
 
+/* === Monetization (detail sheet only) ===
+   Smartlink banner only — popunder removed at user request because it was
+   redirecting visitors off the site. The banner is a normal link opened in a
+   NEW tab, so users stay on Magic Analysis. */
 const SMARTLINK_URL = "https://www.effectivecpmnetwork.com/mmgwyksvk?key=36e68235e91415ba8fdb9b60cb69ed02";
 
 const FIN_SET = new Set(['FT','AET','PEN','Pen.']);
@@ -383,6 +511,9 @@ const statusLabel = s => {
     return s;
 };
 
+/* === LIVE MINUTE EXTRAPOLATION ===
+   Backend stores match.elapsed (number) + match.elapsedAt (ms timestamp of the scrape).
+   Between scrapes we tick the displayed minute forward second-by-second.       */
 const liveMinute = (m) => {
     if (!m) return '';
     const raw = String(m.statusRaw || '').toUpperCase();
@@ -394,13 +525,17 @@ const liveMinute = (m) => {
     if (now > 95) now = 95;
     const whole = Math.floor(now);
     if (whole <= 45) return `${String(whole).padStart(2,'0')}'`;
-    if (whole <= 50) { const add = whole - 45; return add === 0 ? "45'" : `45+${add}'`; }
+    if (whole <= 50) {
+        const add = whole - 45;
+        return add === 0 ? "45'" : `45+${add}'`;
+    }
     if (whole <= 60 && (raw === '1H' || raw === '')) return 'HT';
     if (whole <= 90) return `${String(whole).padStart(2,'0')}'`;
     const add = whole - 90;
     return add === 0 ? "90'" : `90+${add}'`;
 };
 
+/* Re-render hook — fires every second while `active` is true. */
 const useTickingNow = (active) => {
     const [, setTick] = useState(0);
     useEffect(() => {
@@ -432,6 +567,7 @@ const getGoals = m => {
 const fid = m => m?.id || m?.static_id || m?.fixture?.id || null;
 
 // Convert a match's date + time into a sortable UTC millisecond timestamp.
+// Used to order Upcoming (soonest first), Live (earliest kickoff first), Past (most recent first).
 const matchTimestamp = (m) => {
     if (!m || !m.date) return 0;
     const t = Date.parse(`${m.date}T${m.time || '00:00'}:00Z`);
@@ -442,13 +578,17 @@ const matchToPred = m => {
     if (!m || !m.prediction) return null;
     const label = m.prediction === '1' ? 'Home Win'
                 : m.prediction === '2' ? 'Away Win'
-                : m.prediction === 'X' ? 'Draw' : '';
+                : m.prediction === 'X' ? 'Draw'
+                : '';
     return {
-        loading: false, code: m.prediction, label,
-        score: m.correctScore || null, advice: m.advice || null,
-        hp: m.probabilities?.home || '—',
-        dp: m.probabilities?.draw || '—',
-        ap: m.probabilities?.away || '—',
+        loading: false,
+        code:    m.prediction,
+        label,
+        score:   m.correctScore || null,
+        advice:  m.advice || null,
+        hp:      m.probabilities?.home || '—',
+        dp:      m.probabilities?.draw || '—',
+        ap:      m.probabilities?.away || '—',
     };
 };
 
@@ -527,8 +667,13 @@ const TeamLogo = ({ name, url, big = false }) => {
     const [err, setErr] = useState(false);
     if (url && !err) {
         return (
-            <img src={url} alt={name || ''} className={big ? 'detail-logo-img' : 'team-logo-img'}
-                onError={() => setErr(true)} loading="lazy"/>
+            <img
+                src={url}
+                alt={name || ''}
+                className={big ? 'detail-logo-img' : 'team-logo-img'}
+                onError={() => setErr(true)}
+                loading="lazy"
+            />
         );
     }
     const initials = (name || '?').split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
@@ -605,7 +750,10 @@ const MatchCard = ({ match, onOpen, onToggleFav, isFav, pred=null }) => {
     const hasPred    = !!pred && !!pred.code;
     const badgeClass = c==='live'?'s-live':c==='finished'?'s-fin':c==='upcoming'?'s-upc':'s-canc';
     const leagueTxt  = [match.country, match.leagueName].filter(Boolean).join(' · ');
+
+    // Tick every second so the LIVE minute display advances.
     useTickingNow(c === 'live');
+
     return (
         <div className={`card${hasManual?' card-premium':''}`} onClick={()=>onOpen(match)}>
             <div className="card-inner">
@@ -618,6 +766,7 @@ const MatchCard = ({ match, onOpen, onToggleFav, isFav, pred=null }) => {
                         <IcoHeart on={isFav}/>
                     </button>
                 </div>
+
                 <div className="card-row">
                     <div className="card-left">
                         <div className="card-logo-col">
@@ -660,12 +809,14 @@ const MatchCard = ({ match, onOpen, onToggleFav, isFav, pred=null }) => {
                         )}
                     </div>
                 </div>
+
                 {hasManual && (
                     <div className="card-manual-pred">
                         <div className="card-manual-pred-lbl"><IcoStar/> EXPERT TIP</div>
                         <div className="card-manual-pred-txt">{match.manual_prediction}</div>
                     </div>
                 )}
+
                 <div className="card-foot">
                     <span className={`s-badge ${badgeClass}`}>
                         {c==='live' && <span className="dot"/>}
@@ -682,6 +833,7 @@ const MatchCard = ({ match, onOpen, onToggleFav, isFav, pred=null }) => {
     );
 };
 
+/* === Last Matches section inside the detail sheet ====================== */
 const LastMatchesBlock = ({ teamName, matches }) => {
     if (!teamName) return null;
     return (
@@ -707,6 +859,7 @@ const LastMatchesBlock = ({ teamName, matches }) => {
     );
 };
 
+/* === H2H section inside the detail sheet =============================== */
 const H2HBlock = ({ details }) => {
     const list = (details.h2h && details.h2h.matches) || [];
     const s    = (details.h2h && details.h2h.stats)   || {};
@@ -748,6 +901,7 @@ const H2HBlock = ({ details }) => {
                         <div className="lm-score">{g.score}</div>
                         <div className="lm-date">{(g.date || '').slice(5)}</div>
                     </div>
+                    {/* Smartlink interstitial after every 2nd match (but not after the last one) */}
                     {((i + 1) % 2 === 0 && i < list.length - 1) && (
                         <a href={SMARTLINK_URL} target="_blank" rel="noopener noreferrer nofollow" className="inter-ad">
                             <small>Sponsored</small>
@@ -760,6 +914,7 @@ const H2HBlock = ({ details }) => {
     );
 };
 
+/* === Form summary section ============================================== */
 const FormBlock = ({ details }) => {
     const hf = details.home?.form;
     const af = details.away?.form;
@@ -797,18 +952,25 @@ const DetailSheet = ({ match, pred, onClose }) => {
     const leagueTxt  = [match.country, match.leagueName].filter(Boolean).join(' · ') || (match.leagueName || '');
     const analysis   = generateAnalysis(match);
 
+    // Live timer ticks every second while sheet is open
     useTickingNow(c === 'live');
     const liveMin = c === 'live' ? liveMinute(match) : '';
 
+    // Click-to-unlock Last Matches + H2H + Form (monetized via Smartlink)
     const [details, setDetails]       = useState(null);
     const [detailsErr, setDetailsErr] = useState(null);
     const [detailsLoading, setLoading] = useState(false);
     const [unlocked, setUnlocked]     = useState(false);
 
+    // Reset unlock state every time a new match modal is opened
     useEffect(() => {
         setDetails(null); setDetailsErr(null); setLoading(false); setUnlocked(false);
     }, [match]);
 
+    // User clicks the unlock CTA:
+    //   1. Open Smartlink in new tab (revenue!)
+    //   2. Mark as unlocked and start fetching H2H + form
+    //   The new-tab open keeps the user on Magic Analysis while still monetizing.
     const handleUnlock = () => {
         try { window.open(SMARTLINK_URL, '_blank', 'noopener,noreferrer'); } catch {}
         const id = fid(match);
@@ -829,6 +991,7 @@ const DetailSheet = ({ match, pred, onClose }) => {
             <div className="sheet" onClick={e=>e.stopPropagation()}>
                 <div className="handle"/>
 
+                {/* === Smartlink banner (detail sheet only) === */}
                 <a href={SMARTLINK_URL} target="_blank" rel="noopener noreferrer nofollow" className="smartlink-banner">
                     <small>Sponsored</small>
                     🎁 Boost Your Bets — Tap to Claim Today's Top Bonus 🎁
@@ -920,6 +1083,7 @@ const DetailSheet = ({ match, pred, onClose }) => {
                     <div style={{background:'var(--bg)',borderRadius:'var(--r)',padding:'13px 14px',marginBottom:14,textAlign:'center',fontSize:12,color:'var(--t3)'}}>Prediction not available.</div>
                 )}
 
+                {/* === H2H + Recent Form: click-to-view (monetized via Smartlink) === */}
                 {!unlocked && (
                     <div className="unlock-card">
                         <div className="unlock-icon">🤝</div>
@@ -955,6 +1119,7 @@ const DetailSheet = ({ match, pred, onClose }) => {
                         <LastMatchesBlock teamName={details.home?.name} matches={details.home?.lastMatches}/>
                         <LastMatchesBlock teamName={details.away?.name} matches={details.away?.lastMatches}/>
                         <H2HBlock details={details}/>
+                        <StandingsBlock details={details}/>
                         <FormBlock details={details}/>
                         {details.note && <div className="detail-note">ℹ️ {details.note}</div>}
                     </>
@@ -966,6 +1131,68 @@ const DetailSheet = ({ match, pred, onClose }) => {
     );
 };
 
+/* === League Standings inside detail sheet ============================= */
+const StandingsBlock = ({ details }) => {
+    const groups = details.standings;
+    if (!Array.isArray(groups) || groups.length === 0) return null;
+    return (
+        <>
+            <div className="detail-section-title">League Standings</div>
+            {groups.map((group, gi) => {
+                if (!Array.isArray(group) || group.length === 0) return null;
+                const groupName = group[0]?.group || '';
+                return (
+                    <div className="stand-wrap" key={gi}>
+                        {groupName && <div className="stand-grp-name">{groupName}</div>}
+                        <table className="stand-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Team</th>
+                                    <th className="center">P</th>
+                                    <th className="center">W</th>
+                                    <th className="center">D</th>
+                                    <th className="center">L</th>
+                                    <th className="center">+/−</th>
+                                    <th className="right">Pts</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {group.map((row, i) => (
+                                    <tr key={i} className={row.isHomeTeam ? 'this-home' : row.isAwayTeam ? 'this-away' : ''}>
+                                        <td>{row.rank}</td>
+                                        <td className="team-cell">
+                                            {row.teamName || '—'}
+                                            {row.form && (
+                                                <span className="stand-form">
+                                                    {row.form.slice(-5).split('').map((c, j) => (
+                                                        <span key={j} className={`stand-form-dot ${c}`}>{c}</span>
+                                                    ))}
+                                                </span>
+                                            )}
+                                        </td>
+                                        <td className="center">{row.played ?? '—'}</td>
+                                        <td className="center">{row.win ?? '—'}</td>
+                                        <td className="center">{row.draw ?? '—'}</td>
+                                        <td className="center">{row.lose ?? '—'}</td>
+                                        <td className="center">{row.gd != null ? (row.gd > 0 ? '+' + row.gd : row.gd) : '—'}</td>
+                                        <td className="right" style={{fontWeight:700}}>{row.points ?? '—'}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                );
+            })}
+        </>
+    );
+};
+
+/* === Bookmaker Odds Comparison — Alerts tab only ============================
+   Shows the scraped 1X2 odds + clickable bookmaker buttons. Each bookmaker
+   link is an affiliate placeholder — replace with your real affiliate URLs
+   from Bet365 / 1xBet / Betway / Bet9ja partner programs to earn signup
+   commissions when users sign up + bet. */
 const BOOKMAKERS = [
     { name: 'Bet365',  bg: '#076C44', url: 'https://www.bet365.com'   },
     { name: '1xBet',   bg: '#1C49E0', url: 'https://1xbet.com'        },
@@ -1016,16 +1243,22 @@ function App() {
     const [theme,          setTheme]          = useState(() => {
         try { return localStorage.getItem('magic-theme') || 'light'; } catch { return 'light'; }
     });
+    // selectedDate is YYYY-MM-DD (UTC) — filters Upcoming/Past tabs to that day.
+    const [selectedDate,   setSelectedDate]   = useState(() => new Date().toISOString().slice(0, 10));
 
     useEffect(() => {
         try { localStorage.setItem('magic-favs', JSON.stringify(favs)); } catch {}
     }, [favs]);
 
+    // Dark mode — apply class to <body> + persist
     useEffect(() => {
         document.body.className = theme === 'dark' ? 'dark' : '';
         try { localStorage.setItem('magic-theme', theme); } catch {}
     }, [theme]);
 
+    // Try to hydrate from localStorage on first paint so the UI isn't empty
+    // while we wait for the network — and so if Railway is down we still
+    // show *something* useful.
     useEffect(() => {
         try {
             const cached = JSON.parse(localStorage.getItem('magic-cache') || 'null');
@@ -1057,6 +1290,7 @@ function App() {
             setMatches(list);
             const stamp = data.updatedAt || new Date().toISOString();
             setUpdatedAt(stamp);
+            // Cache successful response so we can survive Railway downtime.
             try {
                 localStorage.setItem('magic-cache', JSON.stringify({
                     matches: list, updatedAt: stamp, cachedAt: Date.now(),
@@ -1065,11 +1299,15 @@ function App() {
         } catch (e) {
             if (wt) clearTimeout(wt);
             setWaking(false);
+            // Distinguish "user has no internet" vs "Railway is down / maintenance"
+            //   Offline → "Please check your internet connection"
+            //   Server error → "Website maintenance in progress, some data may be delayed"
             const isOffline = !navigator.onLine ||
                               (e instanceof TypeError && /failed to fetch|network/i.test(e.message)) ||
                               /networkerror/i.test(e.name || '');
             const offlineMsg = "📡 Please connect or check your internet connection.";
             const maintenanceMsg = "🛠️ Website maintenance in progress — some data may be delayed. We apologize in advance.";
+            // Fall back to cached data if we have any.
             let usedCache = false;
             try {
                 const cached = JSON.parse(localStorage.getItem('magic-cache') || 'null');
@@ -1114,20 +1352,42 @@ function App() {
     }, []);
 
     // Sort order rationale:
-    //   - Live:     ascending by kickoff (earliest kickoff = longest into the game = top)
-    //   - Upcoming: ascending by kickoff (match starting in 3 min appears BEFORE one starting in 30 min)
-    //   - Past:     descending by kickoff (most recent finish at top)
-    //   - Saved/Alerts: ascending by kickoff (chronological)
+    //   - Live:     ascending by kickoff — always shows currently-live (no date filter)
+    //   - Upcoming: ascending by kickoff — filtered by selectedDate so calendar works
+    //   - Past:     descending by kickoff — filtered by selectedDate so calendar works
+    //   - Saved/Alerts: ascending by kickoff (chronological, no date filter)
     const liveMatches     = useMemo(() => matches.filter(m => cat(m.status) === 'live')
         .sort((a, b) => matchTimestamp(a) - matchTimestamp(b)), [matches]);
-    const upcomingMatches = useMemo(() => matches.filter(m => cat(m.status) === 'upcoming')
-        .sort((a, b) => matchTimestamp(a) - matchTimestamp(b)), [matches]);
-    const pastMatches     = useMemo(() => matches.filter(m => cat(m.status) === 'finished' && getGoals(m))
-        .sort((a, b) => matchTimestamp(b) - matchTimestamp(a)), [matches]);
+    const upcomingMatches = useMemo(() => matches.filter(m => cat(m.status) === 'upcoming' && m.date === selectedDate)
+        .sort((a, b) => matchTimestamp(a) - matchTimestamp(b)), [matches, selectedDate]);
+    const pastMatches     = useMemo(() => matches.filter(m => cat(m.status) === 'finished' && getGoals(m) && m.date === selectedDate)
+        .sort((a, b) => matchTimestamp(b) - matchTimestamp(a)), [matches, selectedDate]);
     const savedMatches    = useMemo(() => matches.filter(m => favs.includes(fid(m)))
         .sort((a, b) => matchTimestamp(a) - matchTimestamp(b)), [matches, favs]);
     const alertMatches    = useMemo(() => matches.filter(m => { const n=parseInt(m.statusRaw||m.status); return !isNaN(n)&&n>=75&&n<120; })
         .sort((a, b) => matchTimestamp(a) - matchTimestamp(b)), [matches]);
+
+    // Compute the 5-day strip starting from today + count matches per day.
+    const dateStrip = useMemo(() => {
+        const today = new Date();
+        const isoOf = (d) => d.toISOString().slice(0, 10);
+        const counts = {};
+        for (const m of matches) {
+            if (!m.date) continue;
+            counts[m.date] = (counts[m.date] || 0) + 1;
+        }
+        return Array.from({length:5}, (_,i) => {
+            const d = new Date(today.getFullYear(), today.getMonth(), today.getDate() + i);
+            const iso = isoOf(d);
+            return {
+                iso,
+                weekday: d.toLocaleDateString('en-US',{weekday:'short'}),
+                day: d.getDate(),
+                isToday: i === 0,
+                count: counts[iso] || 0,
+            };
+        });
+    }, [matches]);
 
     const renderCard = m => {
         const k = fid(m) || `${m.home?.name}${m.away?.name}${m.status}`;
@@ -1219,6 +1479,19 @@ function App() {
                                 <div key={l} className="stat">
                                     <div className="stat-n">{v}</div>
                                     <div className="stat-l">{l}</div>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* 5-day date strip — tap a date to filter Upcoming/Past tabs */}
+                        <div className="cal-days-strip">
+                            {dateStrip.map(d => (
+                                <div key={d.iso}
+                                    className={`cal-strip-day${selectedDate === d.iso ? ' on' : ''}`}
+                                    onClick={() => setSelectedDate(d.iso)}>
+                                    <div className="cal-strip-dd">{d.isToday ? 'Today' : d.weekday}</div>
+                                    <div className="cal-strip-dn">{d.day}</div>
+                                    {d.count > 0 && <div className="cal-strip-cnt">{d.count} matches</div>}
                                 </div>
                             ))}
                         </div>
