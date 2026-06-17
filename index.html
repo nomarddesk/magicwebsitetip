@@ -244,8 +244,8 @@
         .settings-item:last-child { border-bottom:none; }
         .settings-item:hover { background:var(--bg); }
 
-        .cal-days { display:grid; grid-template-columns:repeat(5,1fr); gap:7px; }
-        .cal-day { display:flex; flex-direction:column; align-items:center; padding:11px 5px; border-radius:12px; cursor:pointer; transition:background .15s,transform .12s; border:1.5px solid var(--sep); }
+        .cal-days { display:flex; gap:7px; overflow-x:auto; padding-bottom:4px; -webkit-overflow-scrolling:touch; scroll-snap-type:x proximity; margin:0 -8px; padding-left:8px; padding-right:8px; }
+        .cal-day { flex:0 0 56px; display:flex; flex-direction:column; align-items:center; padding:11px 5px; border-radius:12px; cursor:pointer; transition:background .15s,transform .12s; border:1.5px solid var(--sep); scroll-snap-align:start; }
         .cal-day:hover { transform:translateY(-1px); }
         .cal-day.on { background:var(--t1); border-color:var(--t1); }
         .cal-day.on .cal-dd,.cal-day.on .cal-dn { color:#fff; }
@@ -1243,6 +1243,9 @@ function App() {
         try { await load(true); } finally { setTabLoading(false); }
     }, [load]);
 
+    // Calendar picker shows 10 future dates starting from TOMORROW.
+    // Today is never shown here — today is the default app view (with 3 tabs)
+    // and is restored on page refresh.
     const dateStrip = useMemo(() => {
         const today = new Date();
         const isoOf = (d) => d.toISOString().slice(0, 10);
@@ -1251,14 +1254,13 @@ function App() {
             if (!m.date) continue;
             counts[m.date] = (counts[m.date] || 0) + 1;
         }
-        return Array.from({length:5}, (_,i) => {
-            const d = new Date(today.getFullYear(), today.getMonth(), today.getDate() + i);
+        return Array.from({length:10}, (_,i) => {
+            const d = new Date(today.getFullYear(), today.getMonth(), today.getDate() + i + 1);
             const iso = isoOf(d);
             return {
                 iso,
                 weekday: d.toLocaleDateString('en-US',{weekday:'short'}),
                 day: d.getDate(),
-                isToday: i === 0,
                 count: counts[iso] || 0,
             };
         });
@@ -1466,7 +1468,7 @@ function App() {
                         <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:22}}>
                             <div>
                                 <div style={{fontSize:19,fontWeight:700,letterSpacing:'-.4px',marginBottom:2}}>Pick a date</div>
-                                <div style={{fontSize:12,color:'var(--t3)'}}>Showing 5 days from today</div>
+                                <div style={{fontSize:12,color:'var(--t3)'}}>Showing the next 10 days</div>
                             </div>
                             <button onClick={()=>setCalOpen(false)} style={{background:'var(--bg)',border:'none',borderRadius:'50%',width:28,height:28,cursor:'pointer',fontSize:16,color:'var(--t2)',display:'flex',alignItems:'center',justifyContent:'center'}}>×</button>
                         </div>
@@ -1475,7 +1477,7 @@ function App() {
                                 <div key={d.iso}
                                     className={`cal-day${selectedDate === d.iso ? ' on' : ''}`}
                                     onClick={() => { setSelectedDate(d.iso); setCalOpen(false); }}>
-                                    <span className="cal-dd">{d.isToday ? 'Today' : d.weekday}</span>
+                                    <span className="cal-dd">{d.weekday}</span>
                                     <span className="cal-dn">{d.day}</span>
                                     {d.count > 0 && <span className="cal-day-cnt">{d.count}</span>}
                                 </div>
