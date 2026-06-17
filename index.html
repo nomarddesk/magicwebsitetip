@@ -12,10 +12,6 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
 
-    <!-- Web Push Notifications via OneSignal — LIVE MATCH ALERTS ONLY -->
-    <!-- Mobile-first: shows a slide-down popup (not a tiny floating bell) so 90%
-         of mobile users can actually see/tap it. Triggers 8 seconds after first
-         page view, framed around live match alerts (not ads/promos). -->
     <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
     <script>
       window.OneSignalDeferred = window.OneSignalDeferred || [];
@@ -24,22 +20,18 @@
           await OneSignal.init({
             appId: "fab78014-9e29-4947-a92b-cac367cb093b",
             safari_web_id: "web.onesignal.auto.05737452-6fb0-4a74-aaf2-b68bc5a2ed6a",
-            // Bell icon OFF — replaced by mobile-friendly slidedown popup below.
             notifyButton: { enable: false },
             promptOptions: {
               slidedown: {
                 prompts: [{
                   type: "push",
-                  autoPrompt: true,                 // appears automatically
+                  autoPrompt: true,
                   text: {
                     actionMessage: "🔴 Get instant alerts when matches go LIVE — never miss a goal.",
                     acceptButton: "🔔 Enable Live Alerts",
                     cancelButton: "Not now"
                   },
-                  delay: {
-                    pageViews: 1,                   // show after 1 page view
-                    timeDelay: 8                    // wait 8 seconds so user sees content first
-                  }
+                  delay: { pageViews: 1, timeDelay: 8 }
                 }]
               }
             }
@@ -48,7 +40,6 @@
       });
     </script>
 
-    <!-- Google Analytics (GA4) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-RNQZZENL62"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -75,7 +66,6 @@
         body { font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue',Arial,sans-serif; background:var(--bg); color:var(--t1); overflow-x:hidden; transition:background .2s,color .2s; }
         ::-webkit-scrollbar { display:none; } * { scrollbar-width:none; }
 
-        /* ===== Dark mode — overrides root vars when body.dark is set ===== */
         body.dark {
             --bg:#000000; --surface:#1C1C1E;
             --t1:#FFFFFF; --t2:#C7C7CC; --t3:#8E8E93;
@@ -140,10 +130,6 @@
         .tab-loading { display:flex; flex-direction:column; align-items:center; gap:18px; padding:60px 20px; background:var(--surface); border-radius:var(--r); box-shadow:var(--card-shadow); margin-bottom:9px; animation:pgIn .2s ease forwards; min-height:240px; justify-content:center; }
         .tab-loading-spin { width:34px; height:34px; border:3px solid var(--sep2); border-top-color:var(--t1); border-radius:50%; animation:rot .8s linear infinite; }
         .tab-loading-msg { font-size:14px; color:var(--t2); font-weight:500; text-align:center; letter-spacing:-.1px; }
-
-        .grp { display:flex; align-items:center; gap:10px; margin:24px 0 10px; }
-        .grp-line { flex:1; height:.5px; background:var(--sep2); }
-        .grp-txt { font-size:11px; font-weight:600; color:var(--t3); text-transform:uppercase; letter-spacing:.5px; white-space:nowrap; }
 
         .card { background:var(--surface); border-radius:var(--r); box-shadow:var(--card-shadow); margin-bottom:9px; overflow:hidden; cursor:pointer; transition:transform .14s,box-shadow .14s; -webkit-tap-highlight-color:transparent; }
         .card:active { transform:scale(.984); }
@@ -299,10 +285,8 @@
 
         .lazy-slot { min-height:175px; }
 
-        /* ===== NEW: Live timer pill (inside card status badge & detail) ===== */
         .live-pill-min { font-weight:800; font-variant-numeric:tabular-nums; letter-spacing:.4px; }
 
-        /* ===== NEW: Smartlink banner inside detail sheet ===== */
         .smartlink-banner {
             display:block; background:linear-gradient(135deg,#FF9500 0%,#FF3B30 100%);
             color:#fff; text-align:center; padding:13px 16px; border-radius:14px;
@@ -316,7 +300,6 @@
             text-transform:uppercase; margin-bottom:3px; font-weight:600;
         }
 
-        /* ===== NEW: Last Matches / H2H / Form sections ===== */
         .detail-section-title {
             font-size:11px; font-weight:700; color:var(--t3);
             text-transform:uppercase; letter-spacing:.5px;
@@ -362,7 +345,6 @@
             display:flex; flex-direction:column; align-items:center; gap:10px;
         }
 
-        /* ===== NEW: Interstitial Smartlink ad (between H2H matches) ===== */
         .inter-ad {
             display:block; background:linear-gradient(90deg,#FFF7ED 0%,#FFEDD5 100%);
             border:1px solid #FED7AA; border-radius:12px;
@@ -379,7 +361,6 @@
         }
         .inter-ad .ia-arrow { margin-left:4px; }
 
-        /* ===== Bookmaker Odds Comparison (Alerts tab only) ===== */
         .odds-card { background:var(--surface); border-radius:var(--r); box-shadow:var(--card-shadow); padding:12px 14px; margin:-3px 0 12px; border-left:3px solid var(--gold); }
         .odds-title { font-size:10px; font-weight:800; color:var(--gold); text-transform:uppercase; letter-spacing:.5px; margin-bottom:9px; display:flex; align-items:center; gap:4px; }
         .odds-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:7px; margin-bottom:10px; }
@@ -391,7 +372,6 @@
         .odds-bk:hover { transform:translateY(-1px); filter:brightness(1.08); }
         .odds-bk small { font-size:8px; opacity:.85; margin-right:4px; font-weight:600; }
 
-        /* ===== League Standings table inside detail sheet ===== */
         .stand-wrap { background:var(--surface); border-radius:var(--r); box-shadow:var(--card-shadow); margin-bottom:12px; overflow:hidden; }
         .stand-grp-name { font-size:10px; font-weight:700; color:var(--t3); text-transform:uppercase; letter-spacing:.5px; padding:10px 12px 6px; }
         .stand-table { width:100%; border-collapse:collapse; font-size:12px; }
@@ -409,15 +389,6 @@
         .stand-form-dot.W { background:var(--green); }
         .stand-form-dot.D { background:var(--t3); }
         .stand-form-dot.L { background:var(--live); }
-
-        /* ===== Active-date pill (shown on Home above match list) ===== */
-        .active-date-pill { display:flex; align-items:center; justify-content:space-between; background:var(--surface); border-radius:12px; padding:10px 14px; margin-bottom:12px; box-shadow:var(--card-shadow); }
-        .active-date-pill-l { display:flex; align-items:center; gap:9px; }
-        .active-date-pill-ico { width:32px; height:32px; border-radius:50%; background:rgba(0,122,255,.1); display:flex; align-items:center; justify-content:center; color:var(--blue); }
-        .active-date-pill-txt { font-size:13px; font-weight:600; letter-spacing:-.1px; }
-        .active-date-pill-sub { font-size:11px; color:var(--t3); }
-        .active-date-pill-btn { font-size:11px; font-weight:700; background:var(--bg); color:var(--t1); border:none; border-radius:100px; padding:6px 12px; cursor:pointer; }
-        .active-date-pill-btn:hover { background:var(--t1); color:#fff; }
     </style>
 </head>
 <body>
@@ -432,10 +403,6 @@ const TAB_LOADING_MAX_MS = 3000;
 const LOADING_MSG = "Just 1 sec...";
 const EMPTY_TAB_MSG = "Oh... please check other tabs for matches, there are no matches here at the moment.";
 
-/* === Monetization (detail sheet only) ===
-   Smartlink banner only — popunder removed at user request because it was
-   redirecting visitors off the site. The banner is a normal link opened in a
-   NEW tab, so users stay on Magic Analysis. */
 const SMARTLINK_URL = "https://www.effectivecpmnetwork.com/mmgwyksvk?key=36e68235e91415ba8fdb9b60cb69ed02";
 
 const FIN_SET = new Set(['FT','AET','PEN','Pen.']);
@@ -464,9 +431,6 @@ const statusLabel = s => {
     return s;
 };
 
-/* === LIVE MINUTE EXTRAPOLATION ===
-   Backend stores match.elapsed (number) + match.elapsedAt (ms timestamp of the scrape).
-   Between scrapes we tick the displayed minute forward second-by-second.       */
 const liveMinute = (m) => {
     if (!m) return '';
     const raw = String(m.statusRaw || '').toUpperCase();
@@ -488,7 +452,6 @@ const liveMinute = (m) => {
     return add === 0 ? "90'" : `90+${add}'`;
 };
 
-/* Re-render hook — fires every second while `active` is true. */
 const useTickingNow = (active) => {
     const [, setTick] = useState(0);
     useEffect(() => {
@@ -519,8 +482,6 @@ const getGoals = m => {
 
 const fid = m => m?.id || m?.static_id || m?.fixture?.id || null;
 
-// Convert a match's date + time into a sortable UTC millisecond timestamp.
-// Used to order Upcoming (soonest first), Live (earliest kickoff first), Past (most recent first).
 const matchTimestamp = (m) => {
     if (!m || !m.date) return 0;
     const t = Date.parse(`${m.date}T${m.time || '00:00'}:00Z`);
@@ -704,7 +665,6 @@ const MatchCard = ({ match, onOpen, onToggleFav, isFav, pred=null }) => {
     const badgeClass = c==='live'?'s-live':c==='finished'?'s-fin':c==='upcoming'?'s-upc':'s-canc';
     const leagueTxt  = [match.country, match.leagueName].filter(Boolean).join(' · ');
 
-    // Tick every second so the LIVE minute display advances.
     useTickingNow(c === 'live');
 
     return (
@@ -786,7 +746,6 @@ const MatchCard = ({ match, onOpen, onToggleFav, isFav, pred=null }) => {
     );
 };
 
-/* === Last Matches section inside the detail sheet ====================== */
 const LastMatchesBlock = ({ teamName, matches }) => {
     if (!teamName) return null;
     return (
@@ -812,7 +771,6 @@ const LastMatchesBlock = ({ teamName, matches }) => {
     );
 };
 
-/* === H2H section inside the detail sheet =============================== */
 const H2HBlock = ({ details }) => {
     const list = (details.h2h && details.h2h.matches) || [];
     const s    = (details.h2h && details.h2h.stats)   || {};
@@ -854,7 +812,6 @@ const H2HBlock = ({ details }) => {
                         <div className="lm-score">{g.score}</div>
                         <div className="lm-date">{(g.date || '').slice(5)}</div>
                     </div>
-                    {/* Smartlink interstitial after every 2nd match (but not after the last one) */}
                     {((i + 1) % 2 === 0 && i < list.length - 1) && (
                         <a href={SMARTLINK_URL} target="_blank" rel="noopener noreferrer nofollow" className="inter-ad">
                             <small>Sponsored</small>
@@ -867,7 +824,6 @@ const H2HBlock = ({ details }) => {
     );
 };
 
-/* === Form summary section ============================================== */
 const FormBlock = ({ details }) => {
     const hf = details.home?.form;
     const af = details.away?.form;
@@ -905,11 +861,9 @@ const DetailSheet = ({ match, pred, onClose }) => {
     const leagueTxt  = [match.country, match.leagueName].filter(Boolean).join(' · ') || (match.leagueName || '');
     const analysis   = generateAnalysis(match);
 
-    // Live timer ticks every second while sheet is open
     useTickingNow(c === 'live');
     const liveMin = c === 'live' ? liveMinute(match) : '';
 
-    // H2H + Standings + Form auto-load when the sheet opens
     const [details, setDetails]       = useState(null);
     const [detailsErr, setDetailsErr] = useState(null);
     const [detailsLoading, setLoading] = useState(false);
@@ -932,7 +886,6 @@ const DetailSheet = ({ match, pred, onClose }) => {
             <div className="sheet" onClick={e=>e.stopPropagation()}>
                 <div className="handle"/>
 
-                {/* === Smartlink banner (detail sheet only) === */}
                 <a href={SMARTLINK_URL} target="_blank" rel="noopener noreferrer nofollow" className="smartlink-banner">
                     <small>Sponsored</small>
                     🎁 Boost Your Bets — Tap to Claim Today's Top Bonus 🎁
@@ -1024,7 +977,6 @@ const DetailSheet = ({ match, pred, onClose }) => {
                     <div style={{background:'var(--bg)',borderRadius:'var(--r)',padding:'13px 14px',marginBottom:14,textAlign:'center',fontSize:12,color:'var(--t3)'}}>Prediction not available.</div>
                 )}
 
-                {/* === Standings + H2H + Form auto-load when sheet opens === */}
                 {detailsLoading && (
                     <div className="detail-loading">
                         <div className="spin-sm"/>
@@ -1054,7 +1006,6 @@ const DetailSheet = ({ match, pred, onClose }) => {
     );
 };
 
-/* === League Standings inside detail sheet ============================= */
 const StandingsBlock = ({ details }) => {
     const groups = details.standings;
     if (!Array.isArray(groups) || groups.length === 0) return null;
@@ -1111,11 +1062,6 @@ const StandingsBlock = ({ details }) => {
     );
 };
 
-/* === Bookmaker Odds Comparison — Alerts tab only ============================
-   Shows the scraped 1X2 odds + clickable bookmaker buttons. Each bookmaker
-   link is an affiliate placeholder — replace with your real affiliate URLs
-   from Bet365 / 1xBet / Betway / Bet9ja partner programs to earn signup
-   commissions when users sign up + bet. */
 const BOOKMAKERS = [
     { name: 'Bet365',  bg: '#076C44', url: 'https://www.bet365.com'   },
     { name: '1xBet',   bg: '#1C49E0', url: 'https://1xbet.com'        },
@@ -1166,22 +1112,19 @@ function App() {
     const [theme,          setTheme]          = useState(() => {
         try { return localStorage.getItem('magic-theme') || 'light'; } catch { return 'light'; }
     });
-    // selectedDate is YYYY-MM-DD (UTC) — filters Upcoming/Past tabs to that day.
+    // selectedDate is YYYY-MM-DD (UTC). When equal to today, the Home tab shows
+    // Live/Upcoming/Past tabs + stats; for future dates we show only Upcoming.
     const [selectedDate,   setSelectedDate]   = useState(() => new Date().toISOString().slice(0, 10));
 
     useEffect(() => {
         try { localStorage.setItem('magic-favs', JSON.stringify(favs)); } catch {}
     }, [favs]);
 
-    // Dark mode — apply class to <body> + persist
     useEffect(() => {
         document.body.className = theme === 'dark' ? 'dark' : '';
         try { localStorage.setItem('magic-theme', theme); } catch {}
     }, [theme]);
 
-    // Try to hydrate from localStorage on first paint so the UI isn't empty
-    // while we wait for the network — and so if Railway is down we still
-    // show *something* useful.
     useEffect(() => {
         try {
             const cached = JSON.parse(localStorage.getItem('magic-cache') || 'null');
@@ -1213,7 +1156,6 @@ function App() {
             setMatches(list);
             const stamp = data.updatedAt || new Date().toISOString();
             setUpdatedAt(stamp);
-            // Cache successful response so we can survive Railway downtime.
             try {
                 localStorage.setItem('magic-cache', JSON.stringify({
                     matches: list, updatedAt: stamp, cachedAt: Date.now(),
@@ -1222,15 +1164,11 @@ function App() {
         } catch (e) {
             if (wt) clearTimeout(wt);
             setWaking(false);
-            // Distinguish "user has no internet" vs "Railway is down / maintenance"
-            //   Offline → "Please check your internet connection"
-            //   Server error → "Website maintenance in progress, some data may be delayed"
             const isOffline = !navigator.onLine ||
                               (e instanceof TypeError && /failed to fetch|network/i.test(e.message)) ||
                               /networkerror/i.test(e.name || '');
             const offlineMsg = "📡 Please connect or check your internet connection.";
             const maintenanceMsg = "🛠️ Website maintenance in progress — some data may be delayed. We apologize in advance.";
-            // Fall back to cached data if we have any.
             let usedCache = false;
             try {
                 const cached = JSON.parse(localStorage.getItem('magic-cache') || 'null');
@@ -1262,11 +1200,13 @@ function App() {
         return () => clearTimeout(done);
     }, [tabLoading]);
 
-    const handleHomeTabClick = useCallback(async (t) => {
-        setHomeTab(t);
+    // Show loading whenever the selected date changes (skip first mount).
+    const dateChangedOnce = useRef(false);
+    useEffect(() => {
+        if (!dateChangedOnce.current) { dateChangedOnce.current = true; return; }
         setTabLoading(true);
-        try { await load(true); } finally { setTabLoading(false); }
-    }, [load]);
+        load(true).finally(() => setTabLoading(false));
+    }, [selectedDate, load]);
 
     const openDetail = useCallback(m => setDetailMatch(m), []);
     const toggleFav  = useCallback(id => {
@@ -1274,11 +1214,12 @@ function App() {
         setFavs(p => p.includes(id) ? p.filter(f => f !== id) : [...p, id]);
     }, []);
 
-    // Sort order rationale:
-    //   - Live:     ascending by kickoff — always shows currently-live (no date filter)
-    //   - Upcoming: ascending by kickoff — filtered by selectedDate so calendar works
-    //   - Past:     descending by kickoff — filtered by selectedDate so calendar works
-    //   - Saved/Alerts: ascending by kickoff (chronological, no date filter)
+    // When viewing TODAY the Home page restores its original 3-tab layout
+    // (Live / Upcoming / Past + stats grid). For any future date we collapse
+    // to a single Upcoming-only view.
+    const todayIso       = new Date().toISOString().slice(0, 10);
+    const isViewingToday = selectedDate === todayIso;
+
     const liveMatches     = useMemo(() => matches.filter(m => cat(m.status) === 'live')
         .sort((a, b) => matchTimestamp(a) - matchTimestamp(b)), [matches]);
     const upcomingMatches = useMemo(() => matches.filter(m => cat(m.status) === 'upcoming' && m.date === selectedDate)
@@ -1290,7 +1231,18 @@ function App() {
     const alertMatches    = useMemo(() => matches.filter(m => { const n=parseInt(m.statusRaw||m.status); return !isNaN(n)&&n>=75&&n<120; })
         .sort((a, b) => matchTimestamp(a) - matchTimestamp(b)), [matches]);
 
-    // Compute the 5-day strip starting from today + count matches per day.
+    // If user picks a future date while sitting on Live/Past, snap to Upcoming
+    // so they don't see an "empty" Live/Past panel that's actually hidden.
+    useEffect(() => {
+        if (!isViewingToday && homeTab !== 'Upcoming') setHomeTab('Upcoming');
+    }, [isViewingToday, homeTab]);
+
+    const handleHomeTabClick = useCallback(async (t) => {
+        setHomeTab(t);
+        setTabLoading(true);
+        try { await load(true); } finally { setTabLoading(false); }
+    }, [load]);
+
     const dateStrip = useMemo(() => {
         const today = new Date();
         const isoOf = (d) => d.toISOString().slice(0, 10);
@@ -1330,23 +1282,15 @@ function App() {
     const renderHomeBody = () => {
         if (tabLoading) return <TabLoading/>;
         if (loading) return [1,2,3].map(i => <Skel key={i}/>);
-        const active = homeTab === 'Live'    ? liveMatches
-                     : homeTab === 'Past'    ? pastMatches
-                     :                          upcomingMatches;
+        const active = isViewingToday
+            ? (homeTab === 'Live' ? liveMatches : homeTab === 'Past' ? pastMatches : upcomingMatches)
+            : upcomingMatches;
         if (active.length === 0) return <EmptyState title={EMPTY_TAB_MSG}/>;
         return active.map(renderCard);
     };
 
     const today  = new Date().toLocaleDateString('en-US', {weekday:'long',month:'long',day:'numeric'});
     const sports = [['Football','⚽'],['Basketball','🏀'],['Tennis','🎾'],['Hockey','🏒'],['Baseball','⚾']];
-
-    // Labels for the active-date pill (Home tab) — shows the date you've filtered to.
-    const todayIso          = new Date().toISOString().slice(0, 10);
-    const isViewingToday    = selectedDate === todayIso;
-    const selectedLabel     = isViewingToday
-        ? 'Today'
-        : new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'});
-    const selectedDateMatchCount = matches.filter(m => m.date === selectedDate).length;
 
     return (
         <>
@@ -1369,7 +1313,7 @@ function App() {
             )}
 
             <header className="hdr">
-                <button className="hdr-btn" onClick={()=>setCalOpen(true)} title="Calendar"><IcoCal/></button>
+                <button className="hdr-btn" onClick={()=>setCalOpen(true)} title="Pick date"><IcoCal/></button>
                 <div className="hdr-center"><MagicLogo size={22}/><span className="hdr-title">Magic Analysis</span></div>
                 <button className="hdr-btn" onClick={()=>setTheme(theme==='dark'?'light':'dark')} title={theme==='dark'?'Light mode':'Dark mode'}>
                     {theme==='dark' ? <IcoSun/> : <IcoMoon/>}
@@ -1394,41 +1338,34 @@ function App() {
                 {tab==='Home' && (
                     <div className="page-in">
                         <div className="page-head">
-                            <h1 className="page-h1">Predictions</h1>
+                            <h1 className="page-h1">{isViewingToday ? 'Predictions' : 'Upcoming Matches'}</h1>
                             <p className="page-sub">{today}{updatedAt ? ` · refreshed ${new Date(updatedAt).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})}` : ''}</p>
                         </div>
-                        <div className="stats">
-                            {[['Live',liveMatches.length],['Upcoming',upcomingMatches.length],['Past',pastMatches.length],['Alerts',alertMatches.length]].map(([l,v]) => (
-                                <div key={l} className="stat">
-                                    <div className="stat-n">{v}</div>
-                                    <div className="stat-l">{l}</div>
-                                </div>
-                            ))}
-                        </div>
 
-                        {/* Active date indicator — tap "Change date" to open header calendar */}
-                        <div className="active-date-pill">
-                            <div className="active-date-pill-l">
-                                <div className="active-date-pill-ico"><IcoCal/></div>
-                                <div>
-                                    <div className="active-date-pill-txt">{selectedLabel}</div>
-                                    <div className="active-date-pill-sub">{selectedDateMatchCount} matches</div>
+                        {isViewingToday && (
+                            <>
+                                <div className="stats">
+                                    {[['Live',liveMatches.length],['Upcoming',upcomingMatches.length],['Past',pastMatches.length],['Alerts',alertMatches.length]].map(([l,v]) => (
+                                        <div key={l} className="stat">
+                                            <div className="stat-n">{v}</div>
+                                            <div className="stat-l">{l}</div>
+                                        </div>
+                                    ))}
                                 </div>
-                            </div>
-                            <button className="active-date-pill-btn" onClick={()=>setCalOpen(true)}>Change date</button>
-                        </div>
 
-                        <div className="home-tabs">
-                            <button className={`home-tab${homeTab==='Live'?' on':''}`} onClick={()=>handleHomeTabClick('Live')}>
-                                🔴 Live <span className="home-tab-count">({liveMatches.length})</span>
-                            </button>
-                            <button className={`home-tab${homeTab==='Upcoming'?' on':''}`} onClick={()=>handleHomeTabClick('Upcoming')}>
-                                🔵 Upcoming <span className="home-tab-count">({upcomingMatches.length})</span>
-                            </button>
-                            <button className={`home-tab${homeTab==='Past'?' on':''}`} onClick={()=>handleHomeTabClick('Past')}>
-                                ✅ Past <span className="home-tab-count">({pastMatches.length})</span>
-                            </button>
-                        </div>
+                                <div className="home-tabs">
+                                    <button className={`home-tab${homeTab==='Live'?' on':''}`} onClick={()=>handleHomeTabClick('Live')}>
+                                        🔴 Live <span className="home-tab-count">({liveMatches.length})</span>
+                                    </button>
+                                    <button className={`home-tab${homeTab==='Upcoming'?' on':''}`} onClick={()=>handleHomeTabClick('Upcoming')}>
+                                        🔵 Upcoming <span className="home-tab-count">({upcomingMatches.length})</span>
+                                    </button>
+                                    <button className={`home-tab${homeTab==='Past'?' on':''}`} onClick={()=>handleHomeTabClick('Past')}>
+                                        ✅ Past <span className="home-tab-count">({pastMatches.length})</span>
+                                    </button>
+                                </div>
+                            </>
+                        )}
 
                         {waking && (
                             <div className="wake-bar">
