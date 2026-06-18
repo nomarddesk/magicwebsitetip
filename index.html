@@ -272,27 +272,19 @@
         .tds-day.on .tds-day-name { color:rgba(255,255,255,.7); }
         .tds-day.on .tds-day-num { color:#fff; }
 
-        /* ===== Country list (drill-down level 1) ===== */
-        .country-grid { display:flex; flex-direction:column; gap:8px; margin-bottom:9px; }
-        .country-card { background:var(--surface); border-radius:var(--r); box-shadow:var(--card-shadow); padding:14px 16px; display:flex; align-items:center; gap:12px; cursor:pointer; transition:transform .14s,box-shadow .14s; -webkit-tap-highlight-color:transparent; }
-        .country-card:active { transform:scale(.985); }
-        .country-card:hover { box-shadow:0 4px 22px rgba(0,0,0,0.1); }
-        .country-card-flag { font-size:26px; line-height:1; flex-shrink:0; }
-        .country-card-info { flex:1; min-width:0; overflow:hidden; }
-        .country-card-name { font-size:15px; font-weight:700; letter-spacing:-.2px; color:var(--t1); margin-bottom:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-        .country-card-count { font-size:11px; font-weight:500; color:var(--t3); }
-        .country-card-chev { color:var(--t3); flex-shrink:0; display:flex; }
+        /* ===== Country filter slider (between sports tabs and main content) ===== */
+        .country-slider { display:flex; gap:5px; background:var(--surface); border-bottom:0.5px solid var(--sep); padding:10px 14px; overflow-x:auto; -webkit-overflow-scrolling:touch; scroll-snap-type:x proximity; }
+        .cs-item { flex:0 0 54px; background:transparent; border:1.5px solid transparent; padding:6px 4px; border-radius:11px; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:4px; scroll-snap-align:center; transition:background .12s,border-color .12s; -webkit-tap-highlight-color:transparent; font-family:inherit; }
+        .cs-item:hover { background:var(--bg); }
+        .cs-item.on { background:var(--t1); border-color:var(--t1); }
+        .cs-flag { font-size:22px; line-height:1; }
+        .cs-code { font-size:9px; font-weight:800; color:var(--t3); letter-spacing:.4px; }
+        .cs-item.on .cs-code { color:#fff; }
 
-        /* ===== Country detail (drill-down level 2) ===== */
-        .country-detail-head { display:flex; align-items:center; gap:10px; padding:6px 0 14px; margin-bottom:6px; border-bottom:0.5px solid var(--sep); }
-        .country-detail-back { background:var(--bg); border:none; border-radius:50%; width:36px; height:36px; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--t1); font-size:20px; line-height:1; flex-shrink:0; transition:background .15s; -webkit-tap-highlight-color:transparent; font-family:inherit; padding:0; }
-        .country-detail-back:hover { background:var(--sep2); }
-        .country-detail-flag { font-size:28px; line-height:1; flex-shrink:0; }
-        .country-detail-info { flex:1; min-width:0; }
-        .country-detail-name { font-size:18px; font-weight:700; letter-spacing:-.3px; color:var(--t1); line-height:1.1; }
-        .country-detail-sub { font-size:11px; color:var(--t3); margin-top:2px; }
+        /* ===== League section (groups matches under each competition) ===== */
         .league-block { margin-bottom:14px; }
-        .league-block-title { font-size:11px; font-weight:700; color:var(--t3); text-transform:uppercase; letter-spacing:.5px; padding:8px 4px 8px; }
+        .league-block-title { font-size:11px; font-weight:700; color:var(--t3); text-transform:uppercase; letter-spacing:.5px; padding:8px 4px 8px; display:flex; align-items:center; gap:6px; }
+        .league-block-flag { font-size:14px; line-height:1; }
 
         /* ===== Past-date note ===== */
         .past-date-note { background:#FFFBEB; border-left:3px solid var(--gold); border-radius:8px; padding:10px 12px; font-size:12px; color:#92400E; line-height:1.5; margin-bottom:12px; }
@@ -401,7 +393,6 @@ const EMPTY_TAB_MSG = "Oh... please check other tabs for matches, there are no m
 
 const SMARTLINK_URL = "https://www.effectivecpmnetwork.com/mmgwyksvk?key=36e68235e91415ba8fdb9b60cb69ed02";
 
-// Country → flag emoji map. Fallback ⚽ for anything not listed.
 const COUNTRY_FLAGS = {
     'England':'🏴󠁧󠁢󠁥󠁮󠁧󠁿','Scotland':'🏴󠁧󠁢󠁳󠁣󠁴󠁿','Wales':'🏴󠁧󠁢󠁷󠁬󠁳󠁿','Northern Ireland':'🇬🇧',
     'Spain':'🇪🇸','Germany':'🇩🇪','Italy':'🇮🇹','France':'🇫🇷','Portugal':'🇵🇹',
@@ -419,6 +410,24 @@ const COUNTRY_FLAGS = {
     'World':'🌐','International':'🌐','Europe':'🇪🇺','South America':'🌎','Africa':'🌍','Asia':'🌏',
 };
 const getCountryFlag = (country) => COUNTRY_FLAGS[country] || '⚽';
+
+const COUNTRY_CODES = {
+    'England':'ENG','Scotland':'SCO','Wales':'WAL','Northern Ireland':'NIR',
+    'Spain':'ES','Germany':'DE','Italy':'IT','France':'FR','Portugal':'PT',
+    'Netherlands':'NL','Belgium':'BE','Turkey':'TR','Greece':'GR','Switzerland':'CH',
+    'Austria':'AT','Russia':'RU','Ukraine':'UA','Poland':'PL','Czech Republic':'CZ',
+    'Croatia':'HR','Serbia':'RS','Romania':'RO','Bulgaria':'BG','Hungary':'HU',
+    'Sweden':'SE','Norway':'NO','Denmark':'DK','Finland':'FI','Ireland':'IE','Iceland':'IS',
+    'Brazil':'BR','Argentina':'AR','Chile':'CL','Colombia':'CO','Peru':'PE','Uruguay':'UY',
+    'Ecuador':'EC','Paraguay':'PY','Bolivia':'BO','Venezuela':'VE',
+    'Mexico':'MX','USA':'US','United States':'US','Canada':'CA',
+    'Japan':'JP','South Korea':'KR','China':'CN','Australia':'AU','India':'IN',
+    'Saudi Arabia':'SA','UAE':'AE','Qatar':'QA','Iran':'IR','Iraq':'IQ','Israel':'IL',
+    'Egypt':'EG','Morocco':'MA','South Africa':'ZA','Nigeria':'NG','Ghana':'GH',
+    'Tunisia':'TN','Algeria':'DZ','Senegal':'SN','Ivory Coast':'CI','Cameroon':'CM',
+    'World':'INT','International':'INT','Europe':'EU','South America':'CSA','Africa':'AFR','Asia':'ASN',
+};
+const getCountryCode = (country) => COUNTRY_CODES[country] || (country || '?').slice(0, 3).toUpperCase();
 
 const FIN_SET = new Set(['FT','AET','PEN','Pen.']);
 const UPC_SET = new Set(['NS','TBD']);
@@ -1226,16 +1235,11 @@ function App() {
         setFavs(p => p.includes(id) ? p.filter(f => f !== id) : [...p, id]);
     }, []);
 
-    // Date-type detection:
-    //   isViewingToday → show Live / Upcoming / Past tabs
-    //   isPastDate     → show only past matches (Live/Upcoming hidden)
-    //   isFutureDate   → show only upcoming matches (Live/Past hidden)
     const todayIso       = new Date().toISOString().slice(0, 10);
     const isViewingToday = selectedDate === todayIso;
     const isPastDate     = selectedDate < todayIso;
     const isFutureDate   = selectedDate > todayIso;
 
-    // Country drill-down state. null = country list view; set = detail view.
     const [selectedCountry, setSelectedCountry] = useState(null);
 
     const liveMatches     = useMemo(() => matches.filter(m => cat(m.status) === 'live')
@@ -1249,16 +1253,10 @@ function App() {
     const alertMatches    = useMemo(() => matches.filter(m => { const n=parseInt(m.statusRaw||m.status); return !isNaN(n)&&n>=75&&n<120; })
         .sort((a, b) => matchTimestamp(a) - matchTimestamp(b)), [matches]);
 
-    // Snap homeTab to the only valid value for the current date type.
     useEffect(() => {
         if (isPastDate && homeTab !== 'Past') setHomeTab('Past');
         else if (isFutureDate && homeTab !== 'Upcoming') setHomeTab('Upcoming');
     }, [isPastDate, isFutureDate, homeTab]);
-
-    // Drop the country drill-down whenever the date changes.
-    useEffect(() => {
-        setSelectedCountry(null);
-    }, [selectedDate]);
 
     const handleHomeTabClick = useCallback(async (t) => {
         setHomeTab(t);
@@ -1266,8 +1264,6 @@ function App() {
         try { await load(true); } finally { setTabLoading(false); }
     }, [load]);
 
-    // Date strip used by BOTH the top horizontal strip and the calendar popup.
-    // Range: Past 5 days + Today + Future 10 days = 16 items, sorted oldest → newest.
     const dateStrip = useMemo(() => {
         const today = new Date();
         const isoOf = (d) => d.toISOString().slice(0, 10);
@@ -1301,7 +1297,8 @@ function App() {
         setCalOpen(false);
     };
 
-    const filteredMatches = useMemo(() => {
+    // Matches relevant to the current date type (before country filter).
+    const dateRelevantMatches = useMemo(() => {
         if (isPastDate)   return pastMatches;
         if (isFutureDate) return upcomingMatches;
         if (homeTab === 'Live') return liveMatches;
@@ -1309,22 +1306,47 @@ function App() {
         return upcomingMatches;
     }, [isPastDate, isFutureDate, homeTab, liveMatches, upcomingMatches, pastMatches]);
 
-    const countryList = useMemo(() => {
+    // Countries available for the slider: any country with at least one match
+    // for the selected date across ANY status, so the slider stays stable when
+    // the user switches Live/Upcoming/Past sub-tabs. Sorted by count desc.
+    const availableCountries = useMemo(() => {
+        const pool = matches.filter(m => {
+            if (isViewingToday && cat(m.status) === 'live') return true;
+            return m.date === selectedDate;
+        });
         const counts = {};
-        for (const m of filteredMatches) {
+        for (const m of pool) {
             const c = m.country || 'International';
             counts[c] = (counts[c] || 0) + 1;
         }
         return Object.entries(counts)
             .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
-            .map(([country, count]) => ({ country, count }));
-    }, [filteredMatches]);
+            .map(([country]) => country);
+    }, [matches, selectedDate, isViewingToday]);
 
-    const selectedCountryLeagues = useMemo(() => {
-        if (!selectedCountry) return [];
-        const inCountry = filteredMatches.filter(m => (m.country || 'International') === selectedCountry);
+    // Auto-select the first available country whenever the current selection
+    // becomes invalid (e.g. date changed and old country has no matches).
+    useEffect(() => {
+        if (availableCountries.length === 0) {
+            if (selectedCountry !== null) setSelectedCountry(null);
+            return;
+        }
+        if (!selectedCountry || !availableCountries.includes(selectedCountry)) {
+            setSelectedCountry(availableCountries[0]);
+        }
+    }, [availableCountries, selectedCountry]);
+
+    // Matches that get rendered: date-relevant + country filter applied.
+    const filteredMatches = useMemo(() => {
+        if (!selectedCountry) return dateRelevantMatches;
+        return dateRelevantMatches.filter(m => (m.country || 'International') === selectedCountry);
+    }, [dateRelevantMatches, selectedCountry]);
+
+    // Group filtered matches by league so we can show competition names
+    // as section headers above each cluster of cards.
+    const matchesByLeague = useMemo(() => {
         const byLeague = {};
-        for (const m of inCountry) {
+        for (const m of filteredMatches) {
             const l = m.leagueName || 'Other';
             if (!byLeague[l]) byLeague[l] = [];
             byLeague[l].push(m);
@@ -1332,7 +1354,15 @@ function App() {
         return Object.entries(byLeague)
             .sort((a, b) => a[0].localeCompare(b[0]))
             .map(([league, leagueMatches]) => ({ league, matches: leagueMatches }));
-    }, [selectedCountry, filteredMatches]);
+    }, [filteredMatches]);
+
+    // Smoothly center the selected country chip whenever it changes.
+    const countrySliderRef = useRef(null);
+    useEffect(() => {
+        if (!selectedCountry || !countrySliderRef.current) return;
+        const el = countrySliderRef.current.querySelector(`[data-country-idx="${availableCountries.indexOf(selectedCountry)}"]`);
+        if (el) el.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    }, [selectedCountry, availableCountries]);
 
     const renderCard = m => {
         const k = fid(m) || `${m.home?.name}${m.away?.name}${m.status}`;
@@ -1349,56 +1379,23 @@ function App() {
         );
     };
 
-    const renderCountryList = () => {
-        if (countryList.length === 0) {
+    const renderHomeBody = () => {
+        if (tabLoading) return <TabLoading/>;
+        if (loading)    return [1,2,3].map(i => <Skel key={i}/>);
+        if (matchesByLeague.length === 0) {
             return <EmptyState title={isPastDate
                 ? "No matches on record for this date."
                 : EMPTY_TAB_MSG}/>;
         }
-        return (
-            <div className="country-grid">
-                {countryList.map(({ country, count }) => (
-                    <div key={country} className="country-card" onClick={() => setSelectedCountry(country)}>
-                        <span className="country-card-flag">{getCountryFlag(country)}</span>
-                        <div className="country-card-info">
-                            <div className="country-card-name">{country}</div>
-                            <div className="country-card-count">{count} {count === 1 ? 'match' : 'matches'}</div>
-                        </div>
-                        <span className="country-card-chev"><IcoChev/></span>
-                    </div>
-                ))}
-            </div>
-        );
-    };
-
-    const renderCountryDetail = () => (
-        <>
-            <div className="country-detail-head">
-                <button className="country-detail-back" onClick={() => setSelectedCountry(null)} title="Back to countries">←</button>
-                <span className="country-detail-flag">{getCountryFlag(selectedCountry)}</span>
-                <div className="country-detail-info">
-                    <div className="country-detail-name">{selectedCountry}</div>
-                    <div className="country-detail-sub">
-                        {selectedCountryLeagues.length} {selectedCountryLeagues.length === 1 ? 'competition' : 'competitions'}
-                    </div>
+        return matchesByLeague.map(({ league, matches: leagueMatches }) => (
+            <div key={league} className="league-block">
+                <div className="league-block-title">
+                    <span className="league-block-flag">{getCountryFlag(selectedCountry)}</span>
+                    {league}
                 </div>
+                {leagueMatches.map(renderCard)}
             </div>
-            {selectedCountryLeagues.length === 0
-                ? <EmptyState title="No matches in this country right now."/>
-                : selectedCountryLeagues.map(({ league, matches: leagueMatches }) => (
-                    <div key={league} className="league-block">
-                        <div className="league-block-title">{league}</div>
-                        {leagueMatches.map(renderCard)}
-                    </div>
-                ))
-            }
-        </>
-    );
-
-    const renderHomeBody = () => {
-        if (tabLoading) return <TabLoading/>;
-        if (loading)    return [1,2,3].map(i => <Skel key={i}/>);
-        return selectedCountry ? renderCountryDetail() : renderCountryList();
+        ));
     };
 
     const today  = new Date().toLocaleDateString('en-US', {weekday:'long',month:'long',day:'numeric'});
@@ -1459,6 +1456,21 @@ function App() {
                 ))}
             </div>
 
+            {tab === 'Home' && availableCountries.length > 0 && (
+                <div className="country-slider" ref={countrySliderRef}>
+                    {availableCountries.map((country, i) => (
+                        <button key={country}
+                            data-country-idx={i}
+                            className={`cs-item${selectedCountry === country ? ' on' : ''}`}
+                            onClick={() => setSelectedCountry(country)}
+                            title={country}>
+                            <span className="cs-flag">{getCountryFlag(country)}</span>
+                            <span className="cs-code">{getCountryCode(country)}</span>
+                        </button>
+                    ))}
+                </div>
+            )}
+
             <main className="page">
                 {tab==='Home' && (
                     <div className="page-in">
@@ -1472,7 +1484,7 @@ function App() {
                             )}
                         </div>
 
-                        {isViewingToday && !selectedCountry && (
+                        {isViewingToday && (
                             <div className="stats">
                                 {[['Live',liveMatches.length],['Upcoming',upcomingMatches.length],['Past',pastMatches.length],['Alerts',alertMatches.length]].map(([l,v]) => (
                                     <div key={l} className="stat">
@@ -1497,7 +1509,7 @@ function App() {
                             </div>
                         )}
 
-                        {isPastDate && !selectedCountry && (
+                        {isPastDate && (
                             <div className="past-date-note">
                                 ℹ️ Historical match data isn't tracked yet — only Today + future days have full coverage. The backend needs an update to cache past matches.
                             </div>
