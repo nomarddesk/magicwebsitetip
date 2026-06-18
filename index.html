@@ -1204,6 +1204,96 @@ const OddsCard = ({ match }) => {
     );
 };
 
+// Backend doesn't return a country field on each match — only leagueName.
+// Map well-known leagues → country here. Anything we can't recognise falls
+// through to "International" (continental cups / friendlies / obscure leagues).
+const LEAGUE_COUNTRY_MAP = {
+    'premier league':'England','efl championship':'England','championship':'England','league one':'England','league two':'England','efl cup':'England','carabao cup':'England','fa cup':'England','fa trophy':'England','national league':'England','national league north':'England','national league south':'England','wsl':'England',"women's super league":'England','community shield':'England',
+    'la liga':'Spain','laliga':'Spain','la liga 2':'Spain','segunda division':'Spain','segunda división':'Spain','copa del rey':'Spain','supercopa de españa':'Spain','liga f':'Spain','primera división rfef':'Spain','primera rfef':'Spain',
+    'bundesliga':'Germany','2. bundesliga':'Germany','3. liga':'Germany','dfb-pokal':'Germany','dfb pokal':'Germany','frauen-bundesliga':'Germany','regionalliga':'Germany','regionalliga nord':'Germany','regionalliga süd':'Germany','regionalliga west':'Germany','regionalliga nordost':'Germany','regionalliga bayern':'Germany',
+    'serie a':'Italy','serie b':'Italy','serie c':'Italy','coppa italia':'Italy','supercoppa italiana':'Italy',
+    'ligue 1':'France','ligue 2':'France','national':'France','coupe de france':'France','trophée des champions':'France',
+    'eredivisie':'Netherlands','eerste divisie':'Netherlands','knvb beker':'Netherlands',
+    'primeira liga':'Portugal','liga portugal':'Portugal','liga portugal 2':'Portugal','taça de portugal':'Portugal','taca de portugal':'Portugal',
+    'jupiler pro league':'Belgium','challenger pro league':'Belgium','belgian pro league':'Belgium','belgian first division a':'Belgium','belgian first division b':'Belgium',
+    'süper lig':'Turkey','super lig':'Turkey','turkish süper lig':'Turkey','tff 1. lig':'Turkey',
+    'super league 1':'Greece','super league 2':'Greece','super league greece':'Greece',
+    'swiss super league':'Switzerland','challenge league':'Switzerland',
+    'austrian bundesliga':'Austria','bundesliga austria':'Austria','erste liga':'Austria','2. liga austria':'Austria',
+    'russian premier league':'Russia','russian premier':'Russia','fnl':'Russia',
+    'ukrainian premier league':'Ukraine','upl':'Ukraine',
+    'ekstraklasa':'Poland','i liga':'Poland',
+    'fortuna 1. liga':'Czech Republic','czech first league':'Czech Republic','czech liga':'Czech Republic',
+    'allsvenskan':'Sweden','superettan':'Sweden',
+    'eliteserien':'Norway','obos-ligaen':'Norway','obos ligaen':'Norway','1. divisjon':'Norway',
+    'superligaen':'Denmark','danish superliga':'Denmark','superliga':'Denmark',
+    'veikkausliiga':'Finland','ykkönen':'Finland','ykkonen':'Finland',
+    'úrvalsdeild karla':'Iceland','urvalsdeild':'Iceland',
+    'scottish premiership':'Scotland','scottish championship':'Scotland','scottish premier league':'Scotland','scottish cup':'Scotland','scottish league cup':'Scotland',
+    'league of ireland premier division':'Ireland','league of ireland':'Ireland','airtricity premier division':'Ireland',
+    'cymru premier':'Wales','welsh cup':'Wales',
+    'hnl':'Croatia','hrvatski telekom prva liga':'Croatia','croatian football league':'Croatia',
+    'serbian superliga':'Serbia','super liga srbije':'Serbia',
+    'liga 1':'Romania','liga 1 romania':'Romania','romanian liga':'Romania',
+    'first professional football league':'Bulgaria','parva liga':'Bulgaria','bulgarian first league':'Bulgaria',
+    'nb i':'Hungary','nb1':'Hungary',
+    'mls':'USA','major league soccer':'USA','usl championship':'USA','usl league one':'USA','usl league two':'USA','nwsl':'USA','nwsl challenge cup':'USA','us open cup':'USA',
+    'canadian premier league':'Canada','cpl':'Canada',
+    'liga mx':'Mexico','liga de expansión mx':'Mexico','liga de expansion mx':'Mexico','copa mx':'Mexico','liga femenil mx':'Mexico',
+    'brasileirão':'Brazil','brasileirao':'Brazil','brasileirão série a':'Brazil','brasileirao serie a':'Brazil','brasileirão série b':'Brazil','brasileirao serie b':'Brazil','copa do brasil':'Brazil','campeonato brasileiro':'Brazil','campeonato carioca':'Brazil','campeonato paulista':'Brazil','campeonato mineiro':'Brazil','campeonato gaúcho':'Brazil','campeonato catarinense':'Brazil',
+    'liga profesional argentina':'Argentina','argentine primera división':'Argentina','primera división argentina':'Argentina','primera division argentina':'Argentina','copa de la liga profesional':'Argentina','copa argentina':'Argentina','primera nacional':'Argentina',
+    'chilean primera división':'Chile','primera división chile':'Chile','chilean primera division':'Chile','primera b chile':'Chile',
+    'categoría primera a':'Colombia','categoria primera a':'Colombia','colombian categoría primera a':'Colombia',
+    'liga 1 perú':'Peru','liga 1 peru':'Peru',
+    'primera división uruguay':'Uruguay','primera division uruguay':'Uruguay',
+    'liga pro ecuador':'Ecuador','liga pro':'Ecuador','serie a ecuador':'Ecuador',
+    'j1 league':'Japan','j2 league':'Japan','j3 league':'Japan','j. league':'Japan','j.league cup':'Japan',"emperor's cup":'Japan',
+    'k league 1':'South Korea','k league 2':'South Korea','kfa cup':'South Korea',
+    'chinese super league':'China','csl':'China','china league one':'China',
+    'saudi pro league':'Saudi Arabia','king cup':'Saudi Arabia',
+    'uae pro league':'UAE','arabian gulf league':'UAE',
+    'qatar stars league':'Qatar',
+    'a-league men':'Australia','a-league women':'Australia','a-league':'Australia','queensland npl':'Australia','nsw npl':'Australia','nsw npl 2':'Australia','victoria npl':'Australia','victoria npl 2':'Australia','national premier league western australia':'Australia','national premier league south australia':'Australia','national premier league tasmania':'Australia','national premier league':'Australia',
+    'npfl':'Nigeria','nigeria premier league':'Nigeria','nigeria premier football league':'Nigeria',
+    'egyptian premier league':'Egypt',
+    'botola pro':'Morocco',
+    'psl':'South Africa','premier soccer league':'South Africa',
+    'ghana premier league':'Ghana',
+    'isl':'India','indian super league':'India','i-league':'India',
+    'thai league 1':'Thailand','thai premier league':'Thailand',
+    'v.league 1':'Vietnam','v-league 1':'Vietnam',
+    'singapore premier league':'Singapore','malaysia super league':'Malaysia','liga 1 indonesia':'Indonesia',
+    'uefa champions league':'International','champions league':'International','uefa europa league':'International','europa league':'International','uefa europa conference league':'International','conference league':'International','uefa super cup':'International','uefa nations league':'International','nations league':'International','uefa euro':'International','euro':'International','european championship':'International','euro qualification':'International','euro qualifying':'International','euro u21':'International','fifa world cup':'International','world cup':'International','world cup qualification':'International','world cup qualifying':'International','copa libertadores':'International','copa sudamericana':'International','copa américa':'International','copa america':'International','recopa sudamericana':'International','concacaf champions cup':'International','concacaf gold cup':'International','concacaf nations league':'International','afc champions league':'International','afc asian cup':'International','afc cup':'International','caf champions league':'International','caf confederation cup':'International','africa cup of nations':'International','afcon':'International','wafcon':'International','fifa club world cup':'International','club world cup':'International','olympic games':'International','club friendlies':'International','international friendlies':'International','friendlies':'International',
+};
+const LEAGUE_PATTERNS = [
+    [/^brazilian|^brasileir/i,'Brazil'],[/^argentin/i,'Argentina'],[/^russian/i,'Russia'],[/^ukrainian/i,'Ukraine'],
+    [/^chinese/i,'China'],[/^japanese/i,'Japan'],[/^italian/i,'Italy'],[/^spanish/i,'Spain'],[/^french/i,'France'],
+    [/^german/i,'Germany'],[/^english/i,'England'],[/^dutch/i,'Netherlands'],[/^portuguese/i,'Portugal'],
+    [/^belgian/i,'Belgium'],[/^turkish/i,'Turkey'],[/^greek/i,'Greece'],[/^swiss/i,'Switzerland'],
+    [/^austrian/i,'Austria'],[/^polish/i,'Poland'],[/^czech/i,'Czech Republic'],[/^croatian/i,'Croatia'],
+    [/^serbian/i,'Serbia'],[/^romanian/i,'Romania'],[/^bulgarian/i,'Bulgaria'],[/^hungarian/i,'Hungary'],
+    [/^danish/i,'Denmark'],[/^swedish/i,'Sweden'],[/^norwegian/i,'Norway'],[/^finnish/i,'Finland'],
+    [/^icelandic/i,'Iceland'],[/^irish/i,'Ireland'],[/^scottish/i,'Scotland'],[/^welsh/i,'Wales'],
+    [/^korean/i,'South Korea'],[/^saudi/i,'Saudi Arabia'],[/^egyptian/i,'Egypt'],[/^nigerian/i,'Nigeria'],
+    [/^ghanaian/i,'Ghana'],[/^moroccan/i,'Morocco'],[/^tunisian/i,'Tunisia'],[/^algerian/i,'Algeria'],
+    [/^canadian/i,'Canada'],[/^mexican/i,'Mexico'],[/^paraguay/i,'Paraguay'],[/^bolivia/i,'Bolivia'],
+    [/^venezuela/i,'Venezuela'],[/^thai/i,'Thailand'],[/^vietnam/i,'Vietnam'],[/^indonesia/i,'Indonesia'],
+    [/^malaysia/i,'Malaysia'],[/^singapore/i,'Singapore'],[/^philippine/i,'Philippines'],
+    [/queensland|nsw npl|victoria npl|western australia npl|south australia npl|tasmania npl|a-league/i,'Australia'],
+    [/^uefa\b|champions league|europa league|conference league|nations league|world cup|euro qualif|olympic|friendlies/i,'International'],
+    [/copa libertadores|copa sudamericana|copa america|conmebol|concacaf|caf champions|afcon|afc champions/i,'International'],
+];
+const getCountryForLeague = (leagueName) => {
+    if (!leagueName) return 'International';
+    const key = leagueName.toLowerCase().trim();
+    if (LEAGUE_COUNTRY_MAP[key]) return LEAGUE_COUNTRY_MAP[key];
+    for (const [pattern, country] of LEAGUE_PATTERNS) {
+        if (pattern.test(leagueName)) return country;
+    }
+    return 'International';
+};
+const getMatchCountry = (m) => m.country || getCountryForLeague(m.leagueName);
+
 function App() {
     const [splash,         setSplash]         = useState(true);
     const [calOpen,        setCalOpen]        = useState(false);
