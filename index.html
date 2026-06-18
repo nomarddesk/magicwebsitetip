@@ -1406,7 +1406,7 @@ function App() {
         });
         const counts = {};
         for (const m of pool) {
-            const c = m.country || 'International';
+                    const c = getMatchCountry(m);
             counts[c] = (counts[c] || 0) + 1;
         }
         return Object.entries(counts)
