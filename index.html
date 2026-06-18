@@ -1429,7 +1429,7 @@ function App() {
     // Matches that get rendered: date-relevant + country filter applied.
     const filteredMatches = useMemo(() => {
         if (!selectedCountry) return dateRelevantMatches;
-        return dateRelevantMatches.filter(m => (m.country || 'International') === selectedCountry);
+               return dateRelevantMatches.filter(m => getMatchCountry(m) === selectedCountry);
     }, [dateRelevantMatches, selectedCountry]);
 
     // Group filtered matches by league so we can show competition names
