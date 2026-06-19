@@ -260,7 +260,6 @@
         .back-to-today { margin-top:10px; padding:6px 14px; background:rgba(0,122,255,.1); color:var(--blue); border:none; border-radius:100px; font-size:12px; font-weight:700; cursor:pointer; transition:background .15s; }
         .back-to-today:hover { background:rgba(0,122,255,.2); }
 
-        /* ===== Top horizontal date strip (Flashscore-style) ===== */
         .top-date-strip { display:flex; gap:6px; background:var(--surface); border-bottom:0.5px solid var(--sep); padding:9px 14px; overflow-x:auto; -webkit-overflow-scrolling:touch; scroll-snap-type:x proximity; }
         .tds-day { flex:0 0 58px; background:transparent; border:1.5px solid transparent; padding:7px 4px; border-radius:11px; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:2px; scroll-snap-align:center; transition:background .12s,border-color .12s; -webkit-tap-highlight-color:transparent; font-family:inherit; }
         .tds-day:hover { background:var(--bg); }
@@ -272,7 +271,6 @@
         .tds-day.on .tds-day-name { color:rgba(255,255,255,.7); }
         .tds-day.on .tds-day-num { color:#fff; }
 
-        /* ===== Country filter slider (between sports tabs and main content) ===== */
         .country-slider { display:flex; gap:5px; background:var(--surface); border-bottom:0.5px solid var(--sep); padding:10px 14px; overflow-x:auto; -webkit-overflow-scrolling:touch; scroll-snap-type:x proximity; }
         .cs-item { flex:0 0 54px; background:transparent; border:1.5px solid transparent; padding:6px 4px; border-radius:11px; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:4px; scroll-snap-align:center; transition:background .12s,border-color .12s; -webkit-tap-highlight-color:transparent; font-family:inherit; }
         .cs-item:hover { background:var(--bg); }
@@ -281,12 +279,10 @@
         .cs-code { font-size:9px; font-weight:800; color:var(--t3); letter-spacing:.4px; }
         .cs-item.on .cs-code { color:#fff; }
 
-        /* ===== League section (groups matches under each competition) ===== */
         .league-block { margin-bottom:14px; }
         .league-block-title { font-size:11px; font-weight:700; color:var(--t3); text-transform:uppercase; letter-spacing:.5px; padding:8px 4px 8px; display:flex; align-items:center; gap:6px; }
         .league-block-flag { font-size:14px; line-height:1; }
 
-        /* ===== Past-date note ===== */
         .past-date-note { background:#FFFBEB; border-left:3px solid var(--gold); border-radius:8px; padding:10px 12px; font-size:12px; color:#92400E; line-height:1.5; margin-bottom:12px; }
         body.dark .past-date-note { background:#3A2E10; color:#FED7AA; border-left-color:var(--gold); }
 
@@ -408,6 +404,10 @@ const COUNTRY_FLAGS = {
     'Egypt':'🇪🇬','Morocco':'🇲🇦','South Africa':'🇿🇦','Nigeria':'🇳🇬','Ghana':'🇬🇭',
     'Tunisia':'🇹🇳','Algeria':'🇩🇿','Senegal':'🇸🇳','Ivory Coast':'🇨🇮','Cameroon':'🇨🇲',
     'World':'🌐','International':'🌐','Europe':'🇪🇺','South America':'🌎','Africa':'🌍','Asia':'🌏',
+    'Estonia':'🇪🇪','Georgia':'🇬🇪','Gibraltar':'🇬🇮','Aruba':'🇦🇼',
+    'Slovakia':'🇸🇰','Latvia':'🇱🇻','Lithuania':'🇱🇹','Belarus':'🇧🇾','Cyprus':'🇨🇾','Malta':'🇲🇹','Liechtenstein':'🇱🇮','Faroe Islands':'🇫🇴',
+    'Jordan':'🇯🇴','Lebanon':'🇱🇧','Bahrain':'🇧🇭','Kuwait':'🇰🇼','Oman':'🇴🇲','Syria':'🇸🇾',
+    'Tanzania':'🇹🇿','Kenya':'🇰🇪','Uganda':'🇺🇬','Zambia':'🇿🇲','Zimbabwe':'🇿🇼',
 };
 const getCountryFlag = (country) => COUNTRY_FLAGS[country] || '⚽';
 
@@ -426,8 +426,129 @@ const COUNTRY_CODES = {
     'Egypt':'EG','Morocco':'MA','South Africa':'ZA','Nigeria':'NG','Ghana':'GH',
     'Tunisia':'TN','Algeria':'DZ','Senegal':'SN','Ivory Coast':'CI','Cameroon':'CM',
     'World':'INT','International':'INT','Europe':'EU','South America':'CSA','Africa':'AFR','Asia':'ASN',
+    'Estonia':'EE','Georgia':'GE','Gibraltar':'GI','Aruba':'AW',
+    'Slovakia':'SK','Latvia':'LV','Lithuania':'LT','Belarus':'BY','Cyprus':'CY','Malta':'MT','Liechtenstein':'LI','Faroe Islands':'FO',
+    'Jordan':'JO','Lebanon':'LB','Bahrain':'BH','Kuwait':'KW','Oman':'OM','Syria':'SY',
+    'Tanzania':'TZ','Kenya':'KE','Uganda':'UG','Zambia':'ZM','Zimbabwe':'ZW',
 };
 const getCountryCode = (country) => COUNTRY_CODES[country] || (country || '?').slice(0, 3).toUpperCase();
+
+const LEAGUE_COUNTRY_MAP = {
+    'premier league':'England','efl championship':'England','championship':'England','league one':'England','league two':'England','efl cup':'England','carabao cup':'England','fa cup':'England','fa trophy':'England','national league':'England','national league north':'England','national league south':'England','wsl':'England',"women's super league":'England','community shield':'England',
+    'la liga':'Spain','laliga':'Spain','la liga 2':'Spain','segunda division':'Spain','segunda división':'Spain','copa del rey':'Spain','supercopa de españa':'Spain','liga f':'Spain','primera división rfef':'Spain','primera rfef':'Spain',
+    'bundesliga':'Germany','2. bundesliga':'Germany','3. liga':'Germany','dfb-pokal':'Germany','dfb pokal':'Germany','frauen-bundesliga':'Germany','regionalliga':'Germany','regionalliga nord':'Germany','regionalliga süd':'Germany','regionalliga west':'Germany','regionalliga nordost':'Germany','regionalliga bayern':'Germany',
+    'serie a':'Italy','serie b':'Italy','serie c':'Italy','coppa italia':'Italy','supercoppa italiana':'Italy',
+    'ligue 1':'France','ligue 2':'France','national':'France','coupe de france':'France','trophée des champions':'France',
+    'eredivisie':'Netherlands','eerste divisie':'Netherlands','knvb beker':'Netherlands',
+    'primeira liga':'Portugal','liga portugal':'Portugal','liga portugal 2':'Portugal','taça de portugal':'Portugal','taca de portugal':'Portugal',
+    'jupiler pro league':'Belgium','challenger pro league':'Belgium','belgian pro league':'Belgium','belgian first division a':'Belgium','belgian first division b':'Belgium',
+    'süper lig':'Turkey','super lig':'Turkey','turkish süper lig':'Turkey','tff 1. lig':'Turkey',
+    'super league 1':'Greece','super league 2':'Greece','super league greece':'Greece',
+    'swiss super league':'Switzerland','challenge league':'Switzerland',
+    'austrian bundesliga':'Austria','bundesliga austria':'Austria','erste liga':'Austria','2. liga austria':'Austria',
+    'russian premier league':'Russia','russian premier':'Russia','fnl':'Russia',
+    'ukrainian premier league':'Ukraine','upl':'Ukraine',
+    'ekstraklasa':'Poland','i liga':'Poland',
+    'fortuna 1. liga':'Czech Republic','czech first league':'Czech Republic','czech liga':'Czech Republic',
+    'allsvenskan':'Sweden','superettan':'Sweden',
+    'eliteserien':'Norway','obos-ligaen':'Norway','obos ligaen':'Norway','1. divisjon':'Norway',
+    'superligaen':'Denmark','danish superliga':'Denmark','superliga':'Denmark',
+    'veikkausliiga':'Finland','ykkönen':'Finland','ykkonen':'Finland',
+    'úrvalsdeild karla':'Iceland','urvalsdeild':'Iceland',
+    'scottish premiership':'Scotland','scottish championship':'Scotland','scottish premier league':'Scotland','scottish cup':'Scotland','scottish league cup':'Scotland',
+    'league of ireland premier division':'Ireland','league of ireland':'Ireland','airtricity premier division':'Ireland',
+    'cymru premier':'Wales','welsh cup':'Wales',
+    'hnl':'Croatia','hrvatski telekom prva liga':'Croatia','croatian football league':'Croatia',
+    'serbian superliga':'Serbia','super liga srbije':'Serbia',
+    'liga 1':'Romania','liga 1 romania':'Romania','romanian liga':'Romania',
+    'first professional football league':'Bulgaria','parva liga':'Bulgaria','bulgarian first league':'Bulgaria',
+    'nb i':'Hungary','nb1':'Hungary',
+    'mls':'USA','major league soccer':'USA','usl championship':'USA','usl league one':'USA','usl league two':'USA','nwsl':'USA','nwsl challenge cup':'USA','us open cup':'USA',
+    'canadian premier league':'Canada','cpl':'Canada',
+    'liga mx':'Mexico','liga de expansión mx':'Mexico','liga de expansion mx':'Mexico','copa mx':'Mexico','liga femenil mx':'Mexico',
+    'brasileirão':'Brazil','brasileirao':'Brazil','brasileirão série a':'Brazil','brasileirao serie a':'Brazil','brasileirão série b':'Brazil','brasileirao serie b':'Brazil','copa do brasil':'Brazil','campeonato brasileiro':'Brazil','campeonato carioca':'Brazil','campeonato paulista':'Brazil','campeonato mineiro':'Brazil','campeonato gaúcho':'Brazil','campeonato catarinense':'Brazil',
+    'liga profesional argentina':'Argentina','argentine primera división':'Argentina','primera división argentina':'Argentina','primera division argentina':'Argentina','copa de la liga profesional':'Argentina','copa argentina':'Argentina','primera nacional':'Argentina',
+    'chilean primera división':'Chile','primera división chile':'Chile','chilean primera division':'Chile','primera b chile':'Chile',
+    'categoría primera a':'Colombia','categoria primera a':'Colombia','colombian categoría primera a':'Colombia',
+    'liga 1 perú':'Peru','liga 1 peru':'Peru',
+    'primera división uruguay':'Uruguay','primera division uruguay':'Uruguay',
+    'liga pro ecuador':'Ecuador','liga pro':'Ecuador','serie a ecuador':'Ecuador',
+    'j1 league':'Japan','j2 league':'Japan','j3 league':'Japan','j. league':'Japan','j.league cup':'Japan',"emperor's cup":'Japan',
+    'k league 1':'South Korea','k league 2':'South Korea','kfa cup':'South Korea',
+    'chinese super league':'China','csl':'China','china league one':'China',
+    'saudi pro league':'Saudi Arabia','king cup':'Saudi Arabia',
+    'uae pro league':'UAE','arabian gulf league':'UAE',
+    'qatar stars league':'Qatar',
+    'a-league men':'Australia','a-league women':'Australia','a-league':'Australia','queensland npl':'Australia','nsw npl':'Australia','nsw npl 2':'Australia','victoria npl':'Australia','victoria npl 2':'Australia','national premier league western australia':'Australia','national premier league south australia':'Australia','national premier league tasmania':'Australia','national premier league':'Australia',
+    'npfl':'Nigeria','nigeria premier league':'Nigeria','nigeria premier football league':'Nigeria',
+    'egyptian premier league':'Egypt',
+    'botola pro':'Morocco',
+    'psl':'South Africa','premier soccer league':'South Africa',
+    'ghana premier league':'Ghana',
+    'isl':'India','indian super league':'India','i-league':'India',
+    'thai league 1':'Thailand','thai premier league':'Thailand',
+    'v.league 1':'Vietnam','v-league 1':'Vietnam',
+    'singapore premier league':'Singapore','malaysia super league':'Malaysia','liga 1 indonesia':'Indonesia',
+    'ettan norra':'Sweden','ettan södra':'Sweden','ettan sodra':'Sweden','division 2 norra götaland':'Sweden','division 2 norra gotaland':'Sweden','division 2 västra götaland':'Sweden','division 2 vastra gotaland':'Sweden','division 2 södra götaland':'Sweden','division 2 sodra gotaland':'Sweden','division 2 norra svealand':'Sweden','division 2 södra svealand':'Sweden','division 2 sodra svealand':'Sweden','division 2 norrland':'Sweden','damallsvenskan':'Sweden','elitettan':'Sweden','svenska cupen':'Sweden',
+    'esiliiga a':'Estonia','esiliiga b':'Estonia','meistriliiga':'Estonia',
+    'erovnuli liga':'Georgia',
+    'gfa league':'Gibraltar',
+    'division di honor':'Aruba',
+    'ykkösliiga':'Finland','ykkosliiga':'Finland',
+    'primera c':'Argentina','torneo federal a':'Argentina','torneo promocional amateur':'Argentina','primera b metropolitana':'Argentina',
+    '3. division girone 1':'Italy','3. division girone 2':'Italy','coppa':'Italy',
+    'queensland premier league':'Australia','capital territory npl':'Australia',
+    'brasileiro u17':'Brazil','brasileiro u20 a':'Brazil','brasileiro u20':'Brazil',
+    '1. division':'Denmark','2. division group 1':'Denmark',
+    'liga 3':'Germany','primera división rfef play offs':'Spain','primera division rfef play offs':'Spain',
+    'reserve league':'England','reserves league':'England','premier league 2':'England','premier league cup':'England',
+    'elite two':'France','elite 1':'France','elite 2':'France',
+    'northern super league':'Canada',
+    'cup':'International','league cup':'International',
+    'fortuna liga':'Slovakia','slovak super liga':'Slovakia',
+    'fortuna liga czech':'Czech Republic',
+    'virsliga':'Latvia','latvian higher league':'Latvia',
+    'a lyga':'Lithuania','lithuanian a lyga':'Lithuania',
+    'belarusian premier league':'Belarus','vysshaya liga':'Belarus',
+    'cypriot first division':'Cyprus','cyta championship':'Cyprus',
+    'maltese premier league':'Malta','bov premier league':'Malta',
+    'liechtenstein cup':'Liechtenstein',
+    'meistarataval':'Faroe Islands','effodeildin':'Faroe Islands',
+    'jordanian pro league':'Jordan','lebanese premier league':'Lebanon','bahraini premier league':'Bahrain',
+    'kuwaiti premier league':'Kuwait','omani professional league':'Oman','syrian premier league':'Syria',
+    'cypriot super cup':'Cyprus',
+    'tanzanian premier league':'Tanzania','kenyan premier league':'Kenya','ugandan premier league':'Uganda',
+    'zambian super league':'Zambia','zimbabwean premier soccer league':'Zimbabwe',
+    'uefa champions league':'International','champions league':'International','uefa europa league':'International','europa league':'International','uefa europa conference league':'International','conference league':'International','uefa super cup':'International','uefa nations league':'International','nations league':'International','uefa euro':'International','euro':'International','european championship':'International','euro qualification':'International','euro qualifying':'International','euro u21':'International','fifa world cup':'International','world cup':'International','world cup qualification':'International','world cup qualifying':'International','copa libertadores':'International','copa sudamericana':'International','copa américa':'International','copa america':'International','recopa sudamericana':'International','concacaf champions cup':'International','concacaf gold cup':'International','concacaf nations league':'International','afc champions league':'International','afc asian cup':'International','afc cup':'International','caf champions league':'International','caf confederation cup':'International','africa cup of nations':'International','afcon':'International','wafcon':'International','fifa club world cup':'International','club world cup':'International','olympic games':'International','club friendlies':'International','international friendlies':'International','friendlies':'International',
+};
+const LEAGUE_PATTERNS = [
+    [/^brazilian|^brasileir/i,'Brazil'],[/^argentin/i,'Argentina'],[/^russian/i,'Russia'],[/^ukrainian/i,'Ukraine'],
+    [/^chinese/i,'China'],[/^japanese/i,'Japan'],[/^italian/i,'Italy'],[/^spanish/i,'Spain'],[/^french/i,'France'],
+    [/^german/i,'Germany'],[/^english/i,'England'],[/^dutch/i,'Netherlands'],[/^portuguese/i,'Portugal'],
+    [/^belgian/i,'Belgium'],[/^turkish/i,'Turkey'],[/^greek/i,'Greece'],[/^swiss/i,'Switzerland'],
+    [/^austrian/i,'Austria'],[/^polish/i,'Poland'],[/^czech/i,'Czech Republic'],[/^croatian/i,'Croatia'],
+    [/^serbian/i,'Serbia'],[/^romanian/i,'Romania'],[/^bulgarian/i,'Bulgaria'],[/^hungarian/i,'Hungary'],
+    [/^danish/i,'Denmark'],[/^swedish/i,'Sweden'],[/^norwegian/i,'Norway'],[/^finnish/i,'Finland'],
+    [/^icelandic/i,'Iceland'],[/^irish/i,'Ireland'],[/^scottish/i,'Scotland'],[/^welsh/i,'Wales'],
+    [/^korean/i,'South Korea'],[/^saudi/i,'Saudi Arabia'],[/^egyptian/i,'Egypt'],[/^nigerian/i,'Nigeria'],
+    [/^ghanaian/i,'Ghana'],[/^moroccan/i,'Morocco'],[/^tunisian/i,'Tunisia'],[/^algerian/i,'Algeria'],
+    [/^canadian/i,'Canada'],[/^mexican/i,'Mexico'],[/^paraguay/i,'Paraguay'],[/^bolivia/i,'Bolivia'],
+    [/^venezuela/i,'Venezuela'],[/^thai/i,'Thailand'],[/^vietnam/i,'Vietnam'],[/^indonesia/i,'Indonesia'],
+    [/^malaysia/i,'Malaysia'],[/^singapore/i,'Singapore'],[/^philippine/i,'Philippines'],
+    [/queensland|nsw npl|victoria npl|western australia npl|south australia npl|tasmania npl|a-league/i,'Australia'],
+    [/^uefa\b|champions league|europa league|conference league|nations league|world cup|euro qualif|olympic|friendlies/i,'International'],
+    [/copa libertadores|copa sudamericana|copa america|conmebol|concacaf|caf champions|afcon|afc champions/i,'International'],
+];
+const getCountryForLeague = (leagueName) => {
+    if (!leagueName) return 'International';
+    const key = leagueName.toLowerCase().trim();
+    if (LEAGUE_COUNTRY_MAP[key]) return LEAGUE_COUNTRY_MAP[key];
+    for (const [pattern, country] of LEAGUE_PATTERNS) {
+        if (pattern.test(leagueName)) return country;
+    }
+    return 'International';
+};
+const getMatchCountry = (m) => m.country || getCountryForLeague(m.leagueName);
 
 const FIN_SET = new Set(['FT','AET','PEN','Pen.']);
 const UPC_SET = new Set(['NS','TBD']);
@@ -1297,7 +1418,6 @@ function App() {
         setCalOpen(false);
     };
 
-    // Matches relevant to the current date type (before country filter).
     const dateRelevantMatches = useMemo(() => {
         if (isPastDate)   return pastMatches;
         if (isFutureDate) return upcomingMatches;
@@ -1306,9 +1426,6 @@ function App() {
         return upcomingMatches;
     }, [isPastDate, isFutureDate, homeTab, liveMatches, upcomingMatches, pastMatches]);
 
-    // Countries available for the slider: any country with at least one match
-    // for the selected date across ANY status, so the slider stays stable when
-    // the user switches Live/Upcoming/Past sub-tabs. Sorted by count desc.
     const availableCountries = useMemo(() => {
         const pool = matches.filter(m => {
             if (isViewingToday && cat(m.status) === 'live') return true;
@@ -1316,7 +1433,7 @@ function App() {
         });
         const counts = {};
         for (const m of pool) {
-            const c = m.country || 'International';
+            const c = getMatchCountry(m);
             counts[c] = (counts[c] || 0) + 1;
         }
         return Object.entries(counts)
@@ -1324,8 +1441,6 @@ function App() {
             .map(([country]) => country);
     }, [matches, selectedDate, isViewingToday]);
 
-    // Auto-select the first available country whenever the current selection
-    // becomes invalid (e.g. date changed and old country has no matches).
     useEffect(() => {
         if (availableCountries.length === 0) {
             if (selectedCountry !== null) setSelectedCountry(null);
@@ -1336,14 +1451,11 @@ function App() {
         }
     }, [availableCountries, selectedCountry]);
 
-    // Matches that get rendered: date-relevant + country filter applied.
     const filteredMatches = useMemo(() => {
         if (!selectedCountry) return dateRelevantMatches;
-        return dateRelevantMatches.filter(m => (m.country || 'International') === selectedCountry);
+        return dateRelevantMatches.filter(m => getMatchCountry(m) === selectedCountry);
     }, [dateRelevantMatches, selectedCountry]);
 
-    // Group filtered matches by league so we can show competition names
-    // as section headers above each cluster of cards.
     const matchesByLeague = useMemo(() => {
         const byLeague = {};
         for (const m of filteredMatches) {
@@ -1356,7 +1468,6 @@ function App() {
             .map(([league, leagueMatches]) => ({ league, matches: leagueMatches }));
     }, [filteredMatches]);
 
-    // Smoothly center the selected country chip whenever it changes.
     const countrySliderRef = useRef(null);
     useEffect(() => {
         if (!selectedCountry || !countrySliderRef.current) return;
