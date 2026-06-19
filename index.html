@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,12 +6,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Magic Analysis</title>
 
+    <!-- Favicon (browser tab icon) — generated via realfavicongenerator.net -->
     <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="shortcut icon" href="/favicon.ico" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
 
+    <!-- Web Push Notifications via OneSignal — LIVE MATCH ALERTS ONLY -->
+    <!-- Mobile-first: shows a slide-down popup (not a tiny floating bell) so 90%
+         of mobile users can actually see/tap it. Triggers 8 seconds after first
+         page view, framed around live match alerts (not ads/promos). -->
     <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
     <script>
       window.OneSignalDeferred = window.OneSignalDeferred || [];
@@ -19,18 +25,22 @@
           await OneSignal.init({
             appId: "fab78014-9e29-4947-a92b-cac367cb093b",
             safari_web_id: "web.onesignal.auto.05737452-6fb0-4a74-aaf2-b68bc5a2ed6a",
+            // Bell icon OFF — replaced by mobile-friendly slidedown popup below.
             notifyButton: { enable: false },
             promptOptions: {
               slidedown: {
                 prompts: [{
                   type: "push",
-                  autoPrompt: true,
+                  autoPrompt: true,                 // appears automatically
                   text: {
                     actionMessage: "🔴 Get instant alerts when matches go LIVE — never miss a goal.",
                     acceptButton: "🔔 Enable Live Alerts",
                     cancelButton: "Not now"
                   },
-                  delay: { pageViews: 1, timeDelay: 8 }
+                  delay: {
+                    pageViews: 1,                   // show after 1 page view
+                    timeDelay: 8                    // wait 8 seconds so user sees content first
+                  }
                 }]
               }
             }
@@ -39,6 +49,7 @@
       });
     </script>
 
+    <!-- Google Analytics (GA4) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-RNQZZENL62"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -65,6 +76,7 @@
         body { font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue',Arial,sans-serif; background:var(--bg); color:var(--t1); overflow-x:hidden; transition:background .2s,color .2s; }
         ::-webkit-scrollbar { display:none; } * { scrollbar-width:none; }
 
+        /* ===== Dark mode — overrides root vars when body.dark is set ===== */
         body.dark {
             --bg:#000000; --surface:#1C1C1E;
             --t1:#FFFFFF; --t2:#C7C7CC; --t3:#8E8E93;
@@ -129,6 +141,10 @@
         .tab-loading { display:flex; flex-direction:column; align-items:center; gap:18px; padding:60px 20px; background:var(--surface); border-radius:var(--r); box-shadow:var(--card-shadow); margin-bottom:9px; animation:pgIn .2s ease forwards; min-height:240px; justify-content:center; }
         .tab-loading-spin { width:34px; height:34px; border:3px solid var(--sep2); border-top-color:var(--t1); border-radius:50%; animation:rot .8s linear infinite; }
         .tab-loading-msg { font-size:14px; color:var(--t2); font-weight:500; text-align:center; letter-spacing:-.1px; }
+
+        .grp { display:flex; align-items:center; gap:10px; margin:24px 0 10px; }
+        .grp-line { flex:1; height:.5px; background:var(--sep2); }
+        .grp-txt { font-size:11px; font-weight:600; color:var(--t3); text-transform:uppercase; letter-spacing:.5px; white-space:nowrap; }
 
         .card { background:var(--surface); border-radius:var(--r); box-shadow:var(--card-shadow); margin-bottom:9px; overflow:hidden; cursor:pointer; transition:transform .14s,box-shadow .14s; -webkit-tap-highlight-color:transparent; }
         .card:active { transform:scale(.984); }
@@ -260,6 +276,7 @@
         .back-to-today { margin-top:10px; padding:6px 14px; background:rgba(0,122,255,.1); color:var(--blue); border:none; border-radius:100px; font-size:12px; font-weight:700; cursor:pointer; transition:background .15s; }
         .back-to-today:hover { background:rgba(0,122,255,.2); }
 
+        /* ===== Top horizontal date strip (Flashscore-style) ===== */
         .top-date-strip { display:flex; gap:6px; background:var(--surface); border-bottom:0.5px solid var(--sep); padding:9px 14px; overflow-x:auto; -webkit-overflow-scrolling:touch; scroll-snap-type:x proximity; }
         .tds-day { flex:0 0 58px; background:transparent; border:1.5px solid transparent; padding:7px 4px; border-radius:11px; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:2px; scroll-snap-align:center; transition:background .12s,border-color .12s; -webkit-tap-highlight-color:transparent; font-family:inherit; }
         .tds-day:hover { background:var(--bg); }
@@ -271,6 +288,7 @@
         .tds-day.on .tds-day-name { color:rgba(255,255,255,.7); }
         .tds-day.on .tds-day-num { color:#fff; }
 
+        /* ===== Country filter slider (between sports tabs and main content) ===== */
         .country-slider { display:flex; gap:5px; background:var(--surface); border-bottom:0.5px solid var(--sep); padding:10px 14px; overflow-x:auto; -webkit-overflow-scrolling:touch; scroll-snap-type:x proximity; }
         .cs-item { flex:0 0 54px; background:transparent; border:1.5px solid transparent; padding:6px 4px; border-radius:11px; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:4px; scroll-snap-align:center; transition:background .12s,border-color .12s; -webkit-tap-highlight-color:transparent; font-family:inherit; }
         .cs-item:hover { background:var(--bg); }
@@ -279,10 +297,12 @@
         .cs-code { font-size:9px; font-weight:800; color:var(--t3); letter-spacing:.4px; }
         .cs-item.on .cs-code { color:#fff; }
 
+        /* ===== League section (groups matches under each competition) ===== */
         .league-block { margin-bottom:14px; }
         .league-block-title { font-size:11px; font-weight:700; color:var(--t3); text-transform:uppercase; letter-spacing:.5px; padding:8px 4px 8px; display:flex; align-items:center; gap:6px; }
         .league-block-flag { font-size:14px; line-height:1; }
 
+        /* ===== Past-date note ===== */
         .past-date-note { background:#FFFBEB; border-left:3px solid var(--gold); border-radius:8px; padding:10px 12px; font-size:12px; color:#92400E; line-height:1.5; margin-bottom:12px; }
         body.dark .past-date-note { background:#3A2E10; color:#FED7AA; border-left-color:var(--gold); }
 
@@ -315,15 +335,39 @@
 
         .lazy-slot { min-height:175px; }
 
+        /* ===== NEW: Live timer pill (inside card status badge & detail) ===== */
         .live-pill-min { font-weight:800; font-variant-numeric:tabular-nums; letter-spacing:.4px; }
 
-        .smartlink-banner { display:block; background:linear-gradient(135deg,#FF9500 0%,#FF3B30 100%); color:#fff; text-align:center; padding:13px 16px; border-radius:14px; text-decoration:none; margin-bottom:16px; font-size:14px; font-weight:700; letter-spacing:-.1px; box-shadow:0 4px 16px rgba(255,149,0,.28); transition:transform .15s, box-shadow .15s; }
+        /* ===== NEW: Smartlink banner inside detail sheet ===== */
+        .smartlink-banner {
+            display:block; background:linear-gradient(135deg,#FF9500 0%,#FF3B30 100%);
+            color:#fff; text-align:center; padding:13px 16px; border-radius:14px;
+            text-decoration:none; margin-bottom:16px; font-size:14px; font-weight:700;
+            letter-spacing:-.1px; box-shadow:0 4px 16px rgba(255,149,0,.28);
+            transition:transform .15s, box-shadow .15s;
+        }
         .smartlink-banner:hover { transform:translateY(-1px); box-shadow:0 6px 22px rgba(255,149,0,.4); }
-        .smartlink-banner small { display:block; font-size:9px; opacity:.85; letter-spacing:.5px; text-transform:uppercase; margin-bottom:3px; font-weight:600; }
+        .smartlink-banner small {
+            display:block; font-size:9px; opacity:.85; letter-spacing:.5px;
+            text-transform:uppercase; margin-bottom:3px; font-weight:600;
+        }
 
-        .detail-section-title { font-size:11px; font-weight:700; color:var(--t3); text-transform:uppercase; letter-spacing:.5px; margin:20px 0 10px; padding:0 2px; }
-        .lm-row { display:grid; grid-template-columns:28px 1fr auto auto; gap:10px; align-items:center; background:var(--bg); border-radius:12px; padding:10px 12px; margin-bottom:6px; }
-        .result-chip { width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:11px; color:#fff; }
+        /* ===== NEW: Last Matches / H2H / Form sections ===== */
+        .detail-section-title {
+            font-size:11px; font-weight:700; color:var(--t3);
+            text-transform:uppercase; letter-spacing:.5px;
+            margin:20px 0 10px; padding:0 2px;
+        }
+        .lm-row {
+            display:grid; grid-template-columns:28px 1fr auto auto; gap:10px;
+            align-items:center; background:var(--bg); border-radius:12px;
+            padding:10px 12px; margin-bottom:6px;
+        }
+        .result-chip {
+            width:26px; height:26px; border-radius:50%;
+            display:flex; align-items:center; justify-content:center;
+            font-weight:800; font-size:11px; color:#fff;
+        }
         .result-W { background:var(--green); }
         .result-D { background:var(--t3); }
         .result-L { background:var(--live); }
@@ -331,20 +375,95 @@
         .lm-comp { font-size:10px; color:var(--t3); margin-top:1px; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
         .lm-score { font-size:14px; font-weight:700; font-variant-numeric:tabular-nums; }
         .lm-date { font-size:11px; color:var(--t3); }
-        .detail-empty { background:var(--bg); border-radius:12px; padding:24px 16px; text-align:center; font-size:13px; color:var(--t3); margin-bottom:12px; }
+        .detail-empty {
+            background:var(--bg); border-radius:12px; padding:24px 16px;
+            text-align:center; font-size:13px; color:var(--t3); margin-bottom:12px;
+        }
         .detail-empty .ico { font-size:28px; opacity:.5; margin-bottom:6px; }
-        .h2h-stat-row { display:grid; grid-template-columns:repeat(5,1fr); gap:6px; margin-bottom:14px; }
-        .h2h-stat-card { background:var(--bg); border-radius:12px; padding:10px 6px; text-align:center; }
+        .h2h-stat-row {
+            display:grid; grid-template-columns:repeat(5,1fr); gap:6px; margin-bottom:14px;
+        }
+        .h2h-stat-card {
+            background:var(--bg); border-radius:12px; padding:10px 6px; text-align:center;
+        }
         .h2h-stat-v { font-size:18px; font-weight:800; letter-spacing:-.3px; font-variant-numeric:tabular-nums; }
         .h2h-stat-l { font-size:9px; font-weight:600; color:var(--t3); text-transform:uppercase; letter-spacing:.3px; margin-top:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-        .detail-note { background:#FFFBEB; border-left:3px solid var(--gold); border-radius:8px; padding:10px 12px; font-size:12px; color:#92400E; line-height:1.5; margin:12px 0; }
-        .detail-loading { padding:30px 16px; text-align:center; color:var(--t3); font-size:13px; display:flex; flex-direction:column; align-items:center; gap:10px; }
+        .detail-note {
+            background:#FFFBEB; border-left:3px solid var(--gold);
+            border-radius:8px; padding:10px 12px; font-size:12px;
+            color:#92400E; line-height:1.5; margin:12px 0;
+        }
+        .detail-loading {
+            padding:30px 16px; text-align:center; color:var(--t3); font-size:13px;
+            display:flex; flex-direction:column; align-items:center; gap:10px;
+        }
 
-        .inter-ad { display:block; background:linear-gradient(90deg,#FFF7ED 0%,#FFEDD5 100%); border:1px solid #FED7AA; border-radius:12px; padding:11px 14px; margin:6px 0; text-decoration:none; color:#9A3412; text-align:center; font-size:12px; font-weight:600; letter-spacing:-.05px; transition:transform .12s, box-shadow .12s; position:relative; }
+        /* ===== NEW: H2H Unlock CTA (Smartlink-monetized button) ===== */
+        .unlock-card {
+            background:linear-gradient(135deg,#1D1D1F 0%,#2C2C2E 100%);
+            border-radius:16px; padding:18px 16px; margin:22px 0 14px;
+            text-align:center; position:relative; overflow:hidden;
+            border:1px solid rgba(255,149,0,.15);
+        }
+        .unlock-card::before {
+            content:''; position:absolute; top:-30%; right:-20%; width:160px; height:160px;
+            background:radial-gradient(circle,rgba(255,149,0,.18) 0%,transparent 70%);
+            pointer-events:none;
+        }
+        .unlock-icon { font-size:32px; margin-bottom:6px; }
+        .unlock-title {
+            color:#fff; font-size:17px; font-weight:700; letter-spacing:-.2px;
+            margin-bottom:6px;
+        }
+        .unlock-sub {
+            color:rgba(255,255,255,.65); font-size:12px; line-height:1.45;
+            margin-bottom:14px; padding:0 4px;
+        }
+        .unlock-features {
+            display:flex; justify-content:center; gap:14px; flex-wrap:wrap;
+            margin-bottom:14px;
+        }
+        .unlock-feature {
+            font-size:11px; color:rgba(255,255,255,.7); font-weight:500;
+            display:flex; align-items:center; gap:4px;
+        }
+        .unlock-feature::before {
+            content:'✓'; color:var(--green); font-weight:800; font-size:12px;
+        }
+        .unlock-btn {
+            display:block; width:100%; background:linear-gradient(135deg,#FF9500 0%,#FF3B30 100%);
+            color:#fff; border:none; border-radius:12px; padding:14px 16px;
+            font-size:15px; font-weight:700; letter-spacing:-.1px; cursor:pointer;
+            text-decoration:none; text-align:center;
+            box-shadow:0 4px 16px rgba(255,149,0,.32);
+            transition:transform .15s, box-shadow .15s;
+            font-family:inherit;
+        }
+        .unlock-btn:hover { transform:translateY(-1px); box-shadow:0 6px 22px rgba(255,149,0,.45); }
+        .unlock-btn:active { transform:translateY(0); }
+        .unlock-disclosure {
+            font-size:10px; color:rgba(255,255,255,.4); margin-top:8px;
+            letter-spacing:.3px; text-transform:uppercase; font-weight:600;
+        }
+
+        /* ===== NEW: Interstitial Smartlink ad (between H2H matches) ===== */
+        .inter-ad {
+            display:block; background:linear-gradient(90deg,#FFF7ED 0%,#FFEDD5 100%);
+            border:1px solid #FED7AA; border-radius:12px;
+            padding:11px 14px; margin:6px 0; text-decoration:none;
+            color:#9A3412; text-align:center;
+            font-size:12px; font-weight:600; letter-spacing:-.05px;
+            transition:transform .12s, box-shadow .12s;
+            position:relative;
+        }
         .inter-ad:hover { transform:translateY(-1px); box-shadow:0 3px 10px rgba(255,149,0,.18); }
-        .inter-ad small { display:block; font-size:9px; color:#C2410C; opacity:.65; letter-spacing:.4px; text-transform:uppercase; margin-bottom:2px; font-weight:700; }
+        .inter-ad small {
+            display:block; font-size:9px; color:#C2410C; opacity:.65;
+            letter-spacing:.4px; text-transform:uppercase; margin-bottom:2px; font-weight:700;
+        }
         .inter-ad .ia-arrow { margin-left:4px; }
 
+        /* ===== Bookmaker Odds Comparison (Alerts tab only) ===== */
         .odds-card { background:var(--surface); border-radius:var(--r); box-shadow:var(--card-shadow); padding:12px 14px; margin:-3px 0 12px; border-left:3px solid var(--gold); }
         .odds-title { font-size:10px; font-weight:800; color:var(--gold); text-transform:uppercase; letter-spacing:.5px; margin-bottom:9px; display:flex; align-items:center; gap:4px; }
         .odds-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:7px; margin-bottom:10px; }
@@ -356,6 +475,7 @@
         .odds-bk:hover { transform:translateY(-1px); filter:brightness(1.08); }
         .odds-bk small { font-size:8px; opacity:.85; margin-right:4px; font-weight:600; }
 
+        /* ===== League Standings table inside detail sheet ===== */
         .stand-wrap { background:var(--surface); border-radius:var(--r); box-shadow:var(--card-shadow); margin-bottom:12px; overflow:hidden; }
         .stand-grp-name { font-size:10px; font-weight:700; color:var(--t3); text-transform:uppercase; letter-spacing:.5px; padding:10px 12px 6px; }
         .stand-table { width:100%; border-collapse:collapse; font-size:12px; }
@@ -373,6 +493,8 @@
         .stand-form-dot.W { background:var(--green); }
         .stand-form-dot.D { background:var(--t3); }
         .stand-form-dot.L { background:var(--live); }
+
+        /* (Active-date pill removed — calendar icon in header replaces it.) */
     </style>
 </head>
 <body>
@@ -387,52 +509,119 @@ const TAB_LOADING_MAX_MS = 3000;
 const LOADING_MSG = "Just 1 sec...";
 const EMPTY_TAB_MSG = "Oh... please check other tabs for matches, there are no matches here at the moment.";
 
+/* === Monetization (detail sheet only) ===
+   Smartlink banner only — popunder removed at user request because it was
+   redirecting visitors off the site. The banner is a normal link opened in a
+   NEW tab, so users stay on Magic Analysis. */
 const SMARTLINK_URL = "https://www.effectivecpmnetwork.com/mmgwyksvk?key=36e68235e91415ba8fdb9b60cb69ed02";
 
+// Country → flag emoji map. Comprehensive list covering every football-playing
+// country so the slider can mirror the source's full country directory.
 const COUNTRY_FLAGS = {
-    'England':'🏴󠁧󠁢󠁥󠁮󠁧󠁿','Scotland':'🏴󠁧󠁢󠁳󠁣󠁴󠁿','Wales':'🏴󠁧󠁢󠁷󠁬󠁳󠁿','Northern Ireland':'🇬🇧',
-    'Spain':'🇪🇸','Germany':'🇩🇪','Italy':'🇮🇹','France':'🇫🇷','Portugal':'🇵🇹',
-    'Netherlands':'🇳🇱','Belgium':'🇧🇪','Turkey':'🇹🇷','Greece':'🇬🇷','Switzerland':'🇨🇭',
-    'Austria':'🇦🇹','Russia':'🇷🇺','Ukraine':'🇺🇦','Poland':'🇵🇱','Czech Republic':'🇨🇿',
-    'Croatia':'🇭🇷','Serbia':'🇷🇸','Romania':'🇷🇴','Bulgaria':'🇧🇬','Hungary':'🇭🇺',
-    'Sweden':'🇸🇪','Norway':'🇳🇴','Denmark':'🇩🇰','Finland':'🇫🇮','Ireland':'🇮🇪','Iceland':'🇮🇸',
-    'Brazil':'🇧🇷','Argentina':'🇦🇷','Chile':'🇨🇱','Colombia':'🇨🇴','Peru':'🇵🇪','Uruguay':'🇺🇾',
-    'Ecuador':'🇪🇨','Paraguay':'🇵🇾','Bolivia':'🇧🇴','Venezuela':'🇻🇪',
-    'Mexico':'🇲🇽','USA':'🇺🇸','United States':'🇺🇸','Canada':'🇨🇦',
-    'Japan':'🇯🇵','South Korea':'🇰🇷','China':'🇨🇳','Australia':'🇦🇺','India':'🇮🇳',
-    'Saudi Arabia':'🇸🇦','UAE':'🇦🇪','Qatar':'🇶🇦','Iran':'🇮🇷','Iraq':'🇮🇶','Israel':'🇮🇱',
-    'Egypt':'🇪🇬','Morocco':'🇲🇦','South Africa':'🇿🇦','Nigeria':'🇳🇬','Ghana':'🇬🇭',
-    'Tunisia':'🇹🇳','Algeria':'🇩🇿','Senegal':'🇸🇳','Ivory Coast':'🇨🇮','Cameroon':'🇨🇲',
+    'Afghanistan':'🇦🇫','Albania':'🇦🇱','Algeria':'🇩🇿','Andorra':'🇦🇩','Angola':'🇦🇴',
+    'Argentina':'🇦🇷','Armenia':'🇦🇲','Aruba':'🇦🇼','Australia':'🇦🇺','Austria':'🇦🇹','Azerbaijan':'🇦🇿',
+    'Bahrain':'🇧🇭','Bangladesh':'🇧🇩','Barbados':'🇧🇧','Belarus':'🇧🇾','Belgium':'🇧🇪','Belize':'🇧🇿','Benin':'🇧🇯',
+    'Bermuda':'🇧🇲','Bhutan':'🇧🇹','Bolivia':'🇧🇴','Bosnia':'🇧🇦','Bosnia and Herzegovina':'🇧🇦','Botswana':'🇧🇼',
+    'Brazil':'🇧🇷','Bulgaria':'🇧🇬','Burkina Faso':'🇧🇫','Burkina-Faso':'🇧🇫','Burundi':'🇧🇮',
+    'Cambodia':'🇰🇭','Cameroon':'🇨🇲','Canada':'🇨🇦','Cape Verde':'🇨🇻','Central African Republic':'🇨🇫',
+    'Chad':'🇹🇩','Chile':'🇨🇱','China':'🇨🇳','Colombia':'🇨🇴','Comoros':'🇰🇲',
+    'Congo':'🇨🇬','Costa Rica':'🇨🇷','Croatia':'🇭🇷','Cuba':'🇨🇺','Curacao':'🇨🇼','Cyprus':'🇨🇾','Czech Republic':'🇨🇿',
+    'Denmark':'🇩🇰','Djibouti':'🇩🇯','Dominica':'🇩🇲','Dominican Republic':'🇩🇴',
+    'DR Congo':'🇨🇩','East Timor':'🇹🇱','Ecuador':'🇪🇨','Egypt':'🇪🇬','El Salvador':'🇸🇻',
+    'England':'🏴󠁧󠁢󠁥󠁮󠁧󠁿','Equatorial Guinea':'🇬🇶','Eritrea':'🇪🇷','Estonia':'🇪🇪','Eswatini':'🇸🇿','Ethiopia':'🇪🇹',
+    'Faroe Islands':'🇫🇴','Fiji':'🇫🇯','Finland':'🇫🇮','France':'🇫🇷',
+    'Gabon':'🇬🇦','Gambia':'🇬🇲','Georgia':'🇬🇪','Germany':'🇩🇪','Ghana':'🇬🇭','Gibraltar':'🇬🇮','Greece':'🇬🇷',
+    'Grenada':'🇬🇩','Guatemala':'🇬🇹','Guinea':'🇬🇳','Guinea-Bissau':'🇬🇼','Guyana':'🇬🇾',
+    'Haiti':'🇭🇹','Honduras':'🇭🇳','Hong Kong':'🇭🇰','Hungary':'🇭🇺',
+    'Iceland':'🇮🇸','India':'🇮🇳','Indonesia':'🇮🇩','Iran':'🇮🇷','Iraq':'🇮🇶','Ireland':'🇮🇪','Israel':'🇮🇱','Italy':'🇮🇹','Ivory Coast':'🇨🇮',
+    'Jamaica':'🇯🇲','Japan':'🇯🇵','Jordan':'🇯🇴',
+    'Kazakhstan':'🇰🇿','Kenya':'🇰🇪','Kosovo':'🇽🇰','Kuwait':'🇰🇼','Kyrgyzstan':'🇰🇬',
+    'Laos':'🇱🇦','Latvia':'🇱🇻','Lebanon':'🇱🇧','Lesotho':'🇱🇸','Liberia':'🇱🇷','Libya':'🇱🇾','Liechtenstein':'🇱🇮','Lithuania':'🇱🇹','Luxembourg':'🇱🇺',
+    'Macau':'🇲🇴','Macedonia':'🇲🇰','North Macedonia':'🇲🇰','Madagascar':'🇲🇬','Malawi':'🇲🇼','Malaysia':'🇲🇾','Maldives':'🇲🇻','Mali':'🇲🇱','Malta':'🇲🇹',
+    'Mauritania':'🇲🇷','Mauritius':'🇲🇺','Mexico':'🇲🇽','Moldova':'🇲🇩','Mongolia':'🇲🇳','Montenegro':'🇲🇪','Morocco':'🇲🇦','Mozambique':'🇲🇿','Myanmar':'🇲🇲',
+    'Namibia':'🇳🇦','Nepal':'🇳🇵','Netherlands':'🇳🇱','New Zealand':'🇳🇿','Nicaragua':'🇳🇮','Niger':'🇳🇪','Nigeria':'🇳🇬','North Korea':'🇰🇵','Northern Ireland':'🇬🇧','Norway':'🇳🇴',
+    'Oman':'🇴🇲',
+    'Pakistan':'🇵🇰','Palestine':'🇵🇸','Panama':'🇵🇦','Papua New Guinea':'🇵🇬','Paraguay':'🇵🇾','Peru':'🇵🇪','Philippines':'🇵🇭','Poland':'🇵🇱','Portugal':'🇵🇹','Puerto Rico':'🇵🇷',
+    'Qatar':'🇶🇦',
+    'Romania':'🇷🇴','Russia':'🇷🇺','Rwanda':'🇷🇼',
+    'Saudi Arabia':'🇸🇦','Scotland':'🏴󠁧󠁢󠁳󠁣󠁴󠁿','Senegal':'🇸🇳','Serbia':'🇷🇸','Seychelles':'🇸🇨','Sierra Leone':'🇸🇱','Singapore':'🇸🇬','Slovakia':'🇸🇰','Slovenia':'🇸🇮','Somalia':'🇸🇴','South Africa':'🇿🇦','South Korea':'🇰🇷','South Sudan':'🇸🇸','Spain':'🇪🇸','Sri Lanka':'🇱🇰','Sudan':'🇸🇩','Suriname':'🇸🇷','Sweden':'🇸🇪','Switzerland':'🇨🇭','Syria':'🇸🇾',
+    'Taiwan':'🇹🇼','Tajikistan':'🇹🇯','Tanzania':'🇹🇿','Thailand':'🇹🇭','Togo':'🇹🇬','Trinidad':'🇹🇹','Trinidad and Tobago':'🇹🇹','Tunisia':'🇹🇳','Turkey':'🇹🇷','Turkmenistan':'🇹🇲',
+    'UAE':'🇦🇪','Uganda':'🇺🇬','Ukraine':'🇺🇦','United States':'🇺🇸','USA':'🇺🇸','Uruguay':'🇺🇾','Uzbekistan':'🇺🇿',
+    'Venezuela':'🇻🇪','Vietnam':'🇻🇳',
+    'Wales':'🏴󠁧󠁢󠁷󠁬󠁳󠁿','Yemen':'🇾🇪','Zambia':'🇿🇲','Zimbabwe':'🇿🇼',
     'World':'🌐','International':'🌐','Europe':'🇪🇺','South America':'🌎','Africa':'🌍','Asia':'🌏',
-    'Estonia':'🇪🇪','Georgia':'🇬🇪','Gibraltar':'🇬🇮','Aruba':'🇦🇼',
-    'Slovakia':'🇸🇰','Latvia':'🇱🇻','Lithuania':'🇱🇹','Belarus':'🇧🇾','Cyprus':'🇨🇾','Malta':'🇲🇹','Liechtenstein':'🇱🇮','Faroe Islands':'🇫🇴',
-    'Jordan':'🇯🇴','Lebanon':'🇱🇧','Bahrain':'🇧🇭','Kuwait':'🇰🇼','Oman':'🇴🇲','Syria':'🇸🇾',
-    'Tanzania':'🇹🇿','Kenya':'🇰🇪','Uganda':'🇺🇬','Zambia':'🇿🇲','Zimbabwe':'🇿🇼',
 };
 const getCountryFlag = (country) => COUNTRY_FLAGS[country] || '⚽';
 
+// Country → short code shown under each flag in the slider.
 const COUNTRY_CODES = {
-    'England':'ENG','Scotland':'SCO','Wales':'WAL','Northern Ireland':'NIR',
-    'Spain':'ES','Germany':'DE','Italy':'IT','France':'FR','Portugal':'PT',
-    'Netherlands':'NL','Belgium':'BE','Turkey':'TR','Greece':'GR','Switzerland':'CH',
-    'Austria':'AT','Russia':'RU','Ukraine':'UA','Poland':'PL','Czech Republic':'CZ',
-    'Croatia':'HR','Serbia':'RS','Romania':'RO','Bulgaria':'BG','Hungary':'HU',
-    'Sweden':'SE','Norway':'NO','Denmark':'DK','Finland':'FI','Ireland':'IE','Iceland':'IS',
-    'Brazil':'BR','Argentina':'AR','Chile':'CL','Colombia':'CO','Peru':'PE','Uruguay':'UY',
-    'Ecuador':'EC','Paraguay':'PY','Bolivia':'BO','Venezuela':'VE',
-    'Mexico':'MX','USA':'US','United States':'US','Canada':'CA',
-    'Japan':'JP','South Korea':'KR','China':'CN','Australia':'AU','India':'IN',
-    'Saudi Arabia':'SA','UAE':'AE','Qatar':'QA','Iran':'IR','Iraq':'IQ','Israel':'IL',
-    'Egypt':'EG','Morocco':'MA','South Africa':'ZA','Nigeria':'NG','Ghana':'GH',
-    'Tunisia':'TN','Algeria':'DZ','Senegal':'SN','Ivory Coast':'CI','Cameroon':'CM',
+    'Afghanistan':'AF','Albania':'AL','Algeria':'DZ','Andorra':'AD','Angola':'AO',
+    'Argentina':'AR','Armenia':'AM','Aruba':'AW','Australia':'AU','Austria':'AT','Azerbaijan':'AZ',
+    'Bahrain':'BH','Bangladesh':'BD','Barbados':'BB','Belarus':'BY','Belgium':'BE','Belize':'BZ','Benin':'BJ',
+    'Bermuda':'BM','Bhutan':'BT','Bolivia':'BO','Bosnia':'BA','Bosnia and Herzegovina':'BA','Botswana':'BW',
+    'Brazil':'BR','Bulgaria':'BG','Burkina Faso':'BF','Burkina-Faso':'BF','Burundi':'BI',
+    'Cambodia':'KH','Cameroon':'CM','Canada':'CA','Cape Verde':'CV','Central African Republic':'CF',
+    'Chad':'TD','Chile':'CL','China':'CN','Colombia':'CO','Comoros':'KM',
+    'Congo':'CG','Costa Rica':'CR','Croatia':'HR','Cuba':'CU','Curacao':'CW','Cyprus':'CY','Czech Republic':'CZ',
+    'Denmark':'DK','Djibouti':'DJ','Dominica':'DM','Dominican Republic':'DO',
+    'DR Congo':'CD','East Timor':'TL','Ecuador':'EC','Egypt':'EG','El Salvador':'SV',
+    'England':'ENG','Equatorial Guinea':'GQ','Eritrea':'ER','Estonia':'EE','Eswatini':'SZ','Ethiopia':'ET',
+    'Faroe Islands':'FO','Fiji':'FJ','Finland':'FI','France':'FR',
+    'Gabon':'GA','Gambia':'GM','Georgia':'GE','Germany':'DE','Ghana':'GH','Gibraltar':'GI','Greece':'GR',
+    'Grenada':'GD','Guatemala':'GT','Guinea':'GN','Guinea-Bissau':'GW','Guyana':'GY',
+    'Haiti':'HT','Honduras':'HN','Hong Kong':'HK','Hungary':'HU',
+    'Iceland':'IS','India':'IN','Indonesia':'ID','Iran':'IR','Iraq':'IQ','Ireland':'IE','Israel':'IL','Italy':'IT','Ivory Coast':'CI',
+    'Jamaica':'JM','Japan':'JP','Jordan':'JO',
+    'Kazakhstan':'KZ','Kenya':'KE','Kosovo':'XK','Kuwait':'KW','Kyrgyzstan':'KG',
+    'Laos':'LA','Latvia':'LV','Lebanon':'LB','Lesotho':'LS','Liberia':'LR','Libya':'LY','Liechtenstein':'LI','Lithuania':'LT','Luxembourg':'LU',
+    'Macau':'MO','Macedonia':'MK','North Macedonia':'MK','Madagascar':'MG','Malawi':'MW','Malaysia':'MY','Maldives':'MV','Mali':'ML','Malta':'MT',
+    'Mauritania':'MR','Mauritius':'MU','Mexico':'MX','Moldova':'MD','Mongolia':'MN','Montenegro':'ME','Morocco':'MA','Mozambique':'MZ','Myanmar':'MM',
+    'Namibia':'NA','Nepal':'NP','Netherlands':'NL','New Zealand':'NZ','Nicaragua':'NI','Niger':'NE','Nigeria':'NG','North Korea':'KP','Northern Ireland':'NIR','Norway':'NO',
+    'Oman':'OM',
+    'Pakistan':'PK','Palestine':'PS','Panama':'PA','Papua New Guinea':'PG','Paraguay':'PY','Peru':'PE','Philippines':'PH','Poland':'PL','Portugal':'PT','Puerto Rico':'PR',
+    'Qatar':'QA',
+    'Romania':'RO','Russia':'RU','Rwanda':'RW',
+    'Saudi Arabia':'SA','Scotland':'SCO','Senegal':'SN','Serbia':'RS','Seychelles':'SC','Sierra Leone':'SL','Singapore':'SG','Slovakia':'SK','Slovenia':'SI','Somalia':'SO','South Africa':'ZA','South Korea':'KR','South Sudan':'SS','Spain':'ES','Sri Lanka':'LK','Sudan':'SD','Suriname':'SR','Sweden':'SE','Switzerland':'CH','Syria':'SY',
+    'Taiwan':'TW','Tajikistan':'TJ','Tanzania':'TZ','Thailand':'TH','Togo':'TG','Trinidad':'TT','Trinidad and Tobago':'TT','Tunisia':'TN','Turkey':'TR','Turkmenistan':'TM',
+    'UAE':'AE','Uganda':'UG','Ukraine':'UA','United States':'US','USA':'US','Uruguay':'UY','Uzbekistan':'UZ',
+    'Venezuela':'VE','Vietnam':'VN',
+    'Wales':'WAL','Yemen':'YE','Zambia':'ZM','Zimbabwe':'ZW',
     'World':'INT','International':'INT','Europe':'EU','South America':'CSA','Africa':'AFR','Asia':'ASN',
-    'Estonia':'EE','Georgia':'GE','Gibraltar':'GI','Aruba':'AW',
-    'Slovakia':'SK','Latvia':'LV','Lithuania':'LT','Belarus':'BY','Cyprus':'CY','Malta':'MT','Liechtenstein':'LI','Faroe Islands':'FO',
-    'Jordan':'JO','Lebanon':'LB','Bahrain':'BH','Kuwait':'KW','Oman':'OM','Syria':'SY',
-    'Tanzania':'TZ','Kenya':'KE','Uganda':'UG','Zambia':'ZM','Zimbabwe':'ZW',
 };
 const getCountryCode = (country) => COUNTRY_CODES[country] || (country || '?').slice(0, 3).toUpperCase();
 
+// Complete country directory — every football-playing country shown in the
+// slider regardless of whether they have matches on the selected date.
+// Mirrors the source's full country sidebar so users can browse, not just
+// see the 6 countries that happen to have games today.
+const ALL_COUNTRIES = [
+    'Afghanistan','Albania','Algeria','Andorra','Angola','Argentina','Armenia','Aruba','Australia','Austria','Azerbaijan',
+    'Bahrain','Bangladesh','Barbados','Belarus','Belgium','Belize','Benin','Bermuda','Bhutan','Bolivia','Bosnia','Botswana','Brazil','Bulgaria','Burkina Faso','Burundi',
+    'Cambodia','Cameroon','Canada','Cape Verde','Chad','Chile','China','Colombia','Comoros','Congo','Costa Rica','Croatia','Cuba','Curacao','Cyprus','Czech Republic',
+    'Denmark','Djibouti','Dominica','Dominican Republic','DR Congo','East Timor','Ecuador','Egypt','El Salvador','England','Equatorial Guinea','Eritrea','Estonia','Eswatini','Ethiopia',
+    'Faroe Islands','Fiji','Finland','France',
+    'Gabon','Gambia','Georgia','Germany','Ghana','Gibraltar','Greece','Grenada','Guatemala','Guinea','Guinea-Bissau','Guyana',
+    'Haiti','Honduras','Hong Kong','Hungary',
+    'Iceland','India','Indonesia','Iran','Iraq','Ireland','Israel','Italy','Ivory Coast',
+    'Jamaica','Japan','Jordan',
+    'Kazakhstan','Kenya','Kosovo','Kuwait','Kyrgyzstan',
+    'Laos','Latvia','Lebanon','Lesotho','Liberia','Libya','Liechtenstein','Lithuania','Luxembourg',
+    'Macau','Madagascar','Malawi','Malaysia','Maldives','Mali','Malta','Mauritania','Mauritius','Mexico','Moldova','Mongolia','Montenegro','Morocco','Mozambique','Myanmar',
+    'Namibia','Nepal','Netherlands','New Zealand','Nicaragua','Niger','Nigeria','North Korea','North Macedonia','Northern Ireland','Norway',
+    'Oman',
+    'Pakistan','Palestine','Panama','Papua New Guinea','Paraguay','Peru','Philippines','Poland','Portugal','Puerto Rico',
+    'Qatar',
+    'Romania','Russia','Rwanda',
+    'Saudi Arabia','Scotland','Senegal','Serbia','Seychelles','Sierra Leone','Singapore','Slovakia','Slovenia','Somalia','South Africa','South Korea','South Sudan','Spain','Sri Lanka','Sudan','Suriname','Sweden','Switzerland','Syria',
+    'Taiwan','Tajikistan','Tanzania','Thailand','Togo','Trinidad','Tunisia','Turkey','Turkmenistan',
+    'UAE','Uganda','Ukraine','United States','Uruguay','Uzbekistan',
+    'Venezuela','Vietnam','Wales','Yemen','Zambia','Zimbabwe',
+    'International',
+];
+
+// Backend doesn't return a country field on each match — only leagueName.
+// Map well-known leagues → country here. Anything we can't recognise falls
+// through to "International" (continental cups / friendlies / obscure leagues).
 const LEAGUE_COUNTRY_MAP = {
     'premier league':'England','efl championship':'England','championship':'England','league one':'England','league two':'England','efl cup':'England','carabao cup':'England','fa cup':'England','fa trophy':'England','national league':'England','national league north':'England','national league south':'England','wsl':'England',"women's super league":'England','community shield':'England',
     'la liga':'Spain','laliga':'Spain','la liga 2':'Spain','segunda division':'Spain','segunda división':'Spain','copa del rey':'Spain','supercopa de españa':'Spain','liga f':'Spain','primera división rfef':'Spain','primera rfef':'Spain',
@@ -489,22 +678,33 @@ const LEAGUE_COUNTRY_MAP = {
     'thai league 1':'Thailand','thai premier league':'Thailand',
     'v.league 1':'Vietnam','v-league 1':'Vietnam',
     'singapore premier league':'Singapore','malaysia super league':'Malaysia','liga 1 indonesia':'Indonesia',
+    // Sweden (lower tiers + women's tiers + cup)
     'ettan norra':'Sweden','ettan södra':'Sweden','ettan sodra':'Sweden','division 2 norra götaland':'Sweden','division 2 norra gotaland':'Sweden','division 2 västra götaland':'Sweden','division 2 vastra gotaland':'Sweden','division 2 södra götaland':'Sweden','division 2 sodra gotaland':'Sweden','division 2 norra svealand':'Sweden','division 2 södra svealand':'Sweden','division 2 sodra svealand':'Sweden','division 2 norrland':'Sweden','damallsvenskan':'Sweden','elitettan':'Sweden','svenska cupen':'Sweden',
+    // Estonia, Georgia, Gibraltar, Aruba (new)
     'esiliiga a':'Estonia','esiliiga b':'Estonia','meistriliiga':'Estonia',
     'erovnuli liga':'Georgia',
     'gfa league':'Gibraltar',
     'division di honor':'Aruba',
+    // Finland additional
     'ykkösliiga':'Finland','ykkosliiga':'Finland',
+    // Argentina additional (lower tiers + amateur)
     'primera c':'Argentina','torneo federal a':'Argentina','torneo promocional amateur':'Argentina','primera b metropolitana':'Argentina',
+    // Italy additional
     '3. division girone 1':'Italy','3. division girone 2':'Italy','coppa':'Italy',
+    // Australia additional
     'queensland premier league':'Australia','capital territory npl':'Australia',
+    // Brazil youth
     'brasileiro u17':'Brazil','brasileiro u20 a':'Brazil','brasileiro u20':'Brazil',
+    // Denmark
     '1. division':'Denmark','2. division group 1':'Denmark',
+    // Germany / Spain additional
     'liga 3':'Germany','primera división rfef play offs':'Spain','primera division rfef play offs':'Spain',
+    // Catch-alls for leagues seen in the live feed
     'reserve league':'England','reserves league':'England','premier league 2':'England','premier league cup':'England',
     'elite two':'France','elite 1':'France','elite 2':'France',
     'northern super league':'Canada',
     'cup':'International','league cup':'International',
+    // Misc European tiers
     'fortuna liga':'Slovakia','slovak super liga':'Slovakia',
     'fortuna liga czech':'Czech Republic',
     'virsliga':'Latvia','latvian higher league':'Latvia',
@@ -514,11 +714,13 @@ const LEAGUE_COUNTRY_MAP = {
     'maltese premier league':'Malta','bov premier league':'Malta',
     'liechtenstein cup':'Liechtenstein',
     'meistarataval':'Faroe Islands','effodeildin':'Faroe Islands',
+    // Misc Asian / African
     'jordanian pro league':'Jordan','lebanese premier league':'Lebanon','bahraini premier league':'Bahrain',
     'kuwaiti premier league':'Kuwait','omani professional league':'Oman','syrian premier league':'Syria',
     'cypriot super cup':'Cyprus',
     'tanzanian premier league':'Tanzania','kenyan premier league':'Kenya','ugandan premier league':'Uganda',
     'zambian super league':'Zambia','zimbabwean premier soccer league':'Zimbabwe',
+    // International / continental cups
     'uefa champions league':'International','champions league':'International','uefa europa league':'International','europa league':'International','uefa europa conference league':'International','conference league':'International','uefa super cup':'International','uefa nations league':'International','nations league':'International','uefa euro':'International','euro':'International','european championship':'International','euro qualification':'International','euro qualifying':'International','euro u21':'International','fifa world cup':'International','world cup':'International','world cup qualification':'International','world cup qualifying':'International','copa libertadores':'International','copa sudamericana':'International','copa américa':'International','copa america':'International','recopa sudamericana':'International','concacaf champions cup':'International','concacaf gold cup':'International','concacaf nations league':'International','afc champions league':'International','afc asian cup':'International','afc cup':'International','caf champions league':'International','caf confederation cup':'International','africa cup of nations':'International','afcon':'International','wafcon':'International','fifa club world cup':'International','club world cup':'International','olympic games':'International','club friendlies':'International','international friendlies':'International','friendlies':'International',
 };
 const LEAGUE_PATTERNS = [
@@ -548,6 +750,8 @@ const getCountryForLeague = (leagueName) => {
     }
     return 'International';
 };
+// Prefer the backend's country field if it ever appears; otherwise infer from
+// the league name. This is what every country-grouping/filter uses.
 const getMatchCountry = (m) => m.country || getCountryForLeague(m.leagueName);
 
 const FIN_SET = new Set(['FT','AET','PEN','Pen.']);
@@ -576,6 +780,9 @@ const statusLabel = s => {
     return s;
 };
 
+/* === LIVE MINUTE EXTRAPOLATION ===
+   Backend stores match.elapsed (number) + match.elapsedAt (ms timestamp of the scrape).
+   Between scrapes we tick the displayed minute forward second-by-second.       */
 const liveMinute = (m) => {
     if (!m) return '';
     const raw = String(m.statusRaw || '').toUpperCase();
@@ -597,6 +804,7 @@ const liveMinute = (m) => {
     return add === 0 ? "90'" : `90+${add}'`;
 };
 
+/* Re-render hook — fires every second while `active` is true. */
 const useTickingNow = (active) => {
     const [, setTick] = useState(0);
     useEffect(() => {
@@ -627,6 +835,8 @@ const getGoals = m => {
 
 const fid = m => m?.id || m?.static_id || m?.fixture?.id || null;
 
+// Convert a match's date + time into a sortable UTC millisecond timestamp.
+// Used to order Upcoming (soonest first), Live (earliest kickoff first), Past (most recent first).
 const matchTimestamp = (m) => {
     if (!m || !m.date) return 0;
     const t = Date.parse(`${m.date}T${m.time || '00:00'}:00Z`);
@@ -810,6 +1020,7 @@ const MatchCard = ({ match, onOpen, onToggleFav, isFav, pred=null }) => {
     const badgeClass = c==='live'?'s-live':c==='finished'?'s-fin':c==='upcoming'?'s-upc':'s-canc';
     const leagueTxt  = [match.country, match.leagueName].filter(Boolean).join(' · ');
 
+    // Tick every second so the LIVE minute display advances.
     useTickingNow(c === 'live');
 
     return (
@@ -891,6 +1102,7 @@ const MatchCard = ({ match, onOpen, onToggleFav, isFav, pred=null }) => {
     );
 };
 
+/* === Last Matches section inside the detail sheet ====================== */
 const LastMatchesBlock = ({ teamName, matches }) => {
     if (!teamName) return null;
     return (
@@ -916,6 +1128,7 @@ const LastMatchesBlock = ({ teamName, matches }) => {
     );
 };
 
+/* === H2H section inside the detail sheet =============================== */
 const H2HBlock = ({ details }) => {
     const list = (details.h2h && details.h2h.matches) || [];
     const s    = (details.h2h && details.h2h.stats)   || {};
@@ -957,6 +1170,7 @@ const H2HBlock = ({ details }) => {
                         <div className="lm-score">{g.score}</div>
                         <div className="lm-date">{(g.date || '').slice(5)}</div>
                     </div>
+                    {/* Smartlink interstitial after every 2nd match (but not after the last one) */}
                     {((i + 1) % 2 === 0 && i < list.length - 1) && (
                         <a href={SMARTLINK_URL} target="_blank" rel="noopener noreferrer nofollow" className="inter-ad">
                             <small>Sponsored</small>
@@ -969,6 +1183,7 @@ const H2HBlock = ({ details }) => {
     );
 };
 
+/* === Form summary section ============================================== */
 const FormBlock = ({ details }) => {
     const hf = details.home?.form;
     const af = details.away?.form;
@@ -1006,9 +1221,11 @@ const DetailSheet = ({ match, pred, onClose }) => {
     const leagueTxt  = [match.country, match.leagueName].filter(Boolean).join(' · ') || (match.leagueName || '');
     const analysis   = generateAnalysis(match);
 
+    // Live timer ticks every second while sheet is open
     useTickingNow(c === 'live');
     const liveMin = c === 'live' ? liveMinute(match) : '';
 
+    // H2H + Standings + Form auto-load when the sheet opens
     const [details, setDetails]       = useState(null);
     const [detailsErr, setDetailsErr] = useState(null);
     const [detailsLoading, setLoading] = useState(false);
@@ -1031,6 +1248,7 @@ const DetailSheet = ({ match, pred, onClose }) => {
             <div className="sheet" onClick={e=>e.stopPropagation()}>
                 <div className="handle"/>
 
+                {/* === Smartlink banner (detail sheet only) === */}
                 <a href={SMARTLINK_URL} target="_blank" rel="noopener noreferrer nofollow" className="smartlink-banner">
                     <small>Sponsored</small>
                     🎁 Boost Your Bets — Tap to Claim Today's Top Bonus 🎁
@@ -1122,6 +1340,7 @@ const DetailSheet = ({ match, pred, onClose }) => {
                     <div style={{background:'var(--bg)',borderRadius:'var(--r)',padding:'13px 14px',marginBottom:14,textAlign:'center',fontSize:12,color:'var(--t3)'}}>Prediction not available.</div>
                 )}
 
+                {/* === Standings + H2H + Form auto-load when sheet opens === */}
                 {detailsLoading && (
                     <div className="detail-loading">
                         <div className="spin-sm"/>
@@ -1151,6 +1370,7 @@ const DetailSheet = ({ match, pred, onClose }) => {
     );
 };
 
+/* === League Standings inside detail sheet ============================= */
 const StandingsBlock = ({ details }) => {
     const groups = details.standings;
     if (!Array.isArray(groups) || groups.length === 0) return null;
@@ -1207,6 +1427,11 @@ const StandingsBlock = ({ details }) => {
     );
 };
 
+/* === Bookmaker Odds Comparison — Alerts tab only ============================
+   Shows the scraped 1X2 odds + clickable bookmaker buttons. Each bookmaker
+   link is an affiliate placeholder — replace with your real affiliate URLs
+   from Bet365 / 1xBet / Betway / Bet9ja partner programs to earn signup
+   commissions when users sign up + bet. */
 const BOOKMAKERS = [
     { name: 'Bet365',  bg: '#076C44', url: 'https://www.bet365.com'   },
     { name: '1xBet',   bg: '#1C49E0', url: 'https://1xbet.com'        },
@@ -1257,17 +1482,23 @@ function App() {
     const [theme,          setTheme]          = useState(() => {
         try { return localStorage.getItem('magic-theme') || 'light'; } catch { return 'light'; }
     });
+    // selectedDate is YYYY-MM-DD (UTC). When equal to today, the Home tab shows
+    // Live/Upcoming/Past tabs + stats; for future dates we show only Upcoming.
     const [selectedDate,   setSelectedDate]   = useState(() => new Date().toISOString().slice(0, 10));
 
     useEffect(() => {
         try { localStorage.setItem('magic-favs', JSON.stringify(favs)); } catch {}
     }, [favs]);
 
+    // Dark mode — apply class to <body> + persist
     useEffect(() => {
         document.body.className = theme === 'dark' ? 'dark' : '';
         try { localStorage.setItem('magic-theme', theme); } catch {}
     }, [theme]);
 
+    // Try to hydrate from localStorage on first paint so the UI isn't empty
+    // while we wait for the network — and so if Railway is down we still
+    // show *something* useful.
     useEffect(() => {
         try {
             const cached = JSON.parse(localStorage.getItem('magic-cache') || 'null');
@@ -1299,6 +1530,7 @@ function App() {
             setMatches(list);
             const stamp = data.updatedAt || new Date().toISOString();
             setUpdatedAt(stamp);
+            // Cache successful response so we can survive Railway downtime.
             try {
                 localStorage.setItem('magic-cache', JSON.stringify({
                     matches: list, updatedAt: stamp, cachedAt: Date.now(),
@@ -1307,11 +1539,15 @@ function App() {
         } catch (e) {
             if (wt) clearTimeout(wt);
             setWaking(false);
+            // Distinguish "user has no internet" vs "Railway is down / maintenance"
+            //   Offline → "Please check your internet connection"
+            //   Server error → "Website maintenance in progress, some data may be delayed"
             const isOffline = !navigator.onLine ||
                               (e instanceof TypeError && /failed to fetch|network/i.test(e.message)) ||
                               /networkerror/i.test(e.name || '');
             const offlineMsg = "📡 Please connect or check your internet connection.";
             const maintenanceMsg = "🛠️ Website maintenance in progress — some data may be delayed. We apologize in advance.";
+            // Fall back to cached data if we have any.
             let usedCache = false;
             try {
                 const cached = JSON.parse(localStorage.getItem('magic-cache') || 'null');
@@ -1343,6 +1579,7 @@ function App() {
         return () => clearTimeout(done);
     }, [tabLoading]);
 
+    // Show loading whenever the selected date changes (skip first mount).
     const dateChangedOnce = useRef(false);
     useEffect(() => {
         if (!dateChangedOnce.current) { dateChangedOnce.current = true; return; }
@@ -1356,11 +1593,16 @@ function App() {
         setFavs(p => p.includes(id) ? p.filter(f => f !== id) : [...p, id]);
     }, []);
 
+    // Date-type detection:
+    //   isViewingToday → show Live / Upcoming / Past tabs
+    //   isPastDate     → show only past matches (Live/Upcoming hidden)
+    //   isFutureDate   → show only upcoming matches (Live/Past hidden)
     const todayIso       = new Date().toISOString().slice(0, 10);
     const isViewingToday = selectedDate === todayIso;
     const isPastDate     = selectedDate < todayIso;
     const isFutureDate   = selectedDate > todayIso;
 
+    // Country drill-down state. null = country list view; set = detail view.
     const [selectedCountry, setSelectedCountry] = useState(null);
 
     const liveMatches     = useMemo(() => matches.filter(m => cat(m.status) === 'live')
@@ -1374,10 +1616,15 @@ function App() {
     const alertMatches    = useMemo(() => matches.filter(m => { const n=parseInt(m.statusRaw||m.status); return !isNaN(n)&&n>=75&&n<120; })
         .sort((a, b) => matchTimestamp(a) - matchTimestamp(b)), [matches]);
 
+    // Snap homeTab to the only valid value for the current date type so
+    // we never try to render "Live" matches for a past date, etc.
     useEffect(() => {
         if (isPastDate && homeTab !== 'Past') setHomeTab('Past');
         else if (isFutureDate && homeTab !== 'Upcoming') setHomeTab('Upcoming');
     }, [isPastDate, isFutureDate, homeTab]);
+
+    // (selectedCountry auto-select logic lives below after availableCountries
+    // is computed; nothing to do here.)
 
     const handleHomeTabClick = useCallback(async (t) => {
         setHomeTab(t);
@@ -1385,6 +1632,9 @@ function App() {
         try { await load(true); } finally { setTabLoading(false); }
     }, [load]);
 
+    // Compute the 5-day strip starting from today + count matches per day.
+    // Date strip used by BOTH the top horizontal strip and the calendar popup.
+    // Range: Past 5 days + Today + Future 10 days = 16 items, sorted oldest → newest.
     const dateStrip = useMemo(() => {
         const today = new Date();
         const isoOf = (d) => d.toISOString().slice(0, 10);
@@ -1394,7 +1644,7 @@ function App() {
             counts[m.date] = (counts[m.date] || 0) + 1;
         }
         return Array.from({length:16}, (_,i) => {
-            const offset = i - 5;
+            const offset = i - 5;  // -5..-1 = past, 0 = today, 1..10 = future
             const d = new Date(today.getFullYear(), today.getMonth(), today.getDate() + offset);
             const iso = isoOf(d);
             return {
@@ -1407,6 +1657,9 @@ function App() {
         });
     }, [matches]);
 
+    // pickDate is shared by the calendar cards AND the "Back to today" button.
+    // When picking Today we auto-select the most useful tab (Live → Upcoming → Past)
+    // so the page never lands on an empty tab and looks broken.
     const pickDate = (iso) => {
         setSelectedDate(iso);
         if (iso === todayIso) {
@@ -1418,6 +1671,8 @@ function App() {
         setCalOpen(false);
     };
 
+    // Matches relevant to the current date type (before applying the
+    // country filter). Drives BOTH the country slider AND the displayed list.
     const dateRelevantMatches = useMemo(() => {
         if (isPastDate)   return pastMatches;
         if (isFutureDate) return upcomingMatches;
@@ -1426,6 +1681,10 @@ function App() {
         return upcomingMatches;
     }, [isPastDate, isFutureDate, homeTab, liveMatches, upcomingMatches, pastMatches]);
 
+    // Country flag slider data. Always shows the COMPLETE country directory
+    // (ALL_COUNTRIES) so users can browse the full list — not just countries
+    // with matches today. Sort order: match count desc, then alphabetical, so
+    // active countries float to the front while everything else stays browsable.
     const availableCountries = useMemo(() => {
         const pool = matches.filter(m => {
             if (isViewingToday && cat(m.status) === 'live') return true;
@@ -1436,11 +1695,23 @@ function App() {
             const c = getMatchCountry(m);
             counts[c] = (counts[c] || 0) + 1;
         }
-        return Object.entries(counts)
-            .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
-            .map(([country]) => country);
+        const merged = new Set([...ALL_COUNTRIES, ...Object.keys(counts)]);
+        const out = Array.from(merged).sort((a, b) => {
+            const ca = counts[a] || 0;
+            const cb = counts[b] || 0;
+            if (cb !== ca) return cb - ca;
+            return a.localeCompare(b);
+        });
+        console.log('[MagicAnalysis] Total countries in slider:', out.length);
+        console.log('[MagicAnalysis] Countries with matches today:', Object.keys(counts).length);
+        console.log('[MagicAnalysis] Match counts by country:', counts);
+        console.log('[MagicAnalysis] Full slider order:', out);
+        return out;
     }, [matches, selectedDate, isViewingToday]);
 
+    // Auto-select the first available country whenever the date changes or
+    // the current selection becomes invalid (e.g. country has no matches
+    // for the new date).
     useEffect(() => {
         if (availableCountries.length === 0) {
             if (selectedCountry !== null) setSelectedCountry(null);
@@ -1451,11 +1722,15 @@ function App() {
         }
     }, [availableCountries, selectedCountry]);
 
+    // Matches that actually get rendered: date-relevant + matching the
+    // currently-selected country filter.
     const filteredMatches = useMemo(() => {
         if (!selectedCountry) return dateRelevantMatches;
         return dateRelevantMatches.filter(m => getMatchCountry(m) === selectedCountry);
     }, [dateRelevantMatches, selectedCountry]);
 
+    // Group filtered matches by league/competition so we can show competition
+    // names as section headers above each cluster of cards.
     const matchesByLeague = useMemo(() => {
         const byLeague = {};
         for (const m of filteredMatches) {
@@ -1468,6 +1743,7 @@ function App() {
             .map(([league, leagueMatches]) => ({ league, matches: leagueMatches }));
     }, [filteredMatches]);
 
+    // Smoothly center the selected country chip whenever it changes.
     const countrySliderRef = useRef(null);
     useEffect(() => {
         if (!selectedCountry || !countrySliderRef.current) return;
