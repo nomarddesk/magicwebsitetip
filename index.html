@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,17 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Magic Analysis</title>
 
-    <!-- Favicon (browser tab icon) — generated via realfavicongenerator.net -->
     <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="shortcut icon" href="/favicon.ico" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
 
-    <!-- Web Push Notifications via OneSignal — LIVE MATCH ALERTS ONLY -->
-    <!-- Mobile-first: shows a slide-down popup (not a tiny floating bell) so 90%
-         of mobile users can actually see/tap it. Triggers 8 seconds after first
-         page view, framed around live match alerts (not ads/promos). -->
     <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
     <script>
       window.OneSignalDeferred = window.OneSignalDeferred || [];
@@ -25,22 +19,18 @@
           await OneSignal.init({
             appId: "fab78014-9e29-4947-a92b-cac367cb093b",
             safari_web_id: "web.onesignal.auto.05737452-6fb0-4a74-aaf2-b68bc5a2ed6a",
-            // Bell icon OFF — replaced by mobile-friendly slidedown popup below.
             notifyButton: { enable: false },
             promptOptions: {
               slidedown: {
                 prompts: [{
                   type: "push",
-                  autoPrompt: true,                 // appears automatically
+                  autoPrompt: true,
                   text: {
                     actionMessage: "🔴 Get instant alerts when matches go LIVE — never miss a goal.",
                     acceptButton: "🔔 Enable Live Alerts",
                     cancelButton: "Not now"
                   },
-                  delay: {
-                    pageViews: 1,                   // show after 1 page view
-                    timeDelay: 8                    // wait 8 seconds so user sees content first
-                  }
+                  delay: { pageViews: 1, timeDelay: 8 }
                 }]
               }
             }
@@ -49,7 +39,6 @@
       });
     </script>
 
-    <!-- Google Analytics (GA4) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-RNQZZENL62"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -76,7 +65,6 @@
         body { font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue',Arial,sans-serif; background:var(--bg); color:var(--t1); overflow-x:hidden; transition:background .2s,color .2s; }
         ::-webkit-scrollbar { display:none; } * { scrollbar-width:none; }
 
-        /* ===== Dark mode — overrides root vars when body.dark is set ===== */
         body.dark {
             --bg:#000000; --surface:#1C1C1E;
             --t1:#FFFFFF; --t2:#C7C7CC; --t3:#8E8E93;
@@ -297,6 +285,21 @@
         .cs-code { font-size:9px; font-weight:800; color:var(--t3); letter-spacing:.4px; }
         .cs-item.on .cs-code { color:#fff; }
 
+        /* Pinned International chip — first, bigger, distinct so worldwide matches are 1 tap away */
+        .cs-item-intl { flex:0 0 72px; background:linear-gradient(135deg,#007AFF 0%,#0051D5 100%); border-color:transparent; padding:8px 4px; box-shadow:0 2px 9px rgba(0,122,255,.32); margin-right:3px; }
+        .cs-item-intl:hover { background:linear-gradient(135deg,#0a84ff 0%,#0a5fe0 100%); }
+        .cs-item-intl .cs-flag { font-size:28px; }
+        .cs-item-intl .cs-code { color:#fff; font-size:9px; }
+        .cs-item-intl.on { background:linear-gradient(135deg,#007AFF 0%,#0051D5 100%); border-color:#fff; box-shadow:0 0 0 2.5px var(--t1),0 2px 9px rgba(0,122,255,.4); }
+        .cs-item-intl.on .cs-code { color:#fff; }
+
+        /* "Showing X — show all" bar appears only when a single country filter is active */
+        .show-all-bar { width:100%; display:flex; align-items:center; justify-content:space-between; gap:10px; background:var(--surface); border:none; border-radius:12px; box-shadow:var(--card-shadow); padding:11px 14px; margin-bottom:12px; cursor:pointer; font-family:inherit; font-size:13px; font-weight:600; color:var(--t1); -webkit-tap-highlight-color:transparent; transition:background .12s; }
+        .show-all-bar:hover { background:var(--bg); }
+        .show-all-bar .sab-left { display:flex; align-items:center; gap:8px; min-width:0; overflow:hidden; }
+        .show-all-bar .sab-flag { font-size:18px; line-height:1; flex-shrink:0; }
+        .show-all-bar .sab-link { flex-shrink:0; font-size:12px; font-weight:700; color:var(--blue); background:rgba(0,122,255,.1); border-radius:100px; padding:4px 11px; }
+
         /* ===== League section (groups matches under each competition) ===== */
         .league-block { margin-bottom:14px; }
         .league-block-title { font-size:11px; font-weight:700; color:var(--t3); text-transform:uppercase; letter-spacing:.5px; padding:8px 4px 8px; display:flex; align-items:center; gap:6px; }
@@ -335,10 +338,8 @@
 
         .lazy-slot { min-height:175px; }
 
-        /* ===== NEW: Live timer pill (inside card status badge & detail) ===== */
         .live-pill-min { font-weight:800; font-variant-numeric:tabular-nums; letter-spacing:.4px; }
 
-        /* ===== NEW: Smartlink banner inside detail sheet ===== */
         .smartlink-banner {
             display:block; background:linear-gradient(135deg,#FF9500 0%,#FF3B30 100%);
             color:#fff; text-align:center; padding:13px 16px; border-radius:14px;
@@ -352,7 +353,6 @@
             text-transform:uppercase; margin-bottom:3px; font-weight:600;
         }
 
-        /* ===== NEW: Last Matches / H2H / Form sections ===== */
         .detail-section-title {
             font-size:11px; font-weight:700; color:var(--t3);
             text-transform:uppercase; letter-spacing:.5px;
@@ -398,7 +398,6 @@
             display:flex; flex-direction:column; align-items:center; gap:10px;
         }
 
-        /* ===== NEW: H2H Unlock CTA (Smartlink-monetized button) ===== */
         .unlock-card {
             background:linear-gradient(135deg,#1D1D1F 0%,#2C2C2E 100%);
             border-radius:16px; padding:18px 16px; margin:22px 0 14px;
@@ -446,7 +445,6 @@
             letter-spacing:.3px; text-transform:uppercase; font-weight:600;
         }
 
-        /* ===== NEW: Interstitial Smartlink ad (between H2H matches) ===== */
         .inter-ad {
             display:block; background:linear-gradient(90deg,#FFF7ED 0%,#FFEDD5 100%);
             border:1px solid #FED7AA; border-radius:12px;
@@ -592,8 +590,6 @@ const getCountryCode = (country) => COUNTRY_CODES[country] || (country || '?').s
 
 // Complete country directory — every football-playing country shown in the
 // slider regardless of whether they have matches on the selected date.
-// Mirrors the source's full country sidebar so users can browse, not just
-// see the 6 countries that happen to have games today.
 const ALL_COUNTRIES = [
     'Afghanistan','Albania','Algeria','Andorra','Angola','Argentina','Armenia','Aruba','Australia','Austria','Azerbaijan',
     'Bahrain','Bangladesh','Barbados','Belarus','Belgium','Belize','Benin','Bermuda','Bhutan','Bolivia','Bosnia','Botswana','Brazil','Bulgaria','Burkina Faso','Burundi',
@@ -619,9 +615,7 @@ const ALL_COUNTRIES = [
     'International',
 ];
 
-// Backend doesn't return a country field on each match — only leagueName.
-// Map well-known leagues → country here. Anything we can't recognise falls
-// through to "International" (continental cups / friendlies / obscure leagues).
+// Backend doesn't always return a country field — fall back to league inference.
 const LEAGUE_COUNTRY_MAP = {
     'premier league':'England','efl championship':'England','championship':'England','league one':'England','league two':'England','efl cup':'England','carabao cup':'England','fa cup':'England','fa trophy':'England','national league':'England','national league north':'England','national league south':'England','wsl':'England',"women's super league":'England','community shield':'England',
     'la liga':'Spain','laliga':'Spain','la liga 2':'Spain','segunda division':'Spain','segunda división':'Spain','copa del rey':'Spain','supercopa de españa':'Spain','liga f':'Spain','primera división rfef':'Spain','primera rfef':'Spain',
@@ -680,14 +674,14 @@ const LEAGUE_COUNTRY_MAP = {
     'singapore premier league':'Singapore','malaysia super league':'Malaysia','liga 1 indonesia':'Indonesia',
     // Sweden (lower tiers + women's tiers + cup)
     'ettan norra':'Sweden','ettan södra':'Sweden','ettan sodra':'Sweden','division 2 norra götaland':'Sweden','division 2 norra gotaland':'Sweden','division 2 västra götaland':'Sweden','division 2 vastra gotaland':'Sweden','division 2 södra götaland':'Sweden','division 2 sodra gotaland':'Sweden','division 2 norra svealand':'Sweden','division 2 södra svealand':'Sweden','division 2 sodra svealand':'Sweden','division 2 norrland':'Sweden','damallsvenskan':'Sweden','elitettan':'Sweden','svenska cupen':'Sweden',
-    // Estonia, Georgia, Gibraltar, Aruba (new)
+    // Estonia, Georgia, Gibraltar, Aruba
     'esiliiga a':'Estonia','esiliiga b':'Estonia','meistriliiga':'Estonia',
     'erovnuli liga':'Georgia',
     'gfa league':'Gibraltar',
     'division di honor':'Aruba',
     // Finland additional
     'ykkösliiga':'Finland','ykkosliiga':'Finland',
-    // Argentina additional (lower tiers + amateur)
+    // Argentina additional
     'primera c':'Argentina','torneo federal a':'Argentina','torneo promocional amateur':'Argentina','primera b metropolitana':'Argentina',
     // Italy additional
     '3. division girone 1':'Italy','3. division girone 2':'Italy','coppa':'Italy',
@@ -750,15 +744,20 @@ const getCountryForLeague = (leagueName) => {
     }
     return 'International';
 };
-// Prefer the backend's country field if it ever appears; otherwise infer from
-// the league name. This is what every country-grouping/filter uses.
+// Normalize every "not a single country" label (UEFA, World Cup, Copa America,
+// continental confederations, friendlies, etc.) into one "International" bucket
+// so all worldwide matches collapse under the single pinned International button.
+const INTL_LABELS = new Set([
+    'world','international','intl','europe','asia','africa','oceania',
+    'north america','south america','south & central america','central america',
+    'caribbean','uefa','conmebol','concacaf','caf','afc','ofc','fifa',
+]);
 const normalizeCountry = (c) => {
     if (!c) return c;
-    const lc = String(c).toLowerCase();
-    if (lc === 'world' || lc === 'international') return 'International';
-    return c;
+    return INTL_LABELS.has(String(c).trim().toLowerCase()) ? 'International' : c;
 };
 const getMatchCountry = (m) => normalizeCountry(m.country || getCountryForLeague(m.leagueName));
+
 const FIN_SET = new Set(['FT','AET','PEN','Pen.']);
 const UPC_SET = new Set(['NS','TBD']);
 const CANC_SET = new Set(['Postp.','Canc.','Susp.','WO','AWD','ABD']);
@@ -785,9 +784,7 @@ const statusLabel = s => {
     return s;
 };
 
-/* === LIVE MINUTE EXTRAPOLATION ===
-   Backend stores match.elapsed (number) + match.elapsedAt (ms timestamp of the scrape).
-   Between scrapes we tick the displayed minute forward second-by-second.       */
+/* === LIVE MINUTE EXTRAPOLATION === */
 const liveMinute = (m) => {
     if (!m) return '';
     const raw = String(m.statusRaw || '').toUpperCase();
@@ -840,8 +837,6 @@ const getGoals = m => {
 
 const fid = m => m?.id || m?.static_id || m?.fixture?.id || null;
 
-// Convert a match's date + time into a sortable UTC millisecond timestamp.
-// Used to order Upcoming (soonest first), Live (earliest kickoff first), Past (most recent first).
 const matchTimestamp = (m) => {
     if (!m || !m.date) return 0;
     const t = Date.parse(`${m.date}T${m.time || '00:00'}:00Z`);
@@ -1025,7 +1020,6 @@ const MatchCard = ({ match, onOpen, onToggleFav, isFav, pred=null }) => {
     const badgeClass = c==='live'?'s-live':c==='finished'?'s-fin':c==='upcoming'?'s-upc':'s-canc';
     const leagueTxt  = [match.country, match.leagueName].filter(Boolean).join(' · ');
 
-    // Tick every second so the LIVE minute display advances.
     useTickingNow(c === 'live');
 
     return (
@@ -1107,7 +1101,7 @@ const MatchCard = ({ match, onOpen, onToggleFav, isFav, pred=null }) => {
     );
 };
 
-/* === Last Matches section inside the detail sheet ====================== */
+/* === Last Matches section inside the detail sheet === */
 const LastMatchesBlock = ({ teamName, matches }) => {
     if (!teamName) return null;
     return (
@@ -1133,7 +1127,7 @@ const LastMatchesBlock = ({ teamName, matches }) => {
     );
 };
 
-/* === H2H section inside the detail sheet =============================== */
+/* === H2H section inside the detail sheet === */
 const H2HBlock = ({ details }) => {
     const list = (details.h2h && details.h2h.matches) || [];
     const s    = (details.h2h && details.h2h.stats)   || {};
@@ -1175,7 +1169,6 @@ const H2HBlock = ({ details }) => {
                         <div className="lm-score">{g.score}</div>
                         <div className="lm-date">{(g.date || '').slice(5)}</div>
                     </div>
-                    {/* Smartlink interstitial after every 2nd match (but not after the last one) */}
                     {((i + 1) % 2 === 0 && i < list.length - 1) && (
                         <a href={SMARTLINK_URL} target="_blank" rel="noopener noreferrer nofollow" className="inter-ad">
                             <small>Sponsored</small>
@@ -1188,7 +1181,7 @@ const H2HBlock = ({ details }) => {
     );
 };
 
-/* === Form summary section ============================================== */
+/* === Form summary section === */
 const FormBlock = ({ details }) => {
     const hf = details.home?.form;
     const af = details.away?.form;
@@ -1226,11 +1219,9 @@ const DetailSheet = ({ match, pred, onClose }) => {
     const leagueTxt  = [match.country, match.leagueName].filter(Boolean).join(' · ') || (match.leagueName || '');
     const analysis   = generateAnalysis(match);
 
-    // Live timer ticks every second while sheet is open
     useTickingNow(c === 'live');
     const liveMin = c === 'live' ? liveMinute(match) : '';
 
-    // H2H + Standings + Form auto-load when the sheet opens
     const [details, setDetails]       = useState(null);
     const [detailsErr, setDetailsErr] = useState(null);
     const [detailsLoading, setLoading] = useState(false);
@@ -1253,7 +1244,6 @@ const DetailSheet = ({ match, pred, onClose }) => {
             <div className="sheet" onClick={e=>e.stopPropagation()}>
                 <div className="handle"/>
 
-                {/* === Smartlink banner (detail sheet only) === */}
                 <a href={SMARTLINK_URL} target="_blank" rel="noopener noreferrer nofollow" className="smartlink-banner">
                     <small>Sponsored</small>
                     🎁 Boost Your Bets — Tap to Claim Today's Top Bonus 🎁
@@ -1345,7 +1335,6 @@ const DetailSheet = ({ match, pred, onClose }) => {
                     <div style={{background:'var(--bg)',borderRadius:'var(--r)',padding:'13px 14px',marginBottom:14,textAlign:'center',fontSize:12,color:'var(--t3)'}}>Prediction not available.</div>
                 )}
 
-                {/* === Standings + H2H + Form auto-load when sheet opens === */}
                 {detailsLoading && (
                     <div className="detail-loading">
                         <div className="spin-sm"/>
@@ -1375,7 +1364,7 @@ const DetailSheet = ({ match, pred, onClose }) => {
     );
 };
 
-/* === League Standings inside detail sheet ============================= */
+/* === League Standings inside detail sheet === */
 const StandingsBlock = ({ details }) => {
     const groups = details.standings;
     if (!Array.isArray(groups) || groups.length === 0) return null;
@@ -1432,11 +1421,7 @@ const StandingsBlock = ({ details }) => {
     );
 };
 
-/* === Bookmaker Odds Comparison — Alerts tab only ============================
-   Shows the scraped 1X2 odds + clickable bookmaker buttons. Each bookmaker
-   link is an affiliate placeholder — replace with your real affiliate URLs
-   from Bet365 / 1xBet / Betway / Bet9ja partner programs to earn signup
-   commissions when users sign up + bet. */
+/* === Bookmaker Odds Comparison — Alerts tab only === */
 const BOOKMAKERS = [
     { name: 'Bet365',  bg: '#076C44', url: 'https://www.bet365.com'   },
     { name: '1xBet',   bg: '#1C49E0', url: 'https://1xbet.com'        },
@@ -1487,23 +1472,17 @@ function App() {
     const [theme,          setTheme]          = useState(() => {
         try { return localStorage.getItem('magic-theme') || 'light'; } catch { return 'light'; }
     });
-    // selectedDate is YYYY-MM-DD (UTC). When equal to today, the Home tab shows
-    // Live/Upcoming/Past tabs + stats; for future dates we show only Upcoming.
     const [selectedDate,   setSelectedDate]   = useState(() => new Date().toISOString().slice(0, 10));
 
     useEffect(() => {
         try { localStorage.setItem('magic-favs', JSON.stringify(favs)); } catch {}
     }, [favs]);
 
-    // Dark mode — apply class to <body> + persist
     useEffect(() => {
         document.body.className = theme === 'dark' ? 'dark' : '';
         try { localStorage.setItem('magic-theme', theme); } catch {}
     }, [theme]);
 
-    // Try to hydrate from localStorage on first paint so the UI isn't empty
-    // while we wait for the network — and so if Railway is down we still
-    // show *something* useful.
     useEffect(() => {
         try {
             const cached = JSON.parse(localStorage.getItem('magic-cache') || 'null');
@@ -1535,7 +1514,6 @@ function App() {
             setMatches(list);
             const stamp = data.updatedAt || new Date().toISOString();
             setUpdatedAt(stamp);
-            // Cache successful response so we can survive Railway downtime.
             try {
                 localStorage.setItem('magic-cache', JSON.stringify({
                     matches: list, updatedAt: stamp, cachedAt: Date.now(),
@@ -1544,15 +1522,11 @@ function App() {
         } catch (e) {
             if (wt) clearTimeout(wt);
             setWaking(false);
-            // Distinguish "user has no internet" vs "Railway is down / maintenance"
-            //   Offline → "Please check your internet connection"
-            //   Server error → "Website maintenance in progress, some data may be delayed"
             const isOffline = !navigator.onLine ||
                               (e instanceof TypeError && /failed to fetch|network/i.test(e.message)) ||
                               /networkerror/i.test(e.name || '');
             const offlineMsg = "📡 Please connect or check your internet connection.";
             const maintenanceMsg = "🛠️ Website maintenance in progress — some data may be delayed. We apologize in advance.";
-            // Fall back to cached data if we have any.
             let usedCache = false;
             try {
                 const cached = JSON.parse(localStorage.getItem('magic-cache') || 'null');
@@ -1584,7 +1558,6 @@ function App() {
         return () => clearTimeout(done);
     }, [tabLoading]);
 
-    // Show loading whenever the selected date changes (skip first mount).
     const dateChangedOnce = useRef(false);
     useEffect(() => {
         if (!dateChangedOnce.current) { dateChangedOnce.current = true; return; }
@@ -1598,16 +1571,11 @@ function App() {
         setFavs(p => p.includes(id) ? p.filter(f => f !== id) : [...p, id]);
     }, []);
 
-    // Date-type detection:
-    //   isViewingToday → show Live / Upcoming / Past tabs
-    //   isPastDate     → show only past matches (Live/Upcoming hidden)
-    //   isFutureDate   → show only upcoming matches (Live/Past hidden)
     const todayIso       = new Date().toISOString().slice(0, 10);
     const isViewingToday = selectedDate === todayIso;
     const isPastDate     = selectedDate < todayIso;
     const isFutureDate   = selectedDate > todayIso;
 
-    // Country drill-down state. null = country list view; set = detail view.
     const [selectedCountry, setSelectedCountry] = useState(null);
 
     const liveMatches     = useMemo(() => matches.filter(m => cat(m.status) === 'live')
@@ -1621,15 +1589,10 @@ function App() {
     const alertMatches    = useMemo(() => matches.filter(m => { const n=parseInt(m.statusRaw||m.status); return !isNaN(n)&&n>=75&&n<120; })
         .sort((a, b) => matchTimestamp(a) - matchTimestamp(b)), [matches]);
 
-    // Snap homeTab to the only valid value for the current date type so
-    // we never try to render "Live" matches for a past date, etc.
     useEffect(() => {
         if (isPastDate && homeTab !== 'Past') setHomeTab('Past');
         else if (isFutureDate && homeTab !== 'Upcoming') setHomeTab('Upcoming');
     }, [isPastDate, isFutureDate, homeTab]);
-
-    // (selectedCountry auto-select logic lives below after availableCountries
-    // is computed; nothing to do here.)
 
     const handleHomeTabClick = useCallback(async (t) => {
         setHomeTab(t);
@@ -1637,9 +1600,6 @@ function App() {
         try { await load(true); } finally { setTabLoading(false); }
     }, [load]);
 
-    // Compute the 5-day strip starting from today + count matches per day.
-    // Date strip used by BOTH the top horizontal strip and the calendar popup.
-    // Range: Past 5 days + Today + Future 10 days = 16 items, sorted oldest → newest.
     const dateStrip = useMemo(() => {
         const today = new Date();
         const isoOf = (d) => d.toISOString().slice(0, 10);
@@ -1649,7 +1609,7 @@ function App() {
             counts[m.date] = (counts[m.date] || 0) + 1;
         }
         return Array.from({length:16}, (_,i) => {
-            const offset = i - 5;  // -5..-1 = past, 0 = today, 1..10 = future
+            const offset = i - 5;
             const d = new Date(today.getFullYear(), today.getMonth(), today.getDate() + offset);
             const iso = isoOf(d);
             return {
@@ -1662,11 +1622,9 @@ function App() {
         });
     }, [matches]);
 
-    // pickDate is shared by the calendar cards AND the "Back to today" button.
-    // When picking Today we auto-select the most useful tab (Live → Upcoming → Past)
-    // so the page never lands on an empty tab and looks broken.
     const pickDate = (iso) => {
         setSelectedDate(iso);
+        setSelectedCountry(null);   // reset to "All countries" so the new date lands on a full list
         if (iso === todayIso) {
             const todayLive = matches.filter(m => cat(m.status) === 'live').length;
             const todayUpc  = matches.filter(m => cat(m.status) === 'upcoming' && m.date === iso).length;
@@ -1676,8 +1634,6 @@ function App() {
         setCalOpen(false);
     };
 
-    // Matches relevant to the current date type (before applying the
-    // country filter). Drives BOTH the country slider AND the displayed list.
     const dateRelevantMatches = useMemo(() => {
         if (isPastDate)   return pastMatches;
         if (isFutureDate) return upcomingMatches;
@@ -1686,10 +1642,8 @@ function App() {
         return upcomingMatches;
     }, [isPastDate, isFutureDate, homeTab, liveMatches, upcomingMatches, pastMatches]);
 
-    // Country flag slider data. Always shows the COMPLETE country directory
-    // (ALL_COUNTRIES) so users can browse the full list — not just countries
-    // with matches today. Sort order: match count desc, then alphabetical, so
-    // active countries float to the front while everything else stays browsable.
+    // Country flag slider: complete directory (ALL_COUNTRIES) + any extra countries
+    // that appear in today's feed, sorted by match count desc then alphabetically.
     const availableCountries = useMemo(() => {
         const pool = matches.filter(m => {
             if (isViewingToday && cat(m.status) === 'live') return true;
@@ -1714,28 +1668,26 @@ function App() {
         return out;
     }, [matches, selectedDate, isViewingToday]);
 
-    // Auto-select the first available country whenever the date changes or
-    // the current selection becomes invalid (e.g. country has no matches
-    // for the new date).
-    useEffect(() => {
-        if (availableCountries.length === 0) {
-            if (selectedCountry !== null) setSelectedCountry(null);
-            return;
-        }
-        if (!selectedCountry || !availableCountries.includes(selectedCountry)) {
-            setSelectedCountry(availableCountries[0]);
-        }
-    }, [availableCountries, selectedCountry]);
+    // NO forced auto-select. selectedCountry === null means "show ALL countries"
+    // (the default) so the page always lands on a full list of matches instead of
+    // getting stuck on an empty country. Users opt into a country by tapping a chip;
+    // pickDate() resets back to null on every date change.
+    //
+    // Per-country counts so the stat cards + Live/Upcoming/Past pills ALWAYS match
+    // the visible list. When no country is selected these equal the global totals.
+    const countOf = (list) => selectedCountry
+        ? list.filter(m => getMatchCountry(m) === selectedCountry).length
+        : list.length;
+    const liveCount     = countOf(liveMatches);
+    const upcomingCount = countOf(upcomingMatches);
+    const pastCount     = countOf(pastMatches);
+    const alertCount    = countOf(alertMatches);
 
-    // Matches that actually get rendered: date-relevant + matching the
-    // currently-selected country filter.
     const filteredMatches = useMemo(() => {
         if (!selectedCountry) return dateRelevantMatches;
         return dateRelevantMatches.filter(m => getMatchCountry(m) === selectedCountry);
     }, [dateRelevantMatches, selectedCountry]);
 
-    // Group filtered matches by league/competition so we can show competition
-    // names as section headers above each cluster of cards.
     const matchesByLeague = useMemo(() => {
         const byLeague = {};
         for (const m of filteredMatches) {
@@ -1748,13 +1700,12 @@ function App() {
             .map(([league, leagueMatches]) => ({ league, matches: leagueMatches }));
     }, [filteredMatches]);
 
-    // Smoothly center the selected country chip whenever it changes.
     const countrySliderRef = useRef(null);
     useEffect(() => {
         if (!selectedCountry || !countrySliderRef.current) return;
-        const el = countrySliderRef.current.querySelector(`[data-country-idx="${availableCountries.indexOf(selectedCountry)}"]`);
+        const el = countrySliderRef.current.querySelector(`[data-country-name="${selectedCountry}"]`);
         if (el) el.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-    }, [selectedCountry, availableCountries]);
+    }, [selectedCountry]);
 
     const renderCard = m => {
         const k = fid(m) || `${m.home?.name}${m.away?.name}${m.status}`;
@@ -1775,19 +1726,27 @@ function App() {
         if (tabLoading) return <TabLoading/>;
         if (loading)    return [1,2,3].map(i => <Skel key={i}/>);
         if (matchesByLeague.length === 0) {
+            if (selectedCountry) {
+                return <EmptyState
+                    title={`No ${selectedCountry} matches on this date.`}
+                    sub="Tap “Show all countries” above, or pick another country."/>;
+            }
             return <EmptyState title={isPastDate
                 ? "No matches on record for this date."
                 : EMPTY_TAB_MSG}/>;
         }
-        return matchesByLeague.map(({ league, matches: leagueMatches }) => (
-            <div key={league} className="league-block">
-                <div className="league-block-title">
-                    <span className="league-block-flag">{getCountryFlag(selectedCountry)}</span>
-                    {league}
+        return matchesByLeague.map(({ league, matches: leagueMatches }) => {
+            const c = getMatchCountry(leagueMatches[0]);
+            return (
+                <div key={league} className="league-block">
+                    <div className="league-block-title">
+                        <span className="league-block-flag">{getCountryFlag(c)}</span>
+                        {c ? `${c} · ${league}` : league}
+                    </div>
+                    {leagueMatches.map(renderCard)}
                 </div>
-                {leagueMatches.map(renderCard)}
-            </div>
-        ));
+            );
+        });
     };
 
     const today  = new Date().toLocaleDateString('en-US', {weekday:'long',month:'long',day:'numeric'});
@@ -1850,11 +1809,21 @@ function App() {
 
             {tab === 'Home' && availableCountries.length > 0 && (
                 <div className="country-slider" ref={countrySliderRef}>
-                    {availableCountries.map((country, i) => (
+                    {/* Pinned #1 — International (worldwide / continental) — always first & bigger */}
+                    <button
+                        data-country-name="International"
+                        className={`cs-item cs-item-intl${selectedCountry === 'International' ? ' on' : ''}`}
+                        onClick={() => setSelectedCountry(selectedCountry === 'International' ? null : 'International')}
+                        title="International — worldwide & continental matches">
+                        <span className="cs-flag">🌐</span>
+                        <span className="cs-code">INT'L</span>
+                    </button>
+                    {/* All other countries (International excluded — it's pinned above) */}
+                    {availableCountries.filter(c => c !== 'International').map((country) => (
                         <button key={country}
-                            data-country-idx={i}
+                            data-country-name={country}
                             className={`cs-item${selectedCountry === country ? ' on' : ''}`}
-                            onClick={() => setSelectedCountry(country)}
+                            onClick={() => setSelectedCountry(selectedCountry === country ? null : country)}
                             title={country}>
                             <span className="cs-flag">{getCountryFlag(country)}</span>
                             <span className="cs-code">{getCountryCode(country)}</span>
@@ -1878,7 +1847,7 @@ function App() {
 
                         {isViewingToday && (
                             <div className="stats">
-                                {[['Live',liveMatches.length],['Upcoming',upcomingMatches.length],['Past',pastMatches.length],['Alerts',alertMatches.length]].map(([l,v]) => (
+                                {[['Live',liveCount],['Upcoming',upcomingCount],['Past',pastCount],['Alerts',alertCount]].map(([l,v]) => (
                                     <div key={l} className="stat">
                                         <div className="stat-n">{v}</div>
                                         <div className="stat-l">{l}</div>
@@ -1890,18 +1859,26 @@ function App() {
                         {isViewingToday && (
                             <div className="home-tabs">
                                 <button className={`home-tab${homeTab==='Live'?' on':''}`} onClick={()=>handleHomeTabClick('Live')}>
-                                    🔴 Live <span className="home-tab-count">({liveMatches.length})</span>
+                                    🔴 Live <span className="home-tab-count">({liveCount})</span>
                                 </button>
                                 <button className={`home-tab${homeTab==='Upcoming'?' on':''}`} onClick={()=>handleHomeTabClick('Upcoming')}>
-                                    🔵 Upcoming <span className="home-tab-count">({upcomingMatches.length})</span>
+                                    🔵 Upcoming <span className="home-tab-count">({upcomingCount})</span>
                                 </button>
                                 <button className={`home-tab${homeTab==='Past'?' on':''}`} onClick={()=>handleHomeTabClick('Past')}>
-                                    ✅ Past <span className="home-tab-count">({pastMatches.length})</span>
+                                    ✅ Past <span className="home-tab-count">({pastCount})</span>
                                 </button>
                             </div>
                         )}
 
-                       
+                        {selectedCountry && (
+                            <button className="show-all-bar" onClick={() => setSelectedCountry(null)}>
+                                <span className="sab-left">
+                                    <span className="sab-flag">{getCountryFlag(selectedCountry)}</span>
+                                    Showing {selectedCountry} only
+                                </span>
+                                <span className="sab-link">✕ Show all countries</span>
+                            </button>
+                        )}
 
                         {waking && (
                             <div className="wake-bar">
