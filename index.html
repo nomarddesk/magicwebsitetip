@@ -752,8 +752,13 @@ const getCountryForLeague = (leagueName) => {
 };
 // Prefer the backend's country field if it ever appears; otherwise infer from
 // the league name. This is what every country-grouping/filter uses.
-const getMatchCountry = (m) => m.country || getCountryForLeague(m.leagueName);
-
+const normalizeCountry = (c) => {
+    if (!c) return c;
+    const lc = String(c).toLowerCase();
+    if (lc === 'world' || lc === 'international') return 'International';
+    return c;
+};
+const getMatchCountry = (m) => normalizeCountry(m.country || getCountryForLeague(m.leagueName));
 const FIN_SET = new Set(['FT','AET','PEN','Pen.']);
 const UPC_SET = new Set(['NS','TBD']);
 const CANC_SET = new Set(['Postp.','Canc.','Susp.','WO','AWD','ABD']);
