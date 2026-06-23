@@ -5,12 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Magic Analysis</title>
 
+    <!-- Favicon (browser tab icon) — generated via realfavicongenerator.net -->
     <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="shortcut icon" href="/favicon.ico" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
 
+    <!-- Web Push Notifications via OneSignal — LIVE MATCH ALERTS ONLY -->
+    <!-- Mobile-first: shows a slide-down popup (not a tiny floating bell) so 90%
+         of mobile users can actually see/tap it. Triggers 8 seconds after first
+         page view, framed around live match alerts (not ads/promos). -->
     <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
     <script>
       window.OneSignalDeferred = window.OneSignalDeferred || [];
@@ -19,18 +24,22 @@
           await OneSignal.init({
             appId: "fab78014-9e29-4947-a92b-cac367cb093b",
             safari_web_id: "web.onesignal.auto.05737452-6fb0-4a74-aaf2-b68bc5a2ed6a",
+            // Bell icon OFF — replaced by mobile-friendly slidedown popup below.
             notifyButton: { enable: false },
             promptOptions: {
               slidedown: {
                 prompts: [{
                   type: "push",
-                  autoPrompt: true,
+                  autoPrompt: true,                 // appears automatically
                   text: {
                     actionMessage: "🔴 Get instant alerts when matches go LIVE — never miss a goal.",
                     acceptButton: "🔔 Enable Live Alerts",
                     cancelButton: "Not now"
                   },
-                  delay: { pageViews: 1, timeDelay: 8 }
+                  delay: {
+                    pageViews: 1,                   // show after 1 page view
+                    timeDelay: 8                    // wait 8 seconds so user sees content first
+                  }
                 }]
               }
             }
@@ -39,6 +48,7 @@
       });
     </script>
 
+    <!-- Google Analytics (GA4) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-RNQZZENL62"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -65,6 +75,7 @@
         body { font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue',Arial,sans-serif; background:var(--bg); color:var(--t1); overflow-x:hidden; transition:background .2s,color .2s; }
         ::-webkit-scrollbar { display:none; } * { scrollbar-width:none; }
 
+        /* ===== Dark mode — overrides root vars when body.dark is set ===== */
         body.dark {
             --bg:#000000; --surface:#1C1C1E;
             --t1:#FFFFFF; --t2:#C7C7CC; --t3:#8E8E93;
@@ -125,6 +136,12 @@
         .home-tab.on { background:var(--t1); color:#fff; box-shadow:0 4px 16px rgba(0,0,0,0.18); transform:translateY(-1px); }
         .home-tab:not(.on):hover { background:#E8E8ED; }
         .home-tab-count { font-size:11px; font-weight:600; opacity:.7; }
+        .home-tab .live-badge { background:var(--live); color:#fff; font-size:11px; font-weight:800; min-width:20px; height:20px; padding:0 6px; border-radius:10px; display:inline-flex; align-items:center; justify-content:center; line-height:1; font-variant-numeric:tabular-nums; box-shadow:0 0 0 3px rgba(255,59,48,.18); animation:livePulse 1.6s ease-in-out infinite; }
+        @keyframes livePulse { 0%,100%{box-shadow:0 0 0 3px rgba(255,59,48,.18)} 50%{box-shadow:0 0 0 6px rgba(255,59,48,.04)} }
+        .home-tab.on .live-badge { box-shadow:0 0 0 3px rgba(255,255,255,.16); }
+
+        .load-more { display:flex; flex-direction:column; align-items:center; gap:10px; padding:24px 20px 30px; }
+        .load-more-txt { font-size:12px; color:var(--t3); font-weight:600; letter-spacing:-.1px; }
 
         .tab-loading { display:flex; flex-direction:column; align-items:center; gap:18px; padding:60px 20px; background:var(--surface); border-radius:var(--r); box-shadow:var(--card-shadow); margin-bottom:9px; animation:pgIn .2s ease forwards; min-height:240px; justify-content:center; }
         .tab-loading-spin { width:34px; height:34px; border:3px solid var(--sep2); border-top-color:var(--t1); border-radius:50%; animation:rot .8s linear infinite; }
@@ -226,6 +243,8 @@
         .card-scores-col { display:flex; flex-direction:column; align-items:flex-end; gap:5px; min-width:20px; }
         .pred-front { display:flex; flex-direction:column; align-items:center; gap:3px; }
         .pred-front-circle { width:44px; height:44px; border-radius:50%; background:var(--gold); display:flex; align-items:center; justify-content:center; font-size:21px; font-weight:800; color:#fff; box-shadow:0 2px 10px rgba(255,149,0,.45); flex-shrink:0; }
+        .pred-front-circle.pred-correct { background:var(--green); box-shadow:0 2px 10px rgba(52,199,89,.5); }
+        .pred-front-circle.pred-wrong { background:var(--surface); color:var(--live); border:2px solid var(--live); box-shadow:none; }
         .pred-front-score { font-size:9px; font-weight:700; color:var(--t2); letter-spacing:.2px; }
         .pred-front-probs { display:flex; gap:6px; }
         .pred-front-prob { display:flex; flex-direction:column; align-items:center; }
@@ -233,6 +252,15 @@
         .pred-front-code { font-size:8px; font-weight:600; color:var(--t3); text-transform:uppercase; letter-spacing:.2px; }
         .pred-front-prob.hi .pred-front-pct { color:var(--gold); }
         .pred-front-prob.hi .pred-front-code { color:rgba(255,149,0,.7); }
+
+        /* ===== 1X2 odds row on every match card ===== */
+        .card-odds { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; margin-top:10px; }
+        .odds-pill { display:flex; align-items:center; justify-content:center; gap:6px; background:var(--bg); border:1.5px solid var(--sep); border-radius:9px; padding:7px 6px; }
+        .odds-pill-code { font-size:10px; font-weight:700; color:var(--t3); }
+        .odds-pill-val { font-size:13px; font-weight:700; color:var(--t1); font-variant-numeric:tabular-nums; }
+        .odds-pill-pick { border-color:var(--green); background:rgba(52,199,89,.09); }
+        .odds-pill-pick .odds-pill-code,
+        .odds-pill-pick .odds-pill-val { color:var(--green); }
 
         .spin { width:22px; height:22px; border:2px solid var(--sep2); border-top-color:var(--t1); border-radius:50%; animation:rot .7s linear infinite; }
         .spin-sm { width:14px; height:14px; border:1.5px solid var(--sep2); border-top-color:var(--blue); border-radius:50%; animation:rot .7s linear infinite; }
@@ -338,8 +366,10 @@
 
         .lazy-slot { min-height:175px; }
 
+        /* ===== NEW: Live timer pill (inside card status badge & detail) ===== */
         .live-pill-min { font-weight:800; font-variant-numeric:tabular-nums; letter-spacing:.4px; }
 
+        /* ===== NEW: Smartlink banner inside detail sheet ===== */
         .smartlink-banner {
             display:block; background:linear-gradient(135deg,#FF9500 0%,#FF3B30 100%);
             color:#fff; text-align:center; padding:13px 16px; border-radius:14px;
@@ -353,6 +383,7 @@
             text-transform:uppercase; margin-bottom:3px; font-weight:600;
         }
 
+        /* ===== NEW: Last Matches / H2H / Form sections ===== */
         .detail-section-title {
             font-size:11px; font-weight:700; color:var(--t3);
             text-transform:uppercase; letter-spacing:.5px;
@@ -398,6 +429,7 @@
             display:flex; flex-direction:column; align-items:center; gap:10px;
         }
 
+        /* ===== NEW: H2H Unlock CTA (Smartlink-monetized button) ===== */
         .unlock-card {
             background:linear-gradient(135deg,#1D1D1F 0%,#2C2C2E 100%);
             border-radius:16px; padding:18px 16px; margin:22px 0 14px;
@@ -445,6 +477,7 @@
             letter-spacing:.3px; text-transform:uppercase; font-weight:600;
         }
 
+        /* ===== NEW: Interstitial Smartlink ad (between H2H matches) ===== */
         .inter-ad {
             display:block; background:linear-gradient(90deg,#FFF7ED 0%,#FFEDD5 100%);
             border:1px solid #FED7AA; border-radius:12px;
@@ -504,6 +537,8 @@ const BACKEND_URL = "https://sportprediction-production.up.railway.app";
 const REFRESH_MS  = 20 * 60 * 1000;
 const TIMER_TICK_MS = 1000;
 const TAB_LOADING_MAX_MS = 3000;
+const PAGE_SIZE = 5;            // matches revealed per infinite-scroll page
+const LOAD_MORE_DELAY_MS = 800; // pause before revealing the next page (loading feel)
 const LOADING_MSG = "Just 1 sec...";
 const EMPTY_TAB_MSG = "Oh... please check other tabs for matches, there are no matches here at the moment.";
 
@@ -590,6 +625,8 @@ const getCountryCode = (country) => COUNTRY_CODES[country] || (country || '?').s
 
 // Complete country directory — every football-playing country shown in the
 // slider regardless of whether they have matches on the selected date.
+// Mirrors the source's full country sidebar so users can browse, not just
+// see the 6 countries that happen to have games today.
 const ALL_COUNTRIES = [
     'Afghanistan','Albania','Algeria','Andorra','Angola','Argentina','Armenia','Aruba','Australia','Austria','Azerbaijan',
     'Bahrain','Bangladesh','Barbados','Belarus','Belgium','Belize','Benin','Bermuda','Bhutan','Bolivia','Bosnia','Botswana','Brazil','Bulgaria','Burkina Faso','Burundi',
@@ -615,7 +652,9 @@ const ALL_COUNTRIES = [
     'International',
 ];
 
-// Backend doesn't always return a country field — fall back to league inference.
+// Backend doesn't return a country field on each match — only leagueName.
+// Map well-known leagues → country here. Anything we can't recognise falls
+// through to "International" (continental cups / friendlies / obscure leagues).
 const LEAGUE_COUNTRY_MAP = {
     'premier league':'England','efl championship':'England','championship':'England','league one':'England','league two':'England','efl cup':'England','carabao cup':'England','fa cup':'England','fa trophy':'England','national league':'England','national league north':'England','national league south':'England','wsl':'England',"women's super league":'England','community shield':'England',
     'la liga':'Spain','laliga':'Spain','la liga 2':'Spain','segunda division':'Spain','segunda división':'Spain','copa del rey':'Spain','supercopa de españa':'Spain','liga f':'Spain','primera división rfef':'Spain','primera rfef':'Spain',
@@ -674,14 +713,14 @@ const LEAGUE_COUNTRY_MAP = {
     'singapore premier league':'Singapore','malaysia super league':'Malaysia','liga 1 indonesia':'Indonesia',
     // Sweden (lower tiers + women's tiers + cup)
     'ettan norra':'Sweden','ettan södra':'Sweden','ettan sodra':'Sweden','division 2 norra götaland':'Sweden','division 2 norra gotaland':'Sweden','division 2 västra götaland':'Sweden','division 2 vastra gotaland':'Sweden','division 2 södra götaland':'Sweden','division 2 sodra gotaland':'Sweden','division 2 norra svealand':'Sweden','division 2 södra svealand':'Sweden','division 2 sodra svealand':'Sweden','division 2 norrland':'Sweden','damallsvenskan':'Sweden','elitettan':'Sweden','svenska cupen':'Sweden',
-    // Estonia, Georgia, Gibraltar, Aruba
+    // Estonia, Georgia, Gibraltar, Aruba (new)
     'esiliiga a':'Estonia','esiliiga b':'Estonia','meistriliiga':'Estonia',
     'erovnuli liga':'Georgia',
     'gfa league':'Gibraltar',
     'division di honor':'Aruba',
     // Finland additional
     'ykkösliiga':'Finland','ykkosliiga':'Finland',
-    // Argentina additional
+    // Argentina additional (lower tiers + amateur)
     'primera c':'Argentina','torneo federal a':'Argentina','torneo promocional amateur':'Argentina','primera b metropolitana':'Argentina',
     // Italy additional
     '3. division girone 1':'Italy','3. division girone 2':'Italy','coppa':'Italy',
@@ -744,6 +783,8 @@ const getCountryForLeague = (leagueName) => {
     }
     return 'International';
 };
+// Prefer the backend's country field if it ever appears; otherwise infer from
+// the league name. This is what every country-grouping/filter uses.
 // Normalize every "not a single country" label (UEFA, World Cup, Copa America,
 // continental confederations, friendlies, etc.) into one "International" bucket
 // so all worldwide matches collapse under the single pinned International button.
@@ -784,7 +825,9 @@ const statusLabel = s => {
     return s;
 };
 
-/* === LIVE MINUTE EXTRAPOLATION === */
+/* === LIVE MINUTE EXTRAPOLATION ===
+   Backend stores match.elapsed (number) + match.elapsedAt (ms timestamp of the scrape).
+   Between scrapes we tick the displayed minute forward second-by-second.       */
 const liveMinute = (m) => {
     if (!m) return '';
     const raw = String(m.statusRaw || '').toUpperCase();
@@ -837,6 +880,8 @@ const getGoals = m => {
 
 const fid = m => m?.id || m?.static_id || m?.fixture?.id || null;
 
+// Convert a match's date + time into a sortable UTC millisecond timestamp.
+// Used to order Upcoming (soonest first), Live (earliest kickoff first), Past (most recent first).
 const matchTimestamp = (m) => {
     if (!m || !m.date) return 0;
     const t = Date.parse(`${m.date}T${m.time || '00:00'}:00Z`);
@@ -859,6 +904,18 @@ const matchToPred = m => {
         dp:      m.probabilities?.draw || '—',
         ap:      m.probabilities?.away || '—',
     };
+};
+
+// For a finished match, was our 1X2 prediction correct? → 'correct' | 'wrong' | null.
+// Mirrors pitchpredictions.com: correct = green badge, wrong = red badge.
+const predictionOutcome = m => {
+    if (!m || !m.prediction || cat(m.status) !== 'finished') return null;
+    const g = getGoals(m);
+    if (!g) return null;
+    const h = parseInt(g.h, 10), a = parseInt(g.a, 10);
+    if (isNaN(h) || isNaN(a)) return null;
+    const actual = h > a ? '1' : h < a ? '2' : 'X';
+    return m.prediction === actual ? 'correct' : 'wrong';
 };
 
 const generateAnalysis = m => {
@@ -1017,9 +1074,11 @@ const MatchCard = ({ match, onOpen, onToggleFav, isFav, pred=null }) => {
     const id         = fid(match);
     const hasManual  = !!match.manual_prediction;
     const hasPred    = !!pred && !!pred.code;
+    const outcome    = predictionOutcome(match);
     const badgeClass = c==='live'?'s-live':c==='finished'?'s-fin':c==='upcoming'?'s-upc':'s-canc';
     const leagueTxt  = [match.country, match.leagueName].filter(Boolean).join(' · ');
 
+    // Tick every second so the LIVE minute display advances.
     useTickingNow(c === 'live');
 
     return (
@@ -1059,7 +1118,7 @@ const MatchCard = ({ match, onOpen, onToggleFav, isFav, pred=null }) => {
                             </div>
                         ) : hasPred ? (
                             <div className="pred-front" onClick={e=>e.stopPropagation()}>
-                                <div className="pred-front-circle">{pred.code}</div>
+                                <div className={`pred-front-circle${outcome ? ' pred-'+outcome : ''}`}>{pred.code}</div>
                                 {pred.score && <div className="pred-front-score">{pred.score}</div>}
                                 <div className="pred-front-probs">
                                     {[['1',pred.hp],['X',pred.dp],['2',pred.ap]].map(([code,pct])=>(
@@ -1077,6 +1136,17 @@ const MatchCard = ({ match, onOpen, onToggleFav, isFav, pred=null }) => {
                         )}
                     </div>
                 </div>
+
+                {(match.oddsHome != null || match.oddsDraw != null || match.oddsAway != null) && (
+                    <div className="card-odds">
+                        {[['1', match.oddsHome], ['X', match.oddsDraw], ['2', match.oddsAway]].map(([code, val]) => (
+                            <div key={code} className={`odds-pill${match.prediction === code ? ' odds-pill-pick' : ''}`}>
+                                <span className="odds-pill-code">{code}</span>
+                                <span className="odds-pill-val">{val != null ? Number(val).toFixed(2) : '–'}</span>
+                            </div>
+                        ))}
+                    </div>
+                )}
 
                 {hasManual && (
                     <div className="card-manual-pred">
@@ -1101,7 +1171,7 @@ const MatchCard = ({ match, onOpen, onToggleFav, isFav, pred=null }) => {
     );
 };
 
-/* === Last Matches section inside the detail sheet === */
+/* === Last Matches section inside the detail sheet ====================== */
 const LastMatchesBlock = ({ teamName, matches }) => {
     if (!teamName) return null;
     return (
@@ -1127,7 +1197,7 @@ const LastMatchesBlock = ({ teamName, matches }) => {
     );
 };
 
-/* === H2H section inside the detail sheet === */
+/* === H2H section inside the detail sheet =============================== */
 const H2HBlock = ({ details }) => {
     const list = (details.h2h && details.h2h.matches) || [];
     const s    = (details.h2h && details.h2h.stats)   || {};
@@ -1169,6 +1239,7 @@ const H2HBlock = ({ details }) => {
                         <div className="lm-score">{g.score}</div>
                         <div className="lm-date">{(g.date || '').slice(5)}</div>
                     </div>
+                    {/* Smartlink interstitial after every 2nd match (but not after the last one) */}
                     {((i + 1) % 2 === 0 && i < list.length - 1) && (
                         <a href={SMARTLINK_URL} target="_blank" rel="noopener noreferrer nofollow" className="inter-ad">
                             <small>Sponsored</small>
@@ -1181,7 +1252,7 @@ const H2HBlock = ({ details }) => {
     );
 };
 
-/* === Form summary section === */
+/* === Form summary section ============================================== */
 const FormBlock = ({ details }) => {
     const hf = details.home?.form;
     const af = details.away?.form;
@@ -1218,10 +1289,13 @@ const DetailSheet = ({ match, pred, onClose }) => {
     const badgeClass = c==='live'?'s-live':c==='finished'?'s-fin':c==='upcoming'?'s-upc':'s-canc';
     const leagueTxt  = [match.country, match.leagueName].filter(Boolean).join(' · ') || (match.leagueName || '');
     const analysis   = generateAnalysis(match);
+    const outcome    = predictionOutcome(match);
 
+    // Live timer ticks every second while sheet is open
     useTickingNow(c === 'live');
     const liveMin = c === 'live' ? liveMinute(match) : '';
 
+    // H2H + Standings + Form auto-load when the sheet opens
     const [details, setDetails]       = useState(null);
     const [detailsErr, setDetailsErr] = useState(null);
     const [detailsLoading, setLoading] = useState(false);
@@ -1244,6 +1318,7 @@ const DetailSheet = ({ match, pred, onClose }) => {
             <div className="sheet" onClick={e=>e.stopPropagation()}>
                 <div className="handle"/>
 
+                {/* === Smartlink banner (detail sheet only) === */}
                 <a href={SMARTLINK_URL} target="_blank" rel="noopener noreferrer nofollow" className="smartlink-banner">
                     <small>Sponsored</small>
                     🎁 Boost Your Bets — Tap to Claim Today's Top Bonus 🎁
@@ -1314,9 +1389,16 @@ const DetailSheet = ({ match, pred, onClose }) => {
                     <div style={{background:'#1D1D1F',borderRadius:'var(--r)',padding:'16px',marginBottom:14}}>
                         <div style={{fontSize:10,fontWeight:700,color:'rgba(255,255,255,.45)',textTransform:'uppercase',letterSpacing:'.4px',marginBottom:10}}>Match Prediction</div>
                         <div style={{display:'flex',alignItems:'center',gap:14,marginBottom:12}}>
-                            <div style={{width:56,height:56,borderRadius:'50%',background:'var(--gold)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:26,fontWeight:800,color:'#fff',flexShrink:0,boxShadow:'0 3px 12px rgba(255,149,0,.45)'}}>{pred.code}</div>
+                            <div style={{width:56,height:56,borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',fontSize:26,fontWeight:800,flexShrink:0,
+                                ...(outcome==='correct'?{background:'var(--green)',color:'#fff',boxShadow:'0 3px 12px rgba(52,199,89,.45)'}
+                                  :outcome==='wrong'?{background:'#fff',color:'var(--live)',border:'2px solid var(--live)'}
+                                  :{background:'var(--gold)',color:'#fff',boxShadow:'0 3px 12px rgba(255,149,0,.45)'})}}>{pred.code}</div>
                             <div>
-                                <div style={{fontSize:16,fontWeight:700,color:'#fff',marginBottom:3}}>{pred.label}</div>
+                                <div style={{fontSize:16,fontWeight:700,color:'#fff',marginBottom:3,display:'flex',alignItems:'center',gap:8}}>
+                                    {pred.label}
+                                    {outcome==='correct' && <span style={{fontSize:11,fontWeight:800,color:'var(--green)',background:'rgba(52,199,89,.15)',padding:'2px 8px',borderRadius:100}}>✓ WON</span>}
+                                    {outcome==='wrong' && <span style={{fontSize:11,fontWeight:800,color:'var(--live)',background:'rgba(255,59,48,.15)',padding:'2px 8px',borderRadius:100}}>✗ LOST</span>}
+                                </div>
                                 {pred.score && <div style={{fontSize:13,color:'rgba(255,255,255,.6)'}}>Predicted score: {pred.score}</div>}
                                 {pred.advice && <div style={{fontSize:12,color:'rgba(255,255,255,.5)',marginTop:2}}>{pred.advice}</div>}
                             </div>
@@ -1335,6 +1417,7 @@ const DetailSheet = ({ match, pred, onClose }) => {
                     <div style={{background:'var(--bg)',borderRadius:'var(--r)',padding:'13px 14px',marginBottom:14,textAlign:'center',fontSize:12,color:'var(--t3)'}}>Prediction not available.</div>
                 )}
 
+                {/* === Standings + H2H + Form auto-load when sheet opens === */}
                 {detailsLoading && (
                     <div className="detail-loading">
                         <div className="spin-sm"/>
@@ -1364,7 +1447,7 @@ const DetailSheet = ({ match, pred, onClose }) => {
     );
 };
 
-/* === League Standings inside detail sheet === */
+/* === League Standings inside detail sheet ============================= */
 const StandingsBlock = ({ details }) => {
     const groups = details.standings;
     if (!Array.isArray(groups) || groups.length === 0) return null;
@@ -1421,7 +1504,11 @@ const StandingsBlock = ({ details }) => {
     );
 };
 
-/* === Bookmaker Odds Comparison — Alerts tab only === */
+/* === Bookmaker Odds Comparison — Alerts tab only ============================
+   Shows the scraped 1X2 odds + clickable bookmaker buttons. Each bookmaker
+   link is an affiliate placeholder — replace with your real affiliate URLs
+   from Bet365 / 1xBet / Betway / Bet9ja partner programs to earn signup
+   commissions when users sign up + bet. */
 const BOOKMAKERS = [
     { name: 'Bet365',  bg: '#076C44', url: 'https://www.bet365.com'   },
     { name: '1xBet',   bg: '#1C49E0', url: 'https://1xbet.com'        },
@@ -1467,22 +1554,29 @@ function App() {
     const [detailMatch,    setDetailMatch]    = useState(null);
     const [updatedAt,      setUpdatedAt]      = useState(null);
 
-    const [homeTab,        setHomeTab]        = useState('Upcoming');
+    const [homeTab,        setHomeTab]        = useState('Today');
     const [tabLoading,     setTabLoading]     = useState(false);
+    const [visibleCount,   setVisibleCount]   = useState(PAGE_SIZE);
     const [theme,          setTheme]          = useState(() => {
         try { return localStorage.getItem('magic-theme') || 'light'; } catch { return 'light'; }
     });
+    // selectedDate is YYYY-MM-DD (UTC). When equal to today, the Home tab shows
+    // Live/Upcoming/Past tabs + stats; for future dates we show only Upcoming.
     const [selectedDate,   setSelectedDate]   = useState(() => new Date().toISOString().slice(0, 10));
 
     useEffect(() => {
         try { localStorage.setItem('magic-favs', JSON.stringify(favs)); } catch {}
     }, [favs]);
 
+    // Dark mode — apply class to <body> + persist
     useEffect(() => {
         document.body.className = theme === 'dark' ? 'dark' : '';
         try { localStorage.setItem('magic-theme', theme); } catch {}
     }, [theme]);
 
+    // Try to hydrate from localStorage on first paint so the UI isn't empty
+    // while we wait for the network — and so if Railway is down we still
+    // show *something* useful.
     useEffect(() => {
         try {
             const cached = JSON.parse(localStorage.getItem('magic-cache') || 'null');
@@ -1514,6 +1608,7 @@ function App() {
             setMatches(list);
             const stamp = data.updatedAt || new Date().toISOString();
             setUpdatedAt(stamp);
+            // Cache successful response so we can survive Railway downtime.
             try {
                 localStorage.setItem('magic-cache', JSON.stringify({
                     matches: list, updatedAt: stamp, cachedAt: Date.now(),
@@ -1522,11 +1617,15 @@ function App() {
         } catch (e) {
             if (wt) clearTimeout(wt);
             setWaking(false);
+            // Distinguish "user has no internet" vs "Railway is down / maintenance"
+            //   Offline → "Please check your internet connection"
+            //   Server error → "Website maintenance in progress, some data may be delayed"
             const isOffline = !navigator.onLine ||
                               (e instanceof TypeError && /failed to fetch|network/i.test(e.message)) ||
                               /networkerror/i.test(e.name || '');
             const offlineMsg = "📡 Please connect or check your internet connection.";
             const maintenanceMsg = "🛠️ Website maintenance in progress — some data may be delayed. We apologize in advance.";
+            // Fall back to cached data if we have any.
             let usedCache = false;
             try {
                 const cached = JSON.parse(localStorage.getItem('magic-cache') || 'null');
@@ -1558,6 +1657,7 @@ function App() {
         return () => clearTimeout(done);
     }, [tabLoading]);
 
+    // Show loading whenever the selected date changes (skip first mount).
     const dateChangedOnce = useRef(false);
     useEffect(() => {
         if (!dateChangedOnce.current) { dateChangedOnce.current = true; return; }
@@ -1571,11 +1671,16 @@ function App() {
         setFavs(p => p.includes(id) ? p.filter(f => f !== id) : [...p, id]);
     }, []);
 
+    // Date-type detection:
+    //   isViewingToday → show Live / Upcoming / Past tabs
+    //   isPastDate     → show only past matches (Live/Upcoming hidden)
+    //   isFutureDate   → show only upcoming matches (Live/Past hidden)
     const todayIso       = new Date().toISOString().slice(0, 10);
     const isViewingToday = selectedDate === todayIso;
     const isPastDate     = selectedDate < todayIso;
     const isFutureDate   = selectedDate > todayIso;
 
+    // Country drill-down state. null = country list view; set = detail view.
     const [selectedCountry, setSelectedCountry] = useState(null);
 
     const liveMatches     = useMemo(() => matches.filter(m => cat(m.status) === 'live')
@@ -1589,10 +1694,24 @@ function App() {
     const alertMatches    = useMemo(() => matches.filter(m => { const n=parseInt(m.statusRaw||m.status); return !isNaN(n)&&n>=75&&n<120; })
         .sort((a, b) => matchTimestamp(a) - matchTimestamp(b)), [matches]);
 
+    // Merged "Today's Matches" = live + today's upcoming + today's finished, in one
+    // list (live first, then soonest kickoff, then most-recent results).
+    const todaysMatches = useMemo(() => {
+        const upc  = matches.filter(m => cat(m.status) === 'upcoming' && m.date === todayIso)
+            .sort((a, b) => matchTimestamp(a) - matchTimestamp(b));
+        const past = matches.filter(m => cat(m.status) === 'finished' && getGoals(m) && m.date === todayIso)
+            .sort((a, b) => matchTimestamp(b) - matchTimestamp(a));
+        return [...liveMatches, ...upc, ...past];
+    }, [matches, liveMatches, todayIso]);
+
+    // Snap homeTab to the only valid value for the current date type so
+    // we never try to render "Live" matches for a past date, etc.
     useEffect(() => {
-        if (isPastDate && homeTab !== 'Past') setHomeTab('Past');
-        else if (isFutureDate && homeTab !== 'Upcoming') setHomeTab('Upcoming');
-    }, [isPastDate, isFutureDate, homeTab]);
+        if (isViewingToday && homeTab !== 'Live' && homeTab !== 'Today') setHomeTab('Today');
+    }, [isViewingToday, homeTab]);
+
+    // (selectedCountry auto-select logic lives below after availableCountries
+    // is computed; nothing to do here.)
 
     const handleHomeTabClick = useCallback(async (t) => {
         setHomeTab(t);
@@ -1600,6 +1719,9 @@ function App() {
         try { await load(true); } finally { setTabLoading(false); }
     }, [load]);
 
+    // Compute the 5-day strip starting from today + count matches per day.
+    // Date strip used by BOTH the top horizontal strip and the calendar popup.
+    // Range: Past 5 days + Today + Future 10 days = 16 items, sorted oldest → newest.
     const dateStrip = useMemo(() => {
         const today = new Date();
         const isoOf = (d) => d.toISOString().slice(0, 10);
@@ -1609,7 +1731,7 @@ function App() {
             counts[m.date] = (counts[m.date] || 0) + 1;
         }
         return Array.from({length:16}, (_,i) => {
-            const offset = i - 5;
+            const offset = i - 5;  // -5..-1 = past, 0 = today, 1..10 = future
             const d = new Date(today.getFullYear(), today.getMonth(), today.getDate() + offset);
             const iso = isoOf(d);
             return {
@@ -1622,28 +1744,31 @@ function App() {
         });
     }, [matches]);
 
+    // pickDate is shared by the calendar cards AND the "Back to today" button.
+    // When picking Today we auto-select the most useful tab (Live → Upcoming → Past)
+    // so the page never lands on an empty tab and looks broken.
     const pickDate = (iso) => {
         setSelectedDate(iso);
         setSelectedCountry(null);   // reset to "All countries" so the new date lands on a full list
         if (iso === todayIso) {
-            const todayLive = matches.filter(m => cat(m.status) === 'live').length;
-            const todayUpc  = matches.filter(m => cat(m.status) === 'upcoming' && m.date === iso).length;
-            const todayPast = matches.filter(m => cat(m.status) === 'finished' && getGoals(m) && m.date === iso).length;
-            setHomeTab(todayLive > 0 ? 'Live' : todayUpc > 0 ? 'Upcoming' : todayPast > 0 ? 'Past' : 'Upcoming');
+            setHomeTab('Today');
         }
         setCalOpen(false);
     };
 
+    // Matches relevant to the current date type (before applying the
+    // country filter). Drives BOTH the country slider AND the displayed list.
     const dateRelevantMatches = useMemo(() => {
         if (isPastDate)   return pastMatches;
         if (isFutureDate) return upcomingMatches;
         if (homeTab === 'Live') return liveMatches;
-        if (homeTab === 'Past') return pastMatches;
-        return upcomingMatches;
-    }, [isPastDate, isFutureDate, homeTab, liveMatches, upcomingMatches, pastMatches]);
+        return todaysMatches;   // "Today's Matches" = live + upcoming + past merged
+    }, [isPastDate, isFutureDate, homeTab, liveMatches, upcomingMatches, pastMatches, todaysMatches]);
 
-    // Country flag slider: complete directory (ALL_COUNTRIES) + any extra countries
-    // that appear in today's feed, sorted by match count desc then alphabetically.
+    // Country flag slider data. Always shows the COMPLETE country directory
+    // (ALL_COUNTRIES) so users can browse the full list — not just countries
+    // with matches today. Sort order: match count desc, then alphabetical, so
+    // active countries float to the front while everything else stays browsable.
     const availableCountries = useMemo(() => {
         const pool = matches.filter(m => {
             if (isViewingToday && cat(m.status) === 'live') return true;
@@ -1682,30 +1807,81 @@ function App() {
     const upcomingCount = countOf(upcomingMatches);
     const pastCount     = countOf(pastMatches);
     const alertCount    = countOf(alertMatches);
+    const todayCount    = countOf(todaysMatches);
 
+    // Matches that actually get rendered: date-relevant + matching the
+    // currently-selected country filter.
     const filteredMatches = useMemo(() => {
         if (!selectedCountry) return dateRelevantMatches;
         return dateRelevantMatches.filter(m => getMatchCountry(m) === selectedCountry);
     }, [dateRelevantMatches, selectedCountry]);
 
-    const matchesByLeague = useMemo(() => {
-        const byLeague = {};
-        for (const m of filteredMatches) {
-            const l = m.leagueName || 'Other';
-            if (!byLeague[l]) byLeague[l] = [];
-            byLeague[l].push(m);
-        }
-        return Object.entries(byLeague)
-            .sort((a, b) => a[0].localeCompare(b[0]))
-            .map(([league, leagueMatches]) => ({ league, matches: leagueMatches }));
+    // Group filtered matches by league/competition so we can show competition
+    // names as section headers above each cluster of cards.
+    // Stable league ordering for pagination: sort the flat list by league name so
+    // revealing more matches always APPENDS at the bottom (new league blocks never
+    // get inserted above what the user is already looking at).
+    const orderedMatches = useMemo(() => {
+        const arr = [...filteredMatches];
+        arr.sort((a, b) => {
+            const la = (a.leagueName || '~').toLowerCase();
+            const lb = (b.leagueName || '~').toLowerCase();
+            return la < lb ? -1 : la > lb ? 1 : 0;   // stable sort keeps time-order within a league
+        });
+        return arr;
     }, [filteredMatches]);
 
+    // Only the first `visibleCount` matches are grouped + rendered. Infinite scroll
+    // raises visibleCount by PAGE_SIZE each time the bottom sentinel appears.
+    const matchesByLeague = useMemo(() => {
+        const slice = orderedMatches.slice(0, visibleCount);
+        const byLeague = {};
+        const order = [];
+        for (const m of slice) {
+            const l = m.leagueName || 'Other';
+            if (!byLeague[l]) { byLeague[l] = []; order.push(l); }
+            byLeague[l].push(m);
+        }
+        return order.map((league) => ({ league, matches: byLeague[league] }));
+    }, [orderedMatches, visibleCount]);
+
+    // Smoothly center the selected country chip whenever it changes.
     const countrySliderRef = useRef(null);
     useEffect(() => {
         if (!selectedCountry || !countrySliderRef.current) return;
         const el = countrySliderRef.current.querySelector(`[data-country-name="${selectedCountry}"]`);
         if (el) el.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
     }, [selectedCountry]);
+
+    // ===== Infinite scroll (progressive reveal, PAGE_SIZE matches at a time) =====
+    // Reset to the first page whenever the visible context changes (date, country,
+    // or Live/Today tab) so the user always re-enters a list from the top.
+    useEffect(() => {
+        setVisibleCount(PAGE_SIZE);
+    }, [selectedDate, selectedCountry, homeTab]);
+
+    // When the bottom sentinel scrolls into view, pause briefly (so it feels like
+    // fresh data is being fetched) then reveal PAGE_SIZE more. The ref guard stops
+    // a single scroll from queuing several reveals at once.
+    const sentinelRef    = useRef(null);
+    const loadingMoreRef = useRef(false);
+    useEffect(() => {
+        const el = sentinelRef.current;
+        if (!el) return;
+        const obs = new IntersectionObserver(([entry]) => {
+            if (entry.isIntersecting && !loadingMoreRef.current) {
+                loadingMoreRef.current = true;
+                setTimeout(() => {
+                    setVisibleCount((c) => c + PAGE_SIZE);
+                    loadingMoreRef.current = false;
+                }, LOAD_MORE_DELAY_MS);
+            }
+        }, { rootMargin: '150px 0px' });
+        obs.observe(el);
+        return () => obs.disconnect();
+        // loading/tabLoading included so the effect re-runs (and re-attaches) once
+        // the skeleton is replaced by the real list and the sentinel actually exists.
+    }, [filteredMatches.length, visibleCount, loading, tabLoading]);
 
     const renderCard = m => {
         const k = fid(m) || `${m.home?.name}${m.away?.name}${m.status}`;
@@ -1735,18 +1911,31 @@ function App() {
                 ? "No matches on record for this date."
                 : EMPTY_TAB_MSG}/>;
         }
-        return matchesByLeague.map(({ league, matches: leagueMatches }) => {
-            const c = getMatchCountry(leagueMatches[0]);
-            return (
-                <div key={league} className="league-block">
-                    <div className="league-block-title">
-                        <span className="league-block-flag">{getCountryFlag(c)}</span>
-                        {c ? `${c} · ${league}` : league}
+        const hasMore = visibleCount < orderedMatches.length;
+        return (
+            <>
+                {matchesByLeague.map(({ league, matches: leagueMatches }) => {
+                    // Flag/label come from the league's own matches so the "All countries"
+                    // view shows the correct flag per section, not a single global one.
+                    const c = getMatchCountry(leagueMatches[0]);
+                    return (
+                        <div key={league} className="league-block">
+                            <div className="league-block-title">
+                                <span className="league-block-flag">{getCountryFlag(c)}</span>
+                                {c ? `${c} · ${league}` : league}
+                            </div>
+                            {leagueMatches.map(renderCard)}
+                        </div>
+                    );
+                })}
+                {hasMore && (
+                    <div ref={sentinelRef} className="load-more">
+                        <div className="tab-loading-spin"/>
+                        <span className="load-more-txt">Loading more matches…</span>
                     </div>
-                    {leagueMatches.map(renderCard)}
-                </div>
-            );
-        });
+                )}
+            </>
+        );
     };
 
     const today  = new Date().toLocaleDateString('en-US', {weekday:'long',month:'long',day:'numeric'});
@@ -1809,17 +1998,17 @@ function App() {
 
             {tab === 'Home' && availableCountries.length > 0 && (
                 <div className="country-slider" ref={countrySliderRef}>
-                    {/* Pinned #1 — International (worldwide / continental) — always first & bigger */}
+                    {/* Pinned #1 — All countries — clears the filter so every match shows */}
                     <button
-                        data-country-name="International"
-                        className={`cs-item cs-item-intl${selectedCountry === 'International' ? ' on' : ''}`}
-                        onClick={() => setSelectedCountry(selectedCountry === 'International' ? null : 'International')}
-                        title="International — worldwide & continental matches">
-                        <span className="cs-flag">🌐</span>
-                        <span className="cs-code">INT'L</span>
+                        data-country-name="__ALL__"
+                        className={`cs-item cs-item-intl${selectedCountry === null ? ' on' : ''}`}
+                        onClick={() => setSelectedCountry(null)}
+                        title="Show matches from all countries">
+                        <span className="cs-flag">🌍</span>
+                        <span className="cs-code">ALL</span>
                     </button>
-                    {/* All other countries (International excluded — it's pinned above) */}
-                    {availableCountries.filter(c => c !== 'International').map((country) => (
+                    {/* Every country (most matches first). "International" appears here as a normal chip. */}
+                    {availableCountries.map((country) => (
                         <button key={country}
                             data-country-name={country}
                             className={`cs-item${selectedCountry === country ? ' on' : ''}`}
@@ -1847,7 +2036,7 @@ function App() {
 
                         {isViewingToday && (
                             <div className="stats">
-                                {[['Live',liveCount],['Upcoming',upcomingCount],['Past',pastCount],['Alerts',alertCount]].map(([l,v]) => (
+                                {[['Today',todayCount],['Live',liveCount],['Finished',pastCount],['Alerts',alertCount]].map(([l,v]) => (
                                     <div key={l} className="stat">
                                         <div className="stat-n">{v}</div>
                                         <div className="stat-l">{l}</div>
@@ -1859,13 +2048,11 @@ function App() {
                         {isViewingToday && (
                             <div className="home-tabs">
                                 <button className={`home-tab${homeTab==='Live'?' on':''}`} onClick={()=>handleHomeTabClick('Live')}>
-                                    🔴 Live <span className="home-tab-count">({liveCount})</span>
+                                    🔴 Live
+                                    {liveCount > 0 && <span className="live-badge">{liveCount}</span>}
                                 </button>
-                                <button className={`home-tab${homeTab==='Upcoming'?' on':''}`} onClick={()=>handleHomeTabClick('Upcoming')}>
-                                    🔵 Upcoming <span className="home-tab-count">({upcomingCount})</span>
-                                </button>
-                                <button className={`home-tab${homeTab==='Past'?' on':''}`} onClick={()=>handleHomeTabClick('Past')}>
-                                    ✅ Past <span className="home-tab-count">({pastCount})</span>
+                                <button className={`home-tab${homeTab==='Today'?' on':''}`} onClick={()=>handleHomeTabClick('Today')}>
+                                    Today's Matches <span className="home-tab-count">({todayCount})</span>
                                 </button>
                             </div>
                         )}
