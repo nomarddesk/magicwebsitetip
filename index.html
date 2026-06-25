@@ -86,7 +86,8 @@
         body.dark .tab-off:hover { background:#2C2C2E; }
         body.dark .home-tab:not(.on):hover { background:#2C2C2E; }
         body.dark .splash { background:#000; }
-        body.dark .nav { background:rgba(28,28,30,0.92); }
+        body.dark .nav { background:rgba(28,28,30,0.6); border-top-color:rgba(255,255,255,0.12); box-shadow:0 -0.5px 0 rgba(255,255,255,0.06), 0 -10px 30px rgba(0,0,0,0.4); }
+        body.dark .nav-item.on { background:rgba(255,255,255,0.12); }
         body.dark .skel { background:linear-gradient(90deg,#2C2C2E 25%,#3A3A3C 50%,#2C2C2E 75%); background-size:200% 100%; }
         body.dark .detail-note { background:#3A2E10; color:#FED7AA; border-left-color:var(--gold); }
         body.dark .inter-ad { background:linear-gradient(90deg,#3A2410 0%,#4A2E15 100%); border-color:#7C2D12; color:#FED7AA; }
@@ -97,11 +98,11 @@
         body.dark .detail-logo-img,
         body.dark .team-logo-img { background:#fff; }
 
-        .hdr { position:sticky; top:0; z-index:100; height:56px; background:var(--navy); color:#fff; border-bottom:0.5px solid rgba(255,255,255,0.06); display:flex; align-items:center; padding:0 16px; }
+        .hdr { position:sticky; top:0; z-index:100; height:62px; background:var(--navy); color:#fff; border-bottom:0.5px solid rgba(255,255,255,0.06); display:flex; align-items:center; padding:0 12px; gap:2px; }
         .hdr-btn { width:34px; height:34px; border-radius:50%; background:none; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; color:#fff; transition:background .15s; flex-shrink:0; }
         .hdr-btn:hover { background:rgba(255,255,255,0.10); }
-        .hdr-center { flex:1; display:flex; align-items:center; justify-content:center; gap:8px; }
-        .hdr-title { font-size:16px; font-weight:600; letter-spacing:-.3px; color:#fff; }
+        .hdr-center { flex:1; display:flex; align-items:center; justify-content:center; gap:9px; }
+        .hdr-title { font-size:20px; font-weight:700; letter-spacing:-.5px; color:#fff; white-space:nowrap; }
 
         .top-ad-banner { width:100%; background:var(--surface); border-bottom:0.5px solid var(--sep); padding:10px 14px; display:flex; align-items:center; justify-content:center; min-height:70px; overflow:hidden; }
 
@@ -196,13 +197,17 @@
         .skel { background:linear-gradient(90deg,var(--bg) 25%,#E8E8ED 50%,var(--bg) 75%); background-size:200% 100%; animation:shim 1.4s infinite; border-radius:5px; }
         @keyframes shim { from{background-position:200% 0} to{background-position:-200% 0} }
 
-        .nav { position:fixed; bottom:0; left:0; right:0; height:80px; background:rgba(255,255,255,0.9); backdrop-filter:blur(24px) saturate(180%); -webkit-backdrop-filter:blur(24px) saturate(180%); border-top:.5px solid var(--sep); display:flex; align-items:flex-start; justify-content:space-around; padding-top:11px; z-index:100; }
-        .nav-item { display:flex; flex-direction:column; align-items:center; gap:3px; cursor:pointer; min-width:56px; -webkit-tap-highlight-color:transparent; }
+        /* Apple "liquid glass" tab bar — translucent, heavy blur + saturation,
+           bolder labels, and a soft pill highlight behind the active tab. */
+        .nav { position:fixed; bottom:0; left:0; right:0; height:84px; background:rgba(255,255,255,0.66); backdrop-filter:blur(34px) saturate(200%); -webkit-backdrop-filter:blur(34px) saturate(200%); border-top:.5px solid rgba(255,255,255,0.55); box-shadow:0 -0.5px 0 var(--sep), 0 -10px 30px rgba(0,0,0,0.07); display:flex; align-items:flex-start; justify-content:space-around; padding-top:9px; z-index:100; }
+        .nav-item { display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer; min-width:60px; padding:7px 16px 5px; border-radius:16px; transition:background .2s, transform .15s; -webkit-tap-highlight-color:transparent; }
+        .nav-item:active { transform:scale(.92); }
+        .nav-item.on { background:rgba(0,0,0,0.06); }
         .nav-ico { width:26px; height:26px; display:flex; align-items:center; justify-content:center; }
-        .nav-lbl { font-size:10px; font-weight:500; letter-spacing:.1px; }
+        .nav-lbl { font-size:11px; font-weight:600; letter-spacing:.1px; }
         .nav-item.on .nav-ico, .nav-item.on .nav-lbl { color:var(--t1); }
-        .nav-item.off .nav-ico, .nav-item.off .nav-lbl { color:#C7C7CC; }
-        .nav-item.on .nav-lbl { font-weight:600; }
+        .nav-item.off .nav-ico, .nav-item.off .nav-lbl { color:#8E8E93; }
+        .nav-item.on .nav-lbl { font-weight:800; }
 
         .overlay { position:fixed; inset:0; z-index:200; background:rgba(0,0,0,0.48); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); display:flex; align-items:flex-end; justify-content:center; }
         .sheet { background:var(--surface); border-radius:var(--r2) var(--r2) 0 0; width:100%; max-width:640px; max-height:92vh; overflow-y:auto; padding:10px 22px 44px; animation:sheetUp .38s cubic-bezier(.32,.72,0,1) forwards; }
@@ -531,7 +536,7 @@
 <body>
 <div id="root"></div>
 <script type="text/babel">
-const { useState, useEffect, useMemo, useCallback, useRef } = React;
+const { useState, useEffect, useMemo, useCallback, useRef, useContext } = React;
 
 const BACKEND_URL = "https://sportprediction-production.up.railway.app";
 const REFRESH_MS  = 20 * 60 * 1000;
@@ -541,6 +546,274 @@ const PAGE_SIZE = 5;            // matches revealed per infinite-scroll page
 const LOAD_MORE_DELAY_MS = 800; // pause before revealing the next page (loading feel)
 const LOADING_MSG = "Just 1 sec...";
 const EMPTY_TAB_MSG = "Oh... please check other tabs for matches, there are no matches here at the moment.";
+
+/* ================= Internationalization (6 languages) =================
+   Static UI strings only. Dynamic data (team / league names, the model's
+   recommendation text) comes from the source and stays as-is. Use {x}
+   placeholders, filled via the second arg of t(). Arabic renders RTL. */
+const LANGS = [
+    ['en', 'English',    '🇬🇧'],
+    ['fr', 'Français',   '🇫🇷'],
+    ['es', 'Español',    '🇪🇸'],
+    ['pt', 'Português',  '🇵🇹'],
+    ['sr', 'Srpski',     '🇷🇸'],
+    ['ar', 'العربية',    '🇸🇦'],
+];
+const LOCALE = { en:'en-US', fr:'fr-FR', es:'es-ES', pt:'pt-PT', sr:'sr-Latn-RS', ar:'ar' };
+const RTL_LANGS = ['ar'];
+
+const I18N = {
+  en: {
+    tagline:"Live Football Intelligence",
+    nav_home:"Home", nav_alerts:"Alerts", nav_saved:"Saved", nav_more:"More",
+    tab_live:"Live", tab_today:"Today's Matches",
+    stat_today:"Today", stat_live:"Live", stat_finished:"Finished", stat_alerts:"Alerts",
+    title_predictions:"Predictions", title_upcoming:"Upcoming Matches", refreshed:"refreshed",
+    all:"ALL", back_today:"← Back to today",
+    showing_only:"Showing {c} only", show_all:"✕ Show all countries",
+    waking:"Waking up server — up to 30 s on first load…", retry:"Retry",
+    empty_tab:"Oh... please check other tabs for matches, there are no matches here at the moment.",
+    empty_country:"No {c} matches on this date.",
+    empty_country_sub:"Tap “Show all countries” above, or pick another country.",
+    empty_past:"No matches on record for this date.", loading_more:"Loading more matches…",
+    b_live:"LIVE", b_ft:"Full Time", b_upcoming:"Upcoming", b_ko:"KO",
+    details:"Details", pro_tip:"PRO TIP", expert_tip:"EXPERT TIP",
+    home_win:"Home Win", draw:"Draw", away_win:"Away Win",
+    vs:"vs", kickoff_at:"Kick-off at {t}", not_started:"Match not started yet",
+    competition:"Competition", country_lbl:"Country", date_lbl:"Date", kickoff_utc:"Kick-off (UTC)",
+    model_analysis:"Model Analysis", match_prediction:"Match Prediction",
+    predicted_score:"Predicted score: {s}", pred_unavailable:"Prediction not available.",
+    won:"✓ WON", lost:"✗ LOST",
+    head_to_head:"Head-to-Head", h2h_stats:"Head-to-Head Stats", past_meetings:"Past Meetings",
+    no_h2h:"No past meetings on record.", h2h_grows:"H2H grows as more matches finish — window: last {d} days.",
+    played:"Played", draws:"Draws", goals_m:"Goals/M",
+    last_n:"{name} — Last {n} matches", no_finished:"No finished matches for this team in our records yet.",
+    standings:"League Standings", agg_form:"Aggregated Form (Recent Season)",
+    avg_scored:"avg scored", avg_conceded:"avg conceded",
+    loading_history:"Loading match history & standings…", could_not_load:"Could not load history: {e}",
+    sponsored:"Sponsored", live_odds:"⚡ Live Odds — Place Your Bet Now", bet_on:"BET ON",
+    about_us:"About Us", terms:"Terms of Use", privacy:"Privacy Policy", contact_us:"Contact Us",
+    coming_soon:"Coming Soon", coming_soon_body:"Live {sport} predictions are on the way.", got_it:"Got it",
+    pick_date:"Pick a date", pick_date_sub:"Past 5 + Today + next 10 days · swipe to scroll",
+    join_community:"Join Our Community", follow_us:"Follow Us",
+    offline:"📡 Please connect or check your internet connection.",
+    maintenance:"🛠️ Website maintenance in progress — some data may be delayed. We apologize in advance.",
+    language:"Language", choose_language:"Choose your language",
+    alerts_sub:"Matches past the 75 minute mark · in-play odds",
+    saved_sub:"Your saved matches", nothing_saved:"Nothing saved yet",
+    nothing_saved_sub:"Tap the heart on any match to save it here.", loading_msg:"Just 1 sec...",
+  },
+  fr: {
+    tagline:"Intelligence football en direct",
+    nav_home:"Accueil", nav_alerts:"Alertes", nav_saved:"Favoris", nav_more:"Plus",
+    tab_live:"En direct", tab_today:"Matchs du jour",
+    stat_today:"Aujourd'hui", stat_live:"En direct", stat_finished:"Terminés", stat_alerts:"Alertes",
+    title_predictions:"Pronostics", title_upcoming:"Matchs à venir", refreshed:"actualisé",
+    all:"TOUS", back_today:"← Retour à aujourd'hui",
+    showing_only:"{c} uniquement", show_all:"✕ Tous les pays",
+    waking:"Démarrage du serveur — jusqu'à 30 s au premier chargement…", retry:"Réessayer",
+    empty_tab:"Aucun match ici pour le moment — vérifiez les autres onglets.",
+    empty_country:"Aucun match en {c} à cette date.",
+    empty_country_sub:"Touchez « Tous les pays » ci-dessus, ou choisissez un autre pays.",
+    empty_past:"Aucun match enregistré pour cette date.", loading_more:"Chargement de plus de matchs…",
+    b_live:"EN DIRECT", b_ft:"Terminé", b_upcoming:"À venir", b_ko:"CE",
+    details:"Détails", pro_tip:"CONSEIL PRO", expert_tip:"CONSEIL EXPERT",
+    home_win:"Victoire domicile", draw:"Match nul", away_win:"Victoire extérieur",
+    vs:"contre", kickoff_at:"Coup d'envoi à {t}", not_started:"Match pas encore commencé",
+    competition:"Compétition", country_lbl:"Pays", date_lbl:"Date", kickoff_utc:"Coup d'envoi (UTC)",
+    model_analysis:"Analyse du modèle", match_prediction:"Pronostic du match",
+    predicted_score:"Score prédit : {s}", pred_unavailable:"Pronostic indisponible.",
+    won:"✓ GAGNÉ", lost:"✗ PERDU",
+    head_to_head:"Face-à-face", h2h_stats:"Statistiques face-à-face", past_meetings:"Confrontations passées",
+    no_h2h:"Aucune confrontation enregistrée.", h2h_grows:"Le face-à-face s'enrichit à mesure des matchs — fenêtre : {d} derniers jours.",
+    played:"Joués", draws:"Nuls", goals_m:"Buts/M",
+    last_n:"{name} — {n} derniers matchs", no_finished:"Aucun match terminé pour cette équipe dans nos données.",
+    standings:"Classement", agg_form:"Forme agrégée (saison récente)",
+    avg_scored:"buts marqués (moy.)", avg_conceded:"buts encaissés (moy.)",
+    loading_history:"Chargement de l'historique et du classement…", could_not_load:"Historique indisponible : {e}",
+    sponsored:"Sponsorisé", live_odds:"⚡ Cotes en direct — Pariez maintenant", bet_on:"PARIER SUR",
+    about_us:"À propos", terms:"Conditions d'utilisation", privacy:"Politique de confidentialité", contact_us:"Contactez-nous",
+    coming_soon:"Bientôt disponible", coming_soon_body:"Les pronostics {sport} arrivent bientôt.", got_it:"Compris",
+    pick_date:"Choisir une date", pick_date_sub:"5 jours passés + Aujourd'hui + 10 prochains · glissez",
+    join_community:"Rejoignez la communauté", follow_us:"Suivez-nous",
+    offline:"📡 Vérifiez votre connexion internet.",
+    maintenance:"🛠️ Maintenance en cours — certaines données peuvent être retardées. Merci de votre patience.",
+    language:"Langue", choose_language:"Choisissez votre langue",
+    alerts_sub:"Matchs après la 75e minute · cotes en direct",
+    saved_sub:"Vos matchs enregistrés", nothing_saved:"Rien d'enregistré",
+    nothing_saved_sub:"Touchez le cœur sur un match pour l'enregistrer ici.", loading_msg:"Une seconde…",
+  },
+  es: {
+    tagline:"Inteligencia de fútbol en vivo",
+    nav_home:"Inicio", nav_alerts:"Alertas", nav_saved:"Guardados", nav_more:"Más",
+    tab_live:"En vivo", tab_today:"Partidos de hoy",
+    stat_today:"Hoy", stat_live:"En vivo", stat_finished:"Finalizados", stat_alerts:"Alertas",
+    title_predictions:"Pronósticos", title_upcoming:"Próximos partidos", refreshed:"actualizado",
+    all:"TODOS", back_today:"← Volver a hoy",
+    showing_only:"Solo {c}", show_all:"✕ Todos los países",
+    waking:"Iniciando el servidor — hasta 30 s en la primera carga…", retry:"Reintentar",
+    empty_tab:"No hay partidos aquí por ahora — revisa las otras pestañas.",
+    empty_country:"No hay partidos de {c} en esta fecha.",
+    empty_country_sub:"Toca «Todos los países» arriba, o elige otro país.",
+    empty_past:"No hay partidos registrados para esta fecha.", loading_more:"Cargando más partidos…",
+    b_live:"EN VIVO", b_ft:"Finalizado", b_upcoming:"Próximo", b_ko:"INI",
+    details:"Detalles", pro_tip:"CONSEJO PRO", expert_tip:"CONSEJO EXPERTO",
+    home_win:"Gana local", draw:"Empate", away_win:"Gana visitante",
+    vs:"vs", kickoff_at:"Inicio a las {t}", not_started:"El partido aún no ha comenzado",
+    competition:"Competición", country_lbl:"País", date_lbl:"Fecha", kickoff_utc:"Inicio (UTC)",
+    model_analysis:"Análisis del modelo", match_prediction:"Pronóstico del partido",
+    predicted_score:"Marcador previsto: {s}", pred_unavailable:"Pronóstico no disponible.",
+    won:"✓ ACERTADO", lost:"✗ FALLADO",
+    head_to_head:"Cara a cara", h2h_stats:"Estadísticas cara a cara", past_meetings:"Enfrentamientos previos",
+    no_h2h:"No hay enfrentamientos registrados.", h2h_grows:"El historial crece con cada partido — ventana: últimos {d} días.",
+    played:"Jugados", draws:"Empates", goals_m:"Goles/P",
+    last_n:"{name} — Últimos {n} partidos", no_finished:"Aún no hay partidos finalizados de este equipo en nuestros datos.",
+    standings:"Clasificación", agg_form:"Forma agregada (temporada reciente)",
+    avg_scored:"goles a favor (prom.)", avg_conceded:"goles en contra (prom.)",
+    loading_history:"Cargando historial y clasificación…", could_not_load:"No se pudo cargar el historial: {e}",
+    sponsored:"Patrocinado", live_odds:"⚡ Cuotas en vivo — Apuesta ahora", bet_on:"APOSTAR EN",
+    about_us:"Acerca de", terms:"Términos de uso", privacy:"Política de privacidad", contact_us:"Contáctanos",
+    coming_soon:"Próximamente", coming_soon_body:"Los pronósticos de {sport} llegan pronto.", got_it:"Entendido",
+    pick_date:"Elegir fecha", pick_date_sub:"5 días pasados + Hoy + 10 próximos · desliza",
+    join_community:"Únete a la comunidad", follow_us:"Síguenos",
+    offline:"📡 Revisa tu conexión a internet.",
+    maintenance:"🛠️ Mantenimiento en curso — algunos datos pueden retrasarse. Disculpa las molestias.",
+    language:"Idioma", choose_language:"Elige tu idioma",
+    alerts_sub:"Partidos pasado el minuto 75 · cuotas en vivo",
+    saved_sub:"Tus partidos guardados", nothing_saved:"Nada guardado aún",
+    nothing_saved_sub:"Toca el corazón en cualquier partido para guardarlo aquí.", loading_msg:"Un segundo…",
+  },
+  pt: {
+    tagline:"Inteligência de futebol ao vivo",
+    nav_home:"Início", nav_alerts:"Alertas", nav_saved:"Salvos", nav_more:"Mais",
+    tab_live:"Ao vivo", tab_today:"Jogos de hoje",
+    stat_today:"Hoje", stat_live:"Ao vivo", stat_finished:"Terminados", stat_alerts:"Alertas",
+    title_predictions:"Prognósticos", title_upcoming:"Próximos jogos", refreshed:"atualizado",
+    all:"TODOS", back_today:"← Voltar para hoje",
+    showing_only:"Apenas {c}", show_all:"✕ Todos os países",
+    waking:"Iniciando o servidor — até 30 s no primeiro carregamento…", retry:"Tentar de novo",
+    empty_tab:"Nenhum jogo aqui no momento — confira as outras abas.",
+    empty_country:"Nenhum jogo de {c} nesta data.",
+    empty_country_sub:"Toque em «Todos os países» acima, ou escolha outro país.",
+    empty_past:"Nenhum jogo registrado para esta data.", loading_more:"Carregando mais jogos…",
+    b_live:"AO VIVO", b_ft:"Terminado", b_upcoming:"Em breve", b_ko:"INÍ",
+    details:"Detalhes", pro_tip:"DICA PRO", expert_tip:"DICA DE ESPECIALISTA",
+    home_win:"Vitória casa", draw:"Empate", away_win:"Vitória fora",
+    vs:"vs", kickoff_at:"Início às {t}", not_started:"O jogo ainda não começou",
+    competition:"Competição", country_lbl:"País", date_lbl:"Data", kickoff_utc:"Início (UTC)",
+    model_analysis:"Análise do modelo", match_prediction:"Prognóstico do jogo",
+    predicted_score:"Placar previsto: {s}", pred_unavailable:"Prognóstico indisponível.",
+    won:"✓ GANHOU", lost:"✗ PERDEU",
+    head_to_head:"Confronto direto", h2h_stats:"Estatísticas de confronto", past_meetings:"Confrontos anteriores",
+    no_h2h:"Nenhum confronto registrado.", h2h_grows:"O histórico cresce a cada jogo — janela: últimos {d} dias.",
+    played:"Jogos", draws:"Empates", goals_m:"Gols/J",
+    last_n:"{name} — Últimos {n} jogos", no_finished:"Ainda não há jogos terminados desta equipe nos nossos dados.",
+    standings:"Classificação", agg_form:"Forma agregada (temporada recente)",
+    avg_scored:"gols marcados (méd.)", avg_conceded:"gols sofridos (méd.)",
+    loading_history:"Carregando histórico e classificação…", could_not_load:"Não foi possível carregar o histórico: {e}",
+    sponsored:"Patrocinado", live_odds:"⚡ Odds ao vivo — Aposte agora", bet_on:"APOSTAR EM",
+    about_us:"Sobre nós", terms:"Termos de uso", privacy:"Política de privacidade", contact_us:"Fale conosco",
+    coming_soon:"Em breve", coming_soon_body:"Os prognósticos de {sport} estão a caminho.", got_it:"Entendi",
+    pick_date:"Escolher data", pick_date_sub:"5 dias passados + Hoje + 10 próximos · deslize",
+    join_community:"Junte-se à comunidade", follow_us:"Siga-nos",
+    offline:"📡 Verifique a sua ligação à internet.",
+    maintenance:"🛠️ Manutenção em curso — alguns dados podem atrasar. Pedimos desculpa.",
+    language:"Idioma", choose_language:"Escolha o seu idioma",
+    alerts_sub:"Jogos após os 75 minutos · odds ao vivo",
+    saved_sub:"Os seus jogos salvos", nothing_saved:"Nada salvo ainda",
+    nothing_saved_sub:"Toque no coração de qualquer jogo para salvá-lo aqui.", loading_msg:"Um segundo…",
+  },
+  sr: {
+    tagline:"Fudbalska analitika uživo",
+    nav_home:"Početna", nav_alerts:"Upozorenja", nav_saved:"Sačuvano", nav_more:"Više",
+    tab_live:"Uživo", tab_today:"Današnje utakmice",
+    stat_today:"Danas", stat_live:"Uživo", stat_finished:"Završeno", stat_alerts:"Upozorenja",
+    title_predictions:"Predviđanja", title_upcoming:"Predstojeće utakmice", refreshed:"osveženo",
+    all:"SVE", back_today:"← Nazad na danas",
+    showing_only:"Samo {c}", show_all:"✕ Sve zemlje",
+    waking:"Pokretanje servera — do 30 s pri prvom učitavanju…", retry:"Pokušaj ponovo",
+    empty_tab:"Trenutno nema utakmica ovde — proverite ostale kartice.",
+    empty_country:"Nema utakmica ({c}) na ovaj datum.",
+    empty_country_sub:"Dodirnite „Sve zemlje“ iznad, ili izaberite drugu zemlju.",
+    empty_past:"Nema zabeleženih utakmica za ovaj datum.", loading_more:"Učitavanje još utakmica…",
+    b_live:"UŽIVO", b_ft:"Kraj", b_upcoming:"Uskoro", b_ko:"PoČ",
+    details:"Detalji", pro_tip:"PRO SAVET", expert_tip:"STRUČNI SAVET",
+    home_win:"Pobeda domaćina", draw:"Nerešeno", away_win:"Pobeda gosta",
+    vs:"protiv", kickoff_at:"Početak u {t}", not_started:"Utakmica još nije počela",
+    competition:"Takmičenje", country_lbl:"Zemlja", date_lbl:"Datum", kickoff_utc:"Početak (UTC)",
+    model_analysis:"Analiza modela", match_prediction:"Predviđanje meča",
+    predicted_score:"Predviđen rezultat: {s}", pred_unavailable:"Predviđanje nije dostupno.",
+    won:"✓ DOBITAN", lost:"✗ GUBITAN",
+    head_to_head:"Međusobni susreti", h2h_stats:"Statistika susreta", past_meetings:"Prethodni susreti",
+    no_h2h:"Nema zabeleženih susreta.", h2h_grows:"Istorija raste kako se utakmice završavaju — period: poslednjih {d} dana.",
+    played:"Odigrano", draws:"Nerešeno", goals_m:"Golova/U",
+    last_n:"{name} — Poslednjih {n} utakmica", no_finished:"Još nema završenih utakmica ovog tima u našim podacima.",
+    standings:"Tabela", agg_form:"Ukupna forma (nedavna sezona)",
+    avg_scored:"dati golovi (pros.)", avg_conceded:"primljeni golovi (pros.)",
+    loading_history:"Učitavanje istorije i tabele…", could_not_load:"Nije moguće učitati istoriju: {e}",
+    sponsored:"Sponzorisano", live_odds:"⚡ Kvote uživo — Kladite se odmah", bet_on:"KLADI SE NA",
+    about_us:"O nama", terms:"Uslovi korišćenja", privacy:"Politika privatnosti", contact_us:"Kontaktirajte nas",
+    coming_soon:"Uskoro", coming_soon_body:"Predviđanja za {sport} su na putu.", got_it:"U redu",
+    pick_date:"Izaberite datum", pick_date_sub:"Prošlih 5 + Danas + sledećih 10 dana · prevucite",
+    join_community:"Pridružite se zajednici", follow_us:"Pratite nas",
+    offline:"📡 Proverite internet konekciju.",
+    maintenance:"🛠️ Održavanje u toku — neki podaci mogu kasniti. Izvinjavamo se unapred.",
+    language:"Jezik", choose_language:"Izaberite jezik",
+    alerts_sub:"Utakmice posle 75. minuta · kvote uživo",
+    saved_sub:"Vaše sačuvane utakmice", nothing_saved:"Još ništa nije sačuvano",
+    nothing_saved_sub:"Dodirnite srce na bilo kojoj utakmici da je sačuvate ovde.", loading_msg:"Samo trenutak…",
+  },
+  ar: {
+    tagline:"تحليلات كرة القدم المباشرة",
+    nav_home:"الرئيسية", nav_alerts:"التنبيهات", nav_saved:"المحفوظة", nav_more:"المزيد",
+    tab_live:"مباشر", tab_today:"مباريات اليوم",
+    stat_today:"اليوم", stat_live:"مباشر", stat_finished:"منتهية", stat_alerts:"تنبيهات",
+    title_predictions:"التوقعات", title_upcoming:"المباريات القادمة", refreshed:"تم التحديث",
+    all:"الكل", back_today:"→ العودة إلى اليوم",
+    showing_only:"عرض {c} فقط", show_all:"✕ كل الدول",
+    waking:"جارٍ تشغيل الخادم — حتى 30 ثانية عند أول تحميل…", retry:"إعادة المحاولة",
+    empty_tab:"لا توجد مباريات هنا حالياً — تفقّد التبويبات الأخرى.",
+    empty_country:"لا توجد مباريات {c} في هذا التاريخ.",
+    empty_country_sub:"اضغط «كل الدول» بالأعلى، أو اختر دولة أخرى.",
+    empty_past:"لا توجد مباريات مسجّلة لهذا التاريخ.", loading_more:"جارٍ تحميل المزيد من المباريات…",
+    b_live:"مباشر", b_ft:"انتهت", b_upcoming:"قادمة", b_ko:"البداية",
+    details:"تفاصيل", pro_tip:"نصيحة احترافية", expert_tip:"نصيحة خبير",
+    home_win:"فوز المضيف", draw:"تعادل", away_win:"فوز الضيف",
+    vs:"ضد", kickoff_at:"البداية في {t}", not_started:"لم تبدأ المباراة بعد",
+    competition:"البطولة", country_lbl:"الدولة", date_lbl:"التاريخ", kickoff_utc:"البداية (UTC)",
+    model_analysis:"تحليل النموذج", match_prediction:"توقّع المباراة",
+    predicted_score:"النتيجة المتوقّعة: {s}", pred_unavailable:"التوقّع غير متاح.",
+    won:"✓ رابحة", lost:"✗ خاسرة",
+    head_to_head:"المواجهات المباشرة", h2h_stats:"إحصائيات المواجهات", past_meetings:"اللقاءات السابقة",
+    no_h2h:"لا توجد لقاءات سابقة مسجّلة.", h2h_grows:"يكبر سجل المواجهات مع انتهاء المباريات — النطاق: آخر {d} يوماً.",
+    played:"لعبت", draws:"تعادل", goals_m:"أهداف/م",
+    last_n:"{name} — آخر {n} مباريات", no_finished:"لا توجد بعد مباريات منتهية لهذا الفريق في بياناتنا.",
+    standings:"ترتيب الدوري", agg_form:"الأداء الإجمالي (الموسم الأخير)",
+    avg_scored:"معدل التسجيل", avg_conceded:"معدل الاستقبال",
+    loading_history:"جارٍ تحميل السجل والترتيب…", could_not_load:"تعذّر تحميل السجل: {e}",
+    sponsored:"إعلان", live_odds:"⚡ احتمالات مباشرة — راهن الآن", bet_on:"راهن على",
+    about_us:"من نحن", terms:"شروط الاستخدام", privacy:"سياسة الخصوصية", contact_us:"اتصل بنا",
+    coming_soon:"قريباً", coming_soon_body:"توقعات {sport} في الطريق.", got_it:"حسناً",
+    pick_date:"اختر تاريخاً", pick_date_sub:"٥ أيام ماضية + اليوم + ١٠ أيام قادمة · اسحب",
+    join_community:"انضم إلى مجتمعنا", follow_us:"تابعنا",
+    offline:"📡 تحقّق من اتصالك بالإنترنت.",
+    maintenance:"🛠️ يجري الآن صيانة الموقع — قد تتأخر بعض البيانات. نعتذر مقدماً.",
+    language:"اللغة", choose_language:"اختر لغتك",
+    alerts_sub:"مباريات بعد الدقيقة ٧٥ · احتمالات مباشرة",
+    saved_sub:"مبارياتك المحفوظة", nothing_saved:"لا شيء محفوظ بعد",
+    nothing_saved_sub:"اضغط القلب على أي مباراة لحفظها هنا.", loading_msg:"لحظة واحدة…",
+  },
+};
+
+const LangContext = React.createContext({ lang:'en', locale:'en-US', t:(k)=>(I18N.en[k]||k) });
+const useT = () => useContext(LangContext);
+function makeT(lang) {
+    return (key, vars) => {
+        let s = (I18N[lang] && I18N[lang][key]) || I18N.en[key] || key;
+        if (vars) for (const k in vars) s = s.split('{' + k + '}').join(vars[k]);
+        return s;
+    };
+}
 
 /* === Monetization (detail sheet only) ===
    Smartlink banner only — popunder removed at user request because it was
@@ -859,14 +1132,15 @@ const useTickingNow = (active) => {
     }, [active]);
 };
 
-const statusBadgeLabel = (m, c) => {
+const statusBadgeLabel = (m, c, t) => {
+    const tr = t || ((k) => k);
     if (c === 'live') {
         const min = liveMinute(m);
-        if (min && min !== 'FT') return `LIVE  ${min}`;
-        return 'LIVE';
+        if (min && min !== 'FT') return `${tr('b_live')}  ${min}`;
+        return tr('b_live');
     }
-    if (c === 'finished')  return 'Full Time';
-    if (c === 'upcoming')  return m.time ? `KO ${m.time}` : 'Upcoming';
+    if (c === 'finished')  return tr('b_ft');
+    if (c === 'upcoming')  return m.time ? `${tr('b_ko')} ${m.time}` : tr('b_upcoming');
     if (c === 'cancelled') return statusLabel(m.status) || 'Cancelled';
     return statusLabel(m.status);
 };
@@ -905,6 +1179,9 @@ const matchToPred = m => {
         ap:      m.probabilities?.away || '—',
     };
 };
+
+// i18n key for a 1X2 prediction code, so the label can be translated at render time.
+const predLabelKey = code => code === '1' ? 'home_win' : code === '2' ? 'away_win' : code === 'X' ? 'draw' : null;
 
 // For a finished match, was our 1X2 prediction correct? → 'correct' | 'wrong' | null.
 // Mirrors pitchpredictions.com: correct = green badge, wrong = red badge.
@@ -1033,16 +1310,21 @@ const EmptyState = ({ title, sub }) => (
     </div>
 );
 
-const TabLoading = () => (
+const TabLoading = () => {
+    const { t } = useT();
+    return (
     <div className="tab-loading">
         <div className="tab-loading-spin"/>
-        <div className="tab-loading-msg">{LOADING_MSG}</div>
+        <div className="tab-loading-msg">{t('loading_msg')}</div>
     </div>
-);
+    );
+};
 
-const SocialHome = () => (
+const SocialHome = () => {
+    const { t } = useT();
+    return (
     <div className="social-home">
-        <div className="social-home-lbl">Join Our Community</div>
+        <div className="social-home-lbl">{t('join_community')}</div>
         <div className="social-home-row">
             <a href="https://t.me/footballinsight01" target="_blank" rel="noopener noreferrer" className="social-home-item" title="Telegram">
                 <div className="social-home-ico"><IcoTGLg/></div>
@@ -1054,11 +1336,14 @@ const SocialHome = () => (
             </a>
         </div>
     </div>
-);
+    );
+};
 
-const Social = () => (
+const Social = () => {
+    const { t } = useT();
+    return (
     <div className="social">
-        <div className="social-lbl">Follow Us</div>
+        <div className="social-lbl">{t('follow_us')}</div>
         <div className="social-row">
             <a href="https://t.me/footballinsight01" target="_blank" rel="noopener noreferrer" className="social-ico" title="Telegram"><IcoTG/></a>
             <a href="https://x.com/tipsmagic30849" target="_blank" rel="noopener noreferrer" className="social-ico" title="X / Twitter"><IcoX/></a>
@@ -1066,9 +1351,11 @@ const Social = () => (
             <a href="https://www.instagram.com/magicbetting" target="_blank" rel="noopener noreferrer" className="social-ico" title="Instagram"><IcoIG/></a>
         </div>
     </div>
-);
+    );
+};
 
 const MatchCard = ({ match, onOpen, onToggleFav, isFav, pred=null }) => {
+    const { t } = useT();
     const c          = cat(match.status);
     const g          = getGoals(match);
     const id         = fid(match);
@@ -1087,7 +1374,7 @@ const MatchCard = ({ match, onOpen, onToggleFav, isFav, pred=null }) => {
                 <div className="card-meta">
                     <div className="card-meta-left">
                         <span className="card-league">{(leagueTxt||'').toUpperCase()}</span>
-                        {hasManual && <span className="pro-tip-badge"><IcoStar/> PRO TIP</span>}
+                        {hasManual && <span className="pro-tip-badge"><IcoStar/> {t('pro_tip')}</span>}
                     </div>
                     <button className={`fav${isFav?' on':''}`} onClick={e=>{e.stopPropagation();if(id)onToggleFav(id);}}>
                         <IcoHeart on={isFav}/>
@@ -1150,7 +1437,7 @@ const MatchCard = ({ match, onOpen, onToggleFav, isFav, pred=null }) => {
 
                 {hasManual && (
                     <div className="card-manual-pred">
-                        <div className="card-manual-pred-lbl"><IcoStar/> EXPERT TIP</div>
+                        <div className="card-manual-pred-lbl"><IcoStar/> {t('expert_tip')}</div>
                         <div className="card-manual-pred-txt">{match.manual_prediction}</div>
                     </div>
                 )}
@@ -1158,11 +1445,11 @@ const MatchCard = ({ match, onOpen, onToggleFav, isFav, pred=null }) => {
                 <div className="card-foot">
                     <span className={`s-badge ${badgeClass}`}>
                         {c==='live' && <span className="dot"/>}
-                        {statusBadgeLabel(match, c)}
+                        {statusBadgeLabel(match, c, t)}
                     </span>
                     {id && (
                         <button className="info-pill" onClick={e=>{e.stopPropagation();onOpen(match);}}>
-                            <IcoZap/> Details
+                            <IcoZap/> {t('details')}
                         </button>
                     )}
                 </div>
@@ -1173,14 +1460,15 @@ const MatchCard = ({ match, onOpen, onToggleFav, isFav, pred=null }) => {
 
 /* === Last Matches section inside the detail sheet ====================== */
 const LastMatchesBlock = ({ teamName, matches }) => {
+    const { t } = useT();
     if (!teamName) return null;
     return (
         <>
-            <div className="detail-section-title">{teamName} — Last {matches?.length || 0} matches</div>
+            <div className="detail-section-title">{t('last_n', {name: teamName, n: matches?.length || 0})}</div>
             {(!matches || matches.length === 0) ? (
                 <div className="detail-empty">
                     <div className="ico">📊</div>
-                    No finished matches for this team in our records yet.
+                    {t('no_finished')}
                 </div>
             ) : matches.map((g, i) => (
                 <div className="lm-row" key={i}>
@@ -1199,6 +1487,7 @@ const LastMatchesBlock = ({ teamName, matches }) => {
 
 /* === H2H section inside the detail sheet =============================== */
 const H2HBlock = ({ details }) => {
+    const { t } = useT();
     const list = (details.h2h && details.h2h.matches) || [];
     const s    = (details.h2h && details.h2h.stats)   || {};
     const homeName = details.home?.name || '';
@@ -1206,26 +1495,26 @@ const H2HBlock = ({ details }) => {
     if (list.length === 0) {
         return (
             <>
-                <div className="detail-section-title">Head-to-Head</div>
+                <div className="detail-section-title">{t('head_to_head')}</div>
                 <div className="detail-empty">
                     <div className="ico">🤝</div>
-                    <div style={{fontWeight:600,color:'var(--t2)',marginBottom:4}}>No past meetings on record.</div>
-                    <div style={{fontSize:11,opacity:.85}}>H2H grows as more matches finish — window: last {details.historyDays || 60} days.</div>
+                    <div style={{fontWeight:600,color:'var(--t2)',marginBottom:4}}>{t('no_h2h')}</div>
+                    <div style={{fontSize:11,opacity:.85}}>{t('h2h_grows', {d: details.historyDays || 60})}</div>
                 </div>
             </>
         );
     }
     return (
         <>
-            <div className="detail-section-title">Head-to-Head Stats</div>
+            <div className="detail-section-title">{t('h2h_stats')}</div>
             <div className="h2h-stat-row">
-                <div className="h2h-stat-card"><div className="h2h-stat-v">{s.played}</div><div className="h2h-stat-l">Played</div></div>
+                <div className="h2h-stat-card"><div className="h2h-stat-v">{s.played}</div><div className="h2h-stat-l">{t('played')}</div></div>
                 <div className="h2h-stat-card"><div className="h2h-stat-v" style={{color:'var(--green)'}}>{s.homeWins}</div><div className="h2h-stat-l">{homeName.slice(0,7)}</div></div>
-                <div className="h2h-stat-card"><div className="h2h-stat-v" style={{color:'var(--t3)'}}>{s.draws}</div><div className="h2h-stat-l">Draws</div></div>
+                <div className="h2h-stat-card"><div className="h2h-stat-v" style={{color:'var(--t3)'}}>{s.draws}</div><div className="h2h-stat-l">{t('draws')}</div></div>
                 <div className="h2h-stat-card"><div className="h2h-stat-v" style={{color:'var(--blue)'}}>{s.awayWins}</div><div className="h2h-stat-l">{awayName.slice(0,7)}</div></div>
-                <div className="h2h-stat-card"><div className="h2h-stat-v">{s.avgGoals}</div><div className="h2h-stat-l">Goals/M</div></div>
+                <div className="h2h-stat-card"><div className="h2h-stat-v">{s.avgGoals}</div><div className="h2h-stat-l">{t('goals_m')}</div></div>
             </div>
-            <div className="detail-section-title">Past Meetings</div>
+            <div className="detail-section-title">{t('past_meetings')}</div>
             {list.map((g, i) => (
                 <React.Fragment key={i}>
                     <div className="lm-row">
@@ -1254,28 +1543,29 @@ const H2HBlock = ({ details }) => {
 
 /* === Form summary section ============================================== */
 const FormBlock = ({ details }) => {
+    const { t } = useT();
     const hf = details.home?.form;
     const af = details.away?.form;
     if (!hf && !af) return null;
     return (
         <>
-            <div className="detail-section-title">Aggregated Form (Recent Season)</div>
+            <div className="detail-section-title">{t('agg_form')}</div>
             <div className="detail-info-grid">
                 <div className="detail-info-cell">
                     <div className="detail-info-val">{hf ? hf.avgScored : '—'}</div>
-                    <div className="detail-info-lbl">{details.home?.name?.slice(0,12)} avg scored</div>
+                    <div className="detail-info-lbl">{details.home?.name?.slice(0,12)} {t('avg_scored')}</div>
                 </div>
                 <div className="detail-info-cell">
                     <div className="detail-info-val">{hf ? hf.avgConceded : '—'}</div>
-                    <div className="detail-info-lbl">{details.home?.name?.slice(0,12)} avg conceded</div>
+                    <div className="detail-info-lbl">{details.home?.name?.slice(0,12)} {t('avg_conceded')}</div>
                 </div>
                 <div className="detail-info-cell">
                     <div className="detail-info-val">{af ? af.avgScored : '—'}</div>
-                    <div className="detail-info-lbl">{details.away?.name?.slice(0,12)} avg scored</div>
+                    <div className="detail-info-lbl">{details.away?.name?.slice(0,12)} {t('avg_scored')}</div>
                 </div>
                 <div className="detail-info-cell">
                     <div className="detail-info-val">{af ? af.avgConceded : '—'}</div>
-                    <div className="detail-info-lbl">{details.away?.name?.slice(0,12)} avg conceded</div>
+                    <div className="detail-info-lbl">{details.away?.name?.slice(0,12)} {t('avg_conceded')}</div>
                 </div>
             </div>
         </>
@@ -1283,6 +1573,7 @@ const FormBlock = ({ details }) => {
 };
 
 const DetailSheet = ({ match, pred, onClose }) => {
+    const { t, lang } = useT();
     const c          = cat(match.status);
     const g          = getGoals(match);
     const hasManual  = !!match.manual_prediction;
@@ -1320,7 +1611,7 @@ const DetailSheet = ({ match, pred, onClose }) => {
 
                 {/* === Smartlink banner (detail sheet only) === */}
                 <a href={SMARTLINK_URL} target="_blank" rel="noopener noreferrer nofollow" className="smartlink-banner">
-                    <small>Sponsored</small>
+                    <small>{t('sponsored')}</small>
                     🎁 Boost Your Bets — Tap to Claim Today's Top Bonus 🎁
                 </a>
 
@@ -1338,7 +1629,7 @@ const DetailSheet = ({ match, pred, onClose }) => {
                         <TeamLogo name={match.home?.name} url={match.home?.logo} big/>
                         <div className="detail-team-nm">{match.home?.name}</div>
                     </div>
-                    <div className="detail-vs">vs</div>
+                    <div className="detail-vs">{t('vs')}</div>
                     <div className="detail-team">
                         <TeamLogo name={match.away?.name} url={match.away?.logo} big/>
                         <div className="detail-team-nm">{match.away?.name}</div>
@@ -1346,48 +1637,48 @@ const DetailSheet = ({ match, pred, onClose }) => {
                 </div>
                 <div className="detail-score-box">
                     <div className="detail-score-big">{g ? `${g.h}  —  ${g.a}` : '—  vs  —'}</div>
-                    {c==='upcoming' && match.time && <div className="detail-score-sub">Kick-off at {match.time}</div>}
-                    {c==='upcoming' && !match.time && <div className="detail-score-sub">Match not started yet</div>}
+                    {c==='upcoming' && match.time && <div className="detail-score-sub">{t('kickoff_at', {t: match.time})}</div>}
+                    {c==='upcoming' && !match.time && <div className="detail-score-sub">{t('not_started')}</div>}
                     {c==='live' && liveMin && <div className="detail-live-min">● {liveMin}</div>}
                     {match.htScore && <div className="detail-score-sub" style={{marginTop:4}}>HT: {match.htScore}</div>}
                 </div>
                 <div className="detail-status-row">
                     <span className={`s-badge ${badgeClass}`} style={{fontSize:12,padding:'5px 14px'}}>
                         {c==='live' && <span className="dot"/>}
-                        {statusBadgeLabel(match, c)}
+                        {statusBadgeLabel(match, c, t)}
                     </span>
                 </div>
                 <div className="detail-info-grid">
                     <div className="detail-info-cell">
                         <div className="detail-info-val">{match.leagueName||'—'}</div>
-                        <div className="detail-info-lbl">Competition</div>
+                        <div className="detail-info-lbl">{t('competition')}</div>
                     </div>
                     <div className="detail-info-cell">
                         <div className="detail-info-val">{match.country||'—'}</div>
-                        <div className="detail-info-lbl">Country</div>
+                        <div className="detail-info-lbl">{t('country_lbl')}</div>
                     </div>
                     {match.time && (
                         <div className="detail-info-cell">
                             <div className="detail-info-val">{match.time}</div>
-                            <div className="detail-info-lbl">Kick-off (UTC)</div>
+                            <div className="detail-info-lbl">{t('kickoff_utc')}</div>
                         </div>
                     )}
                     {match.date && (
                         <div className="detail-info-cell">
                             <div className="detail-info-val">{match.date}</div>
-                            <div className="detail-info-lbl">Date</div>
+                            <div className="detail-info-lbl">{t('date_lbl')}</div>
                         </div>
                     )}
                 </div>
                 {!hasManual && analysis && (
                     <div className="ai-analysis-box">
-                        <div className="ai-analysis-lbl"><IcoStar/> Model Analysis</div>
+                        <div className="ai-analysis-lbl"><IcoStar/> {t('model_analysis')}</div>
                         <div className="ai-analysis-txt">{analysis}</div>
                     </div>
                 )}
                 {!hasManual && pred && pred.code && (
                     <div style={{background:'#1D1D1F',borderRadius:'var(--r)',padding:'16px',marginBottom:14}}>
-                        <div style={{fontSize:10,fontWeight:700,color:'rgba(255,255,255,.45)',textTransform:'uppercase',letterSpacing:'.4px',marginBottom:10}}>Match Prediction</div>
+                        <div style={{fontSize:10,fontWeight:700,color:'rgba(255,255,255,.45)',textTransform:'uppercase',letterSpacing:'.4px',marginBottom:10}}>{t('match_prediction')}</div>
                         <div style={{display:'flex',alignItems:'center',gap:14,marginBottom:12}}>
                             <div style={{width:56,height:56,borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',fontSize:26,fontWeight:800,flexShrink:0,
                                 ...(outcome==='correct'?{background:'var(--green)',color:'#fff',boxShadow:'0 3px 12px rgba(52,199,89,.45)'}
@@ -1395,16 +1686,16 @@ const DetailSheet = ({ match, pred, onClose }) => {
                                   :{background:'var(--gold)',color:'#fff',boxShadow:'0 3px 12px rgba(255,149,0,.45)'})}}>{pred.code}</div>
                             <div>
                                 <div style={{fontSize:16,fontWeight:700,color:'#fff',marginBottom:3,display:'flex',alignItems:'center',gap:8}}>
-                                    {pred.label}
-                                    {outcome==='correct' && <span style={{fontSize:11,fontWeight:800,color:'var(--green)',background:'rgba(52,199,89,.15)',padding:'2px 8px',borderRadius:100}}>✓ WON</span>}
-                                    {outcome==='wrong' && <span style={{fontSize:11,fontWeight:800,color:'var(--live)',background:'rgba(255,59,48,.15)',padding:'2px 8px',borderRadius:100}}>✗ LOST</span>}
+                                    {predLabelKey(pred.code) ? t(predLabelKey(pred.code)) : pred.label}
+                                    {outcome==='correct' && <span style={{fontSize:11,fontWeight:800,color:'var(--green)',background:'rgba(52,199,89,.15)',padding:'2px 8px',borderRadius:100}}>{t('won')}</span>}
+                                    {outcome==='wrong' && <span style={{fontSize:11,fontWeight:800,color:'var(--live)',background:'rgba(255,59,48,.15)',padding:'2px 8px',borderRadius:100}}>{t('lost')}</span>}
                                 </div>
-                                {pred.score && <div style={{fontSize:13,color:'rgba(255,255,255,.6)'}}>Predicted score: {pred.score}</div>}
+                                {pred.score && <div style={{fontSize:13,color:'rgba(255,255,255,.6)'}}>{t('predicted_score', {s: pred.score})}</div>}
                                 {pred.advice && <div style={{fontSize:12,color:'rgba(255,255,255,.5)',marginTop:2}}>{pred.advice}</div>}
                             </div>
                         </div>
                         <div style={{display:'flex',gap:8}}>
-                            {[['1','Home Win',pred.hp],['X','Draw',pred.dp],['2','Away Win',pred.ap]].map(([code,lbl,pct])=>(
+                            {[['1',t('home_win'),pred.hp],['X',t('draw'),pred.dp],['2',t('away_win'),pred.ap]].map(([code,lbl,pct])=>(
                                 <div key={code} style={{flex:1,textAlign:'center',background:pred.code===code?'rgba(255,149,0,.2)':'rgba(255,255,255,.06)',borderRadius:10,padding:'8px 4px',outline:pred.code===code?'1.5px solid var(--gold)':'none'}}>
                                     <div style={{fontSize:16,fontWeight:800,color:pred.code===code?'var(--gold)':'#fff'}}>{pct||'—'}</div>
                                     <div style={{fontSize:9,fontWeight:600,color:'rgba(255,255,255,.4)',textTransform:'uppercase',letterSpacing:'.3px',marginTop:1}}>{lbl}</div>
@@ -1414,20 +1705,20 @@ const DetailSheet = ({ match, pred, onClose }) => {
                     </div>
                 )}
                 {!hasManual && !pred && (
-                    <div style={{background:'var(--bg)',borderRadius:'var(--r)',padding:'13px 14px',marginBottom:14,textAlign:'center',fontSize:12,color:'var(--t3)'}}>Prediction not available.</div>
+                    <div style={{background:'var(--bg)',borderRadius:'var(--r)',padding:'13px 14px',marginBottom:14,textAlign:'center',fontSize:12,color:'var(--t3)'}}>{t('pred_unavailable')}</div>
                 )}
 
                 {/* === Standings + H2H + Form auto-load when sheet opens === */}
                 {detailsLoading && (
                     <div className="detail-loading">
                         <div className="spin-sm"/>
-                        <div>Loading match history & standings…</div>
+                        <div>{t('loading_history')}</div>
                     </div>
                 )}
                 {detailsErr && (
                     <div className="detail-empty">
                         <div className="ico">⚠️</div>
-                        Could not load history: {detailsErr}
+                        {t('could_not_load', {e: detailsErr})}
                     </div>
                 )}
                 {details && (
@@ -1441,7 +1732,7 @@ const DetailSheet = ({ match, pred, onClose }) => {
                     </>
                 )}
 
-                <button className="btn-secondary" style={{marginTop:14}} onClick={onClose}>Close</button>
+                <button className="btn-secondary" style={{marginTop:14}} onClick={onClose}>{({en:'Close',fr:'Fermer',es:'Cerrar',pt:'Fechar',sr:'Zatvori',ar:'إغلاق'})[lang] || 'Close'}</button>
             </div>
         </div>
     );
@@ -1449,11 +1740,12 @@ const DetailSheet = ({ match, pred, onClose }) => {
 
 /* === League Standings inside detail sheet ============================= */
 const StandingsBlock = ({ details }) => {
+    const { t } = useT();
     const groups = details.standings;
     if (!Array.isArray(groups) || groups.length === 0) return null;
     return (
         <>
-            <div className="detail-section-title">League Standings</div>
+            <div className="detail-section-title">{t('standings')}</div>
             {groups.map((group, gi) => {
                 if (!Array.isArray(group) || group.length === 0) return null;
                 const groupName = group[0]?.group || '';
@@ -1516,20 +1808,21 @@ const BOOKMAKERS = [
     { name: 'Bet9ja',  bg: '#1a8a3e', url: 'https://www.bet9ja.com'   },
 ];
 const OddsCard = ({ match }) => {
+    const { t } = useT();
     const h = match.oddsHome, d = match.oddsDraw, a = match.oddsAway;
     if (!h || !d || !a) return null;
     return (
         <div className="odds-card">
-            <div className="odds-title">⚡ Live Odds — Place Your Bet Now</div>
+            <div className="odds-title">{t('live_odds')}</div>
             <div className="odds-grid">
                 <div className="odds-cell"><div className="odds-lbl">{(match.home?.name||'Home').slice(0,8)}</div><div className="odds-val">{h.toFixed(2)}</div></div>
-                <div className="odds-cell"><div className="odds-lbl">Draw</div><div className="odds-val">{d.toFixed(2)}</div></div>
+                <div className="odds-cell"><div className="odds-lbl">{t('draw')}</div><div className="odds-val">{d.toFixed(2)}</div></div>
                 <div className="odds-cell"><div className="odds-lbl">{(match.away?.name||'Away').slice(0,8)}</div><div className="odds-val">{a.toFixed(2)}</div></div>
             </div>
             <div className="odds-bks">
                 {BOOKMAKERS.map(b => (
                     <a key={b.name} href={b.url} target="_blank" rel="noopener noreferrer nofollow" className="odds-bk" style={{background:b.bg}}>
-                        <small>BET ON</small>{b.name} ›
+                        <small>{t('bet_on')}</small>{b.name} ›
                     </a>
                 ))}
             </div>
@@ -1560,6 +1853,12 @@ function App() {
     const [theme,          setTheme]          = useState(() => {
         try { return localStorage.getItem('magic-theme') || 'light'; } catch { return 'light'; }
     });
+    const [lang,           setLang]           = useState(() => {
+        try { return localStorage.getItem('magic-lang') || 'en'; } catch { return 'en'; }
+    });
+    const [langOpen,       setLangOpen]       = useState(false);
+    const t      = useMemo(() => makeT(lang), [lang]);
+    const locale = LOCALE[lang] || 'en-US';
     // selectedDate is YYYY-MM-DD (UTC). When equal to today, the Home tab shows
     // Live/Upcoming/Past tabs + stats; for future dates we show only Upcoming.
     const [selectedDate,   setSelectedDate]   = useState(() => new Date().toISOString().slice(0, 10));
@@ -1573,6 +1872,13 @@ function App() {
         document.body.className = theme === 'dark' ? 'dark' : '';
         try { localStorage.setItem('magic-theme', theme); } catch {}
     }, [theme]);
+
+    // Language — persist + set <html> lang/dir (Arabic renders right-to-left)
+    useEffect(() => {
+        try { localStorage.setItem('magic-lang', lang); } catch {}
+        document.documentElement.lang = lang;
+        document.documentElement.dir = RTL_LANGS.includes(lang) ? 'rtl' : 'ltr';
+    }, [lang]);
 
     // Try to hydrate from localStorage on first paint so the UI isn't empty
     // while we wait for the network — and so if Railway is down we still
@@ -1632,12 +1938,12 @@ function App() {
                 if (cached && Array.isArray(cached.matches) && cached.matches.length) {
                     setMatches(cached.matches);
                     setUpdatedAt(cached.updatedAt);
-                    setErr(isOffline ? offlineMsg : maintenanceMsg);
+                    setErr(isOffline ? 'offline' : 'maintenance');
                     usedCache = true;
                 }
             } catch {}
             if (!silent && !usedCache) {
-                setErr(isOffline ? offlineMsg : maintenanceMsg);
+                setErr(isOffline ? 'offline' : 'maintenance');
             }
         } finally {
             if (!silent) setLoading(false);
@@ -1736,13 +2042,13 @@ function App() {
             const iso = isoOf(d);
             return {
                 iso,
-                weekday: d.toLocaleDateString('en-US',{weekday:'short'}),
+                weekday: d.toLocaleDateString(locale,{weekday:'short'}),
                 day: d.getDate(),
                 isToday: offset === 0,
                 count: counts[iso] || 0,
             };
         });
-    }, [matches]);
+    }, [matches, locale]);
 
     // pickDate is shared by the calendar cards AND the "Back to today" button.
     // When picking Today we auto-select the most useful tab (Live → Upcoming → Past)
@@ -1904,12 +2210,10 @@ function App() {
         if (matchesByLeague.length === 0) {
             if (selectedCountry) {
                 return <EmptyState
-                    title={`No ${selectedCountry} matches on this date.`}
-                    sub="Tap “Show all countries” above, or pick another country."/>;
+                    title={t('empty_country', {c: selectedCountry})}
+                    sub={t('empty_country_sub')}/>;
             }
-            return <EmptyState title={isPastDate
-                ? "No matches on record for this date."
-                : EMPTY_TAB_MSG}/>;
+            return <EmptyState title={isPastDate ? t('empty_past') : t('empty_tab')}/>;
         }
         const hasMore = visibleCount < orderedMatches.length;
         return (
@@ -1931,17 +2235,18 @@ function App() {
                 {hasMore && (
                     <div ref={sentinelRef} className="load-more">
                         <div className="tab-loading-spin"/>
-                        <span className="load-more-txt">Loading more matches…</span>
+                        <span className="load-more-txt">{t('loading_more')}</span>
                     </div>
                 )}
             </>
         );
     };
 
-    const today  = new Date().toLocaleDateString('en-US', {weekday:'long',month:'long',day:'numeric'});
+    const today  = new Date().toLocaleDateString(locale, {weekday:'long',month:'long',day:'numeric'});
     const sports = [['Football','⚽'],['Basketball','🏀'],['Tennis','🎾'],['Hockey','🏒'],['Baseball','⚾']];
 
     return (
+        <LangContext.Provider value={{ lang, locale, t }}>
         <>
             {splash && (
                 <div className="splash">
@@ -1951,19 +2256,22 @@ function App() {
                         </div>
                         <div style={{textAlign:'center'}}>
                             <div style={{fontSize:22,fontWeight:700,letterSpacing:'-.5px'}}>Magic Analysis</div>
-                            <div style={{fontSize:13,color:'var(--t3)',marginTop:2}}>Live Football Intelligence</div>
+                            <div style={{fontSize:13,color:'var(--t3)',marginTop:2}}>{t('tagline')}</div>
                         </div>
                     </div>
                 </div>
             )}
 
             {showToast && (
-                <div className="toast"><div className="spin"/>Fetching latest data…</div>
+                <div className="toast"><div className="spin"/>{({en:'Fetching latest data…',fr:'Chargement des données…',es:'Cargando datos…',pt:'Carregando dados…',sr:'Učitavanje podataka…',ar:'جارٍ تحميل البيانات…'})[lang]||'Fetching latest data…'}</div>
             )}
 
             <header className="hdr">
                 <button className="hdr-btn" onClick={()=>setCalOpen(true)} title="Pick date"><IcoCal/></button>
-                <div className="hdr-center"><MagicLogo size={22}/><span className="hdr-title">Magic Analysis</span></div>
+                <div className="hdr-center"><MagicLogo size={29}/><span className="hdr-title">Magic Analysis</span></div>
+                <button className="hdr-btn" onClick={()=>setLangOpen(true)} title={t('language')} aria-label={t('language')}>
+                    <span style={{fontSize:18,lineHeight:1}}>{(LANGS.find(l=>l[0]===lang)||LANGS[0])[2]}</span>
+                </button>
                 <button className="hdr-btn" onClick={()=>setTheme(theme==='dark'?'light':'dark')} title={theme==='dark'?'Light mode':'Dark mode'}>
                     {theme==='dark' ? <IcoSun/> : <IcoMoon/>}
                 </button>
@@ -1976,7 +2284,7 @@ function App() {
                         <button key={d.iso}
                             className={`tds-day${selectedDate === d.iso ? ' on' : ''}${d.isToday ? ' tds-today' : ''}`}
                             onClick={() => pickDate(d.iso)}>
-                            <span className="tds-day-name">{d.isToday ? 'Today' : d.weekday}</span>
+                            <span className="tds-day-name">{d.isToday ? t('stat_today') : d.weekday}</span>
                             <span className="tds-day-num">{d.day}</span>
                         </button>
                     ))}
@@ -2003,9 +2311,9 @@ function App() {
                         data-country-name="__ALL__"
                         className={`cs-item cs-item-intl${selectedCountry === null ? ' on' : ''}`}
                         onClick={() => setSelectedCountry(null)}
-                        title="Show matches from all countries">
+                        title={t('show_all')}>
                         <span className="cs-flag">🌍</span>
-                        <span className="cs-code">ALL</span>
+                        <span className="cs-code">{t('all')}</span>
                     </button>
                     {/* Every country (most matches first). "International" appears here as a normal chip. */}
                     {availableCountries.map((country) => (
@@ -2025,21 +2333,21 @@ function App() {
                 {tab==='Home' && (
                     <div className="page-in">
                         <div className="page-head">
-                            <h1 className="page-h1">{isViewingToday ? 'Predictions' : 'Upcoming Matches'}</h1>
-                            <p className="page-sub">{today}{updatedAt ? ` · refreshed ${new Date(updatedAt).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})}` : ''}</p>
+                            <h1 className="page-h1">{isViewingToday ? t('title_predictions') : t('title_upcoming')}</h1>
+                            <p className="page-sub">{today}{updatedAt ? ` · ${t('refreshed')} ${new Date(updatedAt).toLocaleTimeString(locale,{hour:'2-digit',minute:'2-digit'})}` : ''}</p>
                             {!isViewingToday && (
                                 <button className="back-to-today" onClick={() => pickDate(todayIso)}>
-                                    ← Back to today
+                                    {t('back_today')}
                                 </button>
                             )}
                         </div>
 
                         {isViewingToday && (
                             <div className="stats">
-                                {[['Today',todayCount],['Live',liveCount],['Finished',pastCount],['Alerts',alertCount]].map(([l,v]) => (
+                                {[['stat_today',todayCount],['stat_live',liveCount],['stat_finished',pastCount],['stat_alerts',alertCount]].map(([l,v]) => (
                                     <div key={l} className="stat">
                                         <div className="stat-n">{v}</div>
-                                        <div className="stat-l">{l}</div>
+                                        <div className="stat-l">{t(l)}</div>
                                     </div>
                                 ))}
                             </div>
@@ -2048,11 +2356,11 @@ function App() {
                         {isViewingToday && (
                             <div className="home-tabs">
                                 <button className={`home-tab${homeTab==='Live'?' on':''}`} onClick={()=>handleHomeTabClick('Live')}>
-                                    🔴 Live
+                                    🔴 {t('tab_live')}
                                     {liveCount > 0 && <span className="live-badge">{liveCount}</span>}
                                 </button>
                                 <button className={`home-tab${homeTab==='Today'?' on':''}`} onClick={()=>handleHomeTabClick('Today')}>
-                                    Today's Matches <span className="home-tab-count">({todayCount})</span>
+                                    {t('tab_today')} <span className="home-tab-count">({todayCount})</span>
                                 </button>
                             </div>
                         )}
@@ -2061,22 +2369,22 @@ function App() {
                             <button className="show-all-bar" onClick={() => setSelectedCountry(null)}>
                                 <span className="sab-left">
                                     <span className="sab-flag">{getCountryFlag(selectedCountry)}</span>
-                                    Showing {selectedCountry} only
+                                    {t('showing_only', {c: selectedCountry})}
                                 </span>
-                                <span className="sab-link">✕ Show all countries</span>
+                                <span className="sab-link">{t('show_all')}</span>
                             </button>
                         )}
 
                         {waking && (
                             <div className="wake-bar">
                                 <div className="spin" style={{flexShrink:0}}/>
-                                <span style={{fontSize:13,fontWeight:500,color:'var(--t2)'}}>Waking up server — up to 30 s on first load…</span>
+                                <span style={{fontSize:13,fontWeight:500,color:'var(--t2)'}}>{t('waking')}</span>
                             </div>
                         )}
                         {err && !loading && (
                             <div className="err-bar">
-                                <span className="err-txt">{err}</span>
-                                <button className="retry-btn" onClick={()=>load()}>Retry</button>
+                                <span className="err-txt">{t(err)}</span>
+                                <button className="retry-btn" onClick={()=>load()}>{t('retry')}</button>
                             </div>
                         )}
 
@@ -2089,8 +2397,8 @@ function App() {
                 {tab==='Alerts' && (
                     <div className="page-in">
                         <div className="page-head">
-                            <h1 className="page-h1">Alerts</h1>
-                            <p className="page-sub">Matches past the 75 minute mark · in-play odds</p>
+                            <h1 className="page-h1">{t('nav_alerts')}</h1>
+                            <p className="page-sub">{t('alerts_sub')}</p>
                         </div>
                         {alertMatches.length > 0
                             ? alertMatches.map(m => {
@@ -2110,7 +2418,7 @@ function App() {
                                     </div>
                                 );
                             })
-                            : <EmptyState title={EMPTY_TAB_MSG}/>
+                            : <EmptyState title={t('empty_tab')}/>
                         }
                         <Social/>
                     </div>
@@ -2119,16 +2427,16 @@ function App() {
                 {tab==='Favs' && (
                     <div className="page-in">
                         <div className="page-head">
-                            <h1 className="page-h1">Saved</h1>
-                            <p className="page-sub">Your saved matches</p>
+                            <h1 className="page-h1">{t('nav_saved')}</h1>
+                            <p className="page-sub">{t('saved_sub')}</p>
                         </div>
                         {savedMatches.length > 0
                             ? savedMatches.map(renderCard)
                             : (
                                 <div style={{paddingTop:56,textAlign:'center'}}>
                                     <div style={{fontSize:36,color:'var(--sep2)',marginBottom:10}}>♡</div>
-                                    <div style={{fontSize:14,fontWeight:600,color:'var(--t2)'}}>Nothing saved yet</div>
-                                    <div style={{fontSize:12,color:'var(--t3)',marginTop:3}}>Tap the heart on any match to save it here.</div>
+                                    <div style={{fontSize:14,fontWeight:600,color:'var(--t2)'}}>{t('nothing_saved')}</div>
+                                    <div style={{fontSize:12,color:'var(--t3)',marginTop:3}}>{t('nothing_saved_sub')}</div>
                                 </div>
                             )
                         }
@@ -2138,17 +2446,17 @@ function App() {
 
                 {tab==='More' && (
                     <div className="page-in">
-                        <div className="page-head"><h1 className="page-h1">More</h1></div>
+                        <div className="page-head"><h1 className="page-h1">{t('nav_more')}</h1></div>
                         <div className="settings-group">
                             {[
-                                ['About Us','https://docs.google.com/document/d/1OaaYhaQi3FZzog6YLIoojh3CnX3aN0lrizXyQ5N9Dkw/edit?usp=sharing'],
-                                ['Terms of Use','https://docs.google.com/document/d/1wO92_LRf7q1vS90SdmHgArGITPkimnMa7g_U_VHFZo4/edit?usp=sharing'],
-                                ['Privacy Policy','https://docs.google.com/document/d/1qrcuBqJ3RoSTTdjtyHJXidpVNODILbHW5cLx4wlAe6Y/edit?usp=sharing'],
+                                ['about_us','https://docs.google.com/document/d/1OaaYhaQi3FZzog6YLIoojh3CnX3aN0lrizXyQ5N9Dkw/edit?usp=sharing'],
+                                ['terms','https://docs.google.com/document/d/1wO92_LRf7q1vS90SdmHgArGITPkimnMa7g_U_VHFZo4/edit?usp=sharing'],
+                                ['privacy','https://docs.google.com/document/d/1qrcuBqJ3RoSTTdjtyHJXidpVNODILbHW5cLx4wlAe6Y/edit?usp=sharing'],
                             ].map(([l,u]) => (
-                                <a key={l} href={u} target="_blank" rel="noopener noreferrer" className="settings-item">{l}<IcoChev/></a>
+                                <a key={l} href={u} target="_blank" rel="noopener noreferrer" className="settings-item">{t(l)}<IcoChev/></a>
                             ))}
                             <a href="mailto:Magicbetingtips@gmail.com" className="settings-item">
-                                <span style={{display:'flex',alignItems:'center',gap:10}}><IcoMail/> Contact Us</span>
+                                <span style={{display:'flex',alignItems:'center',gap:10}}><IcoMail/> {t('contact_us')}</span>
                                 <span style={{fontSize:12,color:'var(--t3)'}}>Magicbetingtips@gmail.com</span>
                             </a>
                         </div>
@@ -2165,8 +2473,8 @@ function App() {
                     <div className="center-card" onClick={e=>e.stopPropagation()}>
                         <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:22}}>
                             <div>
-                                <div style={{fontSize:19,fontWeight:700,letterSpacing:'-.4px',marginBottom:2}}>Pick a date</div>
-                                <div style={{fontSize:12,color:'var(--t3)'}}>Past 5 + Today + next 10 days · swipe to scroll</div>
+                                <div style={{fontSize:19,fontWeight:700,letterSpacing:'-.4px',marginBottom:2}}>{t('pick_date')}</div>
+                                <div style={{fontSize:12,color:'var(--t3)'}}>{t('pick_date_sub')}</div>
                             </div>
                             <button onClick={()=>setCalOpen(false)} style={{background:'var(--bg)',border:'none',borderRadius:'50%',width:28,height:28,cursor:'pointer',fontSize:16,color:'var(--t2)',display:'flex',alignItems:'center',justifyContent:'center'}}>×</button>
                         </div>
@@ -2175,7 +2483,7 @@ function App() {
                                 <div key={d.iso}
                                     className={`cal-day${selectedDate === d.iso ? ' on' : ''}${d.isToday ? ' cal-day-today' : ''}`}
                                     onClick={() => pickDate(d.iso)}>
-                                    <span className="cal-dd">{d.isToday ? 'Today' : d.weekday}</span>
+                                    <span className="cal-dd">{d.isToday ? t('stat_today') : d.weekday}</span>
                                     <span className="cal-dn">{d.day}</span>
                                     {d.count > 0 && <span className="cal-day-cnt">{d.count}</span>}
                                 </div>
@@ -2189,9 +2497,31 @@ function App() {
                 <div className="center-overlay" onClick={()=>setCsSport(null)}>
                     <div className="center-card" style={{textAlign:'center'}} onClick={e=>e.stopPropagation()}>
                         <div style={{fontSize:38,marginBottom:14}}>🔜</div>
-                        <div style={{fontSize:21,fontWeight:700,letterSpacing:'-.4px',marginBottom:8}}>Coming Soon</div>
-                        <div style={{fontSize:14,color:'var(--t2)',lineHeight:1.55,marginBottom:26}}>Live <strong>{csSport}</strong> predictions are on the way.</div>
-                        <button className="btn-primary" onClick={()=>setCsSport(null)}>Got it</button>
+                        <div style={{fontSize:21,fontWeight:700,letterSpacing:'-.4px',marginBottom:8}}>{t('coming_soon')}</div>
+                        <div style={{fontSize:14,color:'var(--t2)',lineHeight:1.55,marginBottom:26}}>{t('coming_soon_body', {sport: csSport})}</div>
+                        <button className="btn-primary" onClick={()=>setCsSport(null)}>{t('got_it')}</button>
+                    </div>
+                </div>
+            )}
+
+            {langOpen && (
+                <div className="center-overlay" onClick={()=>setLangOpen(false)}>
+                    <div className="center-card" onClick={e=>e.stopPropagation()}>
+                        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:18}}>
+                            <div style={{fontSize:19,fontWeight:700,letterSpacing:'-.4px'}}>{t('choose_language')}</div>
+                            <button onClick={()=>setLangOpen(false)} style={{background:'var(--bg)',border:'none',borderRadius:'50%',width:28,height:28,cursor:'pointer',fontSize:16,color:'var(--t2)',display:'flex',alignItems:'center',justifyContent:'center'}}>×</button>
+                        </div>
+                        <div style={{display:'flex',flexDirection:'column',gap:8}}>
+                            {LANGS.map(([code,label,flag])=>(
+                                <button key={code} onClick={()=>{setLang(code);setLangOpen(false);}}
+                                    style={{display:'flex',alignItems:'center',gap:12,padding:'13px 14px',borderRadius:12,border:'none',cursor:'pointer',fontFamily:'inherit',fontSize:15,fontWeight:600,
+                                        background: code===lang ? 'var(--t1)' : 'var(--bg)', color: code===lang ? '#fff' : 'var(--t1)'}}>
+                                    <span style={{fontSize:22,lineHeight:1}}>{flag}</span>
+                                    <span style={{flex:1,textAlign:'start'}}>{label}</span>
+                                    {code===lang && <span>✓</span>}
+                                </button>
+                            ))}
+                        </div>
                     </div>
                 </div>
             )}
@@ -2205,14 +2535,15 @@ function App() {
             )}
 
             <nav className="nav">
-                {[{id:'Home',lbl:'Home',ico:<IcoHome/>},{id:'Alerts',lbl:'Alerts',ico:<IcoBell/>},{id:'Favs',lbl:'Saved',ico:<IcoHeart on={false}/>},{id:'More',lbl:'More',ico:<IcoMenu/>}].map(({id,lbl,ico}) => (
+                {[{id:'Home',lbl:'nav_home',ico:<IcoHome/>},{id:'Alerts',lbl:'nav_alerts',ico:<IcoBell/>},{id:'Favs',lbl:'nav_saved',ico:<IcoHeart on={false}/>},{id:'More',lbl:'nav_more',ico:<IcoMenu/>}].map(({id,lbl,ico}) => (
                     <div key={id} className={`nav-item ${tab===id?'on':'off'}`} onClick={()=>setTab(id)}>
                         <div className="nav-ico">{ico}</div>
-                        <span className="nav-lbl">{lbl}</span>
+                        <span className="nav-lbl">{t(lbl)}</span>
                     </div>
                 ))}
             </nav>
         </>
+        </LangContext.Provider>
     );
 }
 
