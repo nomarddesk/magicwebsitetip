@@ -88,6 +88,18 @@
         body.dark .splash { background:#000; }
         body.dark .nav { background:rgba(28,28,30,0.6); border-top-color:rgba(255,255,255,0.12); box-shadow:0 -0.5px 0 rgba(255,255,255,0.06), 0 -10px 30px rgba(0,0,0,0.4); }
         body.dark .nav-item.on { background:rgba(255,255,255,0.12); }
+        /* Dark mode: "active" pills use a white background (var(--t1) flips to #fff),
+           so their text must flip to dark — otherwise it's white-on-white (invisible). */
+        body.dark .tab-on,
+        body.dark .home-tab.on,
+        body.dark .btn-primary,
+        body.dark .toast,
+        body.dark .tds-day.on .tds-day-num,
+        body.dark .cal-day.on .cal-dn,
+        body.dark .cs-item.on:not(.cs-item-intl) .cs-code { color:#000; }
+        body.dark .tds-day.on .tds-day-name,
+        body.dark .cal-day.on .cal-dd { color:rgba(0,0,0,.6); }
+        body.dark .cal-day.on .cal-day-cnt { color:#000; background:rgba(0,0,0,.12); }
         body.dark .skel { background:linear-gradient(90deg,#2C2C2E 25%,#3A3A3C 50%,#2C2C2E 75%); background-size:200% 100%; }
         body.dark .detail-note { background:#3A2E10; color:#FED7AA; border-left-color:var(--gold); }
         body.dark .inter-ad { background:linear-gradient(90deg,#3A2410 0%,#4A2E15 100%); border-color:#7C2D12; color:#FED7AA; }
@@ -2515,7 +2527,7 @@ function App() {
                             {LANGS.map(([code,label,flag])=>(
                                 <button key={code} onClick={()=>{setLang(code);setLangOpen(false);}}
                                     style={{display:'flex',alignItems:'center',gap:12,padding:'13px 14px',borderRadius:12,border:'none',cursor:'pointer',fontFamily:'inherit',fontSize:15,fontWeight:600,
-                                        background: code===lang ? 'var(--t1)' : 'var(--bg)', color: code===lang ? '#fff' : 'var(--t1)'}}>
+                                        background: code===lang ? 'var(--blue)' : 'var(--bg)', color: code===lang ? '#fff' : 'var(--t1)'}}>
                                     <span style={{fontSize:22,lineHeight:1}}>{flag}</span>
                                     <span style={{flex:1,textAlign:'start'}}>{label}</span>
                                     {code===lang && <span>✓</span>}
