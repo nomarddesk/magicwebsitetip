@@ -260,9 +260,10 @@
         .card-scores-col { display:flex; flex-direction:column; align-items:flex-end; gap:5px; min-width:20px; }
         /* Predicted scoreline box (middle of the card). Neutral before kickoff;
            turns green if our pick was right after FT, red if it was wrong. */
-        .card-pred-score { flex-shrink:0; align-self:center; min-width:44px; text-align:center; padding:6px 9px; border-radius:10px; border:1.5px solid var(--sep2); background:var(--bg); font-size:15px; font-weight:800; color:var(--t1); font-variant-numeric:tabular-nums; letter-spacing:.5px; }
+        .card-pred-score { display:flex; flex-direction:column; align-items:center; justify-content:center; flex-shrink:0; align-self:center; min-width:46px; text-align:center; padding:5px 9px; border-radius:10px; border:1.5px solid var(--sep2); background:var(--bg); font-size:15px; font-weight:800; color:var(--t1); font-variant-numeric:tabular-nums; letter-spacing:.5px; }
         .card-pred-score.cps-correct { border-color:var(--green); background:rgba(52,199,89,.12); color:var(--green); }
-        .card-pred-score.cps-wrong { color:var(--t3); }   /* missed → muted grey, no red */
+        .card-pred-score.cps-wrong { color:var(--t3); }   /* prediction missed → muted grey, no red */
+        .cps-ht { font-size:9px; font-weight:600; color:var(--t3); letter-spacing:0; margin-top:1px; }
         .pred-front { display:flex; flex-direction:column; align-items:center; gap:3px; }
         .pred-front-circle { width:44px; height:44px; border-radius:50%; background:var(--gold); display:flex; align-items:center; justify-content:center; font-size:21px; font-weight:800; color:#fff; box-shadow:0 2px 10px rgba(255,149,0,.45); flex-shrink:0; }
         .pred-front-circle.pred-correct { background:var(--green); box-shadow:0 2px 10px rgba(52,199,89,.5); }
@@ -359,6 +360,7 @@
         .league-block { margin-bottom:14px; }
         .league-block-title { font-size:11px; font-weight:700; color:var(--t3); text-transform:uppercase; letter-spacing:.5px; padding:8px 4px 8px; display:flex; align-items:center; gap:6px; }
         .league-block-flag { font-size:14px; line-height:1; }
+        .wc-badge { margin-left:6px; font-size:9px; font-weight:800; color:#fff; background:linear-gradient(135deg,#FF9500,#FF3B30); padding:2px 7px; border-radius:100px; letter-spacing:.4px; }
 
         /* ===== Past-date note ===== */
         .past-date-note { background:#FFFBEB; border-left:3px solid var(--gold); border-radius:8px; padding:10px 12px; font-size:12px; color:#92400E; line-height:1.5; margin-bottom:12px; }
@@ -1414,16 +1416,12 @@ const MatchCard = ({ match, onOpen, onToggleFav, isFav, pred=null }) => {
                             <span className="team-nm">{match.away?.name||'—'}</span>
                         </div>
                     </div>
-                    {hasPred && pred.score && (
-                        <div className={`card-pred-score${outcome ? ' cps-'+outcome : ''}`} title={pred.label}>{pred.score}</div>
-                    )}
+                    <div className={`card-pred-score${outcome ? ' cps-'+outcome : ''}`} title={hasPred ? pred.label : ''}>
+                        {g
+                            ? <>{g.h}-{g.a}{match.htScore ? <span className="cps-ht">({match.htScore})</span> : null}</>
+                            : '-'}
+                    </div>
                     <div className="card-right-col">
-                        <div className="card-scores-col">
-                            {g
-                                ? <><span className="score-n">{g.h}</span><span className="score-n">{g.a}</span></>
-                                : <><span className="score-n dim">—</span><span className="score-n dim">—</span></>
-                            }
-                        </div>
                         {hasManual ? (
                             <div className="pred-front">
                                 <div className="pred-front-circle" style={{fontSize:20}}>⭐</div>
@@ -2243,11 +2241,13 @@ function App() {
                     // Flag/label come from the league's own matches so the "All countries"
                     // view shows the correct flag per section, not a single global one.
                     const c = getMatchCountry(leagueMatches[0]);
+                    const isWorldCup = /world cup/i.test(league);
                     return (
                         <div key={league} className="league-block">
                             <div className="league-block-title">
-                                <span className="league-block-flag">{getCountryFlag(c)}</span>
+                                <span className="league-block-flag">{isWorldCup ? '🏆' : getCountryFlag(c)}</span>
                                 {c ? `${c} · ${league}` : league}
+                                {isWorldCup && <span className="wc-badge">World Cup</span>}
                             </div>
                             {leagueMatches.map(renderCard)}
                         </div>
