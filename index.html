@@ -270,6 +270,10 @@
         .pred-front-circle.pred-wrong { background:var(--live); box-shadow:0 2px 10px rgba(255,59,48,.45); }
         .pred-front-score { font-size:9px; font-weight:700; color:var(--t2); letter-spacing:.2px; }
         .pred-front-probs { display:flex; gap:6px; }
+        /* pitch-style "top pick" badge (recommendation + confidence %) */
+        .pred-rec { font-size:11px; font-weight:800; padding:3px 9px; border-radius:100px; background:var(--gold); color:#fff; white-space:nowrap; letter-spacing:.2px; font-variant-numeric:tabular-nums; }
+        .pred-rec.rec-correct { background:var(--green); }
+        .pred-rec.rec-wrong { background:var(--live); }
         .pred-front-prob { display:flex; flex-direction:column; align-items:center; }
         .pred-front-pct { font-size:10px; font-weight:700; color:var(--t2); line-height:1.2; }
         .pred-front-code { font-size:8px; font-weight:600; color:var(--t3); text-transform:uppercase; letter-spacing:.2px; }
@@ -1207,6 +1211,34 @@ const matchToPred = m => {
 // i18n key for a 1X2 prediction code, so the label can be translated at render time.
 const predLabelKey = code => code === '1' ? 'home_win' : code === '2' ? 'away_win' : code === 'X' ? 'draw' : null;
 
+// Pitch-style "top pick" — the single highest-confidence prediction across
+// 1X2 / Over-Under 2.5 / Double Chance, with its confidence %. Mirrors the
+// "Prediction" badge + % pitchpredictions shows.
+const topPick = (m) => {
+    if (!m) return null;
+    const h = parseInt(m.probabilities?.home)||0, d = parseInt(m.probabilities?.draw)||0, a = parseInt(m.probabilities?.away)||0;
+    const best = Math.max(h, d, a);
+    const cands = [];
+    if (best > 0) cands.push({ label: best===h?'1':best===a?'2':'X', pct: best, kind:'1x2' });
+    if (m.ouPred && m.ouPct) cands.push({ label: m.ouPred, pct: parseInt(m.ouPct)||0, kind:'ou', raw:m.ouPred });
+    if (m.dcType && m.dcPct) cands.push({ label: m.dcType, pct: parseInt(m.dcPct)||0, kind:'dc' });
+    if (!cands.length) return null;
+    cands.sort((x, y) => y.pct - x.pct);
+    return cands[0];
+};
+// Did the top pick land? (finished matches only) → 'correct' | 'wrong' | null.
+const pickOutcome = (m, pick) => {
+    if (!pick || cat(m.status) !== 'finished') return null;
+    const g = getGoals(m); if (!g) return null;
+    const hs = parseInt(g.h), as = parseInt(g.a); if (isNaN(hs) || isNaN(as)) return null;
+    const total = hs + as, res = hs>as ? '1' : hs<as ? '2' : 'X';
+    let ok;
+    if (pick.kind === '1x2') ok = pick.label === res;
+    else if (pick.kind === 'ou') ok = pick.raw === 'Ov2.5' ? total > 2.5 : total < 2.5;
+    else ok = pick.label==='1X' ? (res==='1'||res==='X') : pick.label==='12' ? (res==='1'||res==='2') : (res==='X'||res==='2');
+    return ok ? 'correct' : 'wrong';
+};
+
 // For a finished match, was our 1X2 prediction correct? → 'correct' | 'wrong' | null.
 // Mirrors pitchpredictions.com: correct = green badge, wrong = red badge.
 const predictionOutcome = m => {
@@ -1388,6 +1420,8 @@ const MatchCard = ({ match, onOpen, onToggleFav, isFav, pred=null }) => {
     const outcome    = predictionOutcome(match);
     // Exact-score hit: green ONLY when the predicted scoreline equals the final score.
     const scoreExact = outcome && g && pred && pred.score && pred.score === `${g.h}-${g.a}`;
+    const pick       = topPick(match);                 // pitch's top recommendation + %
+    const pickRes    = pickOutcome(match, pick);       // did that pick land? (finished only)
     const badgeClass = c==='live'?'s-live':c==='finished'?'s-fin':c==='upcoming'?'s-upc':'s-canc';
     const leagueTxt  = [match.country, match.leagueName].filter(Boolean).join(' · ');
 
@@ -1435,14 +1469,7 @@ const MatchCard = ({ match, onOpen, onToggleFav, isFav, pred=null }) => {
                         ) : hasPred ? (
                             <div className="pred-front" onClick={e=>e.stopPropagation()}>
                                 <div className={`pred-front-circle${outcome ? ' pred-'+outcome : ''}`}>{pred.code}</div>
-                                <div className="pred-front-probs">
-                                    {[['1',pred.hp],['X',pred.dp],['2',pred.ap]].map(([code,pct])=>(
-                                        <div key={code} className={`pred-front-prob${pred.code===code?(outcome==='correct'?' hi hi-green':' hi'):''}`}>
-                                            <span className="pred-front-pct">{pct||'—'}</span>
-                                            <span className="pred-front-code">{code}</span>
-                                        </div>
-                                    ))}
-                                </div>
+                                {pick && <div className={`pred-rec${pickRes ? ' rec-'+pickRes : ''}`}>{pick.label} · {pick.pct}%</div>}
                             </div>
                         ) : (
                             <div className="pred-front">
@@ -1723,6 +1750,12 @@ const DetailSheet = ({ match, pred, onClose }) => {
                                 {pred.advice && <div style={{fontSize:12,color:'rgba(255,255,255,.5)',marginTop:2}}>{pred.advice}</div>}
                             </div>
                         </div>
+                        {(() => { const _p = topPick(match); const _r = pickOutcome(match, _p); return _p ? (
+                            <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:10}}>
+                                <span style={{fontSize:10,fontWeight:700,color:'rgba(255,255,255,.45)',textTransform:'uppercase',letterSpacing:'.4px'}}>Top pick</span>
+                                <span style={{fontSize:13,fontWeight:800,color:'#fff',background:_r==='correct'?'var(--green)':_r==='wrong'?'var(--live)':'var(--gold)',padding:'3px 10px',borderRadius:100}}>{_p.label} · {_p.pct}%</span>
+                            </div>
+                        ) : null; })()}
                         <div style={{display:'flex',gap:8}}>
                             {[['1',t('home_win'),pred.hp],['X',t('draw'),pred.dp],['2',t('away_win'),pred.ap]].map(([code,lbl,pct])=>(
                                 <div key={code} style={{flex:1,textAlign:'center',background:pred.code===code?'rgba(255,149,0,.2)':'rgba(255,255,255,.06)',borderRadius:10,padding:'8px 4px',outline:pred.code===code?'1.5px solid var(--gold)':'none'}}>
@@ -2058,21 +2091,26 @@ function App() {
     // Date strip used by BOTH the top horizontal strip and the calendar popup.
     // Range: Past 5 days + Today + Future 10 days = 16 items, sorted oldest → newest.
     const dateStrip = useMemo(() => {
-        const today = new Date();
-        const isoOf = (d) => d.toISOString().slice(0, 10);
         const counts = {};
         for (const m of matches) {
             if (!m.date) continue;
             counts[m.date] = (counts[m.date] || 0) + 1;
         }
+        // Anchor the WHOLE strip to UTC midnight so every cell's iso lines up
+        // exactly with selectedDate, todayIso and each match's m.date — all of
+        // which are UTC yyyy-mm-dd. The old code built cells from LOCAL midnight
+        // then called toISOString(), which shifted the date back a day for users
+        // ahead of UTC — so tapping a day loaded the PREVIOUS day's matches.
+        const now = new Date();
+        const todayUTC = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
         return Array.from({length:16}, (_,i) => {
             const offset = i - 5;  // -5..-1 = past, 0 = today, 1..10 = future
-            const d = new Date(today.getFullYear(), today.getMonth(), today.getDate() + offset);
-            const iso = isoOf(d);
+            const d = new Date(todayUTC + offset * 86400000);
+            const iso = d.toISOString().slice(0, 10);
             return {
                 iso,
-                weekday: d.toLocaleDateString(locale,{weekday:'short'}),
-                day: d.getDate(),
+                weekday: d.toLocaleDateString(locale, {weekday:'short', timeZone:'UTC'}),
+                day: d.getUTCDate(),
                 isToday: offset === 0,
                 count: counts[iso] || 0,
             };
