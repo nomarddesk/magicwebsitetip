@@ -101,7 +101,7 @@
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-            gtag('config', 'G-RNQZZENL62');
+      gtag('config', 'G-RNQZZENL62');
     </script>
 
     <!-- Cloudflare Web Analytics -->
@@ -644,6 +644,11 @@ const { useState, useEffect, useMemo, useCallback, useRef, useContext } = React;
 
 const BACKEND_URL = "https://sportprediction-production.up.railway.app";
 const REFRESH_MS  = 3 * 60 * 1000;
+// The maintenance bar is now AUTOMATIC — it shows itself whenever the backend can't
+// serve data (see load()) and hides when data is healthy again. Leave this false.
+// Only flip to true to FORCE a banner even while the backend looks healthy — e.g. the
+// upstream live feed is frozen but our scrape still "succeeds".
+const MAINTENANCE_MODE = false;
 const TIMER_TICK_MS = 1000;
 const TAB_LOADING_MAX_MS = 3000;
 const PAGE_SIZE = 5;            // matches revealed per infinite-scroll page
@@ -2049,6 +2054,33 @@ function App() {
             if (!res.ok) throw new Error(`${res.status}`);
             const data = await res.json();
             const list = Array.isArray(data.matches) ? data.matches : [];
+            // Backend answered 200 but with NOTHING — almost always the upstream feed
+            // is blocked/down, not a genuinely empty day. Confirm via /api/health; if the
+            // backend reports unhealthy, show the maintenance bar, keep the last-known
+            // matches, and DON'T overwrite the cache with an empty list.
+            if (list.length === 0) {
+                let healthOk = true;
+                try {
+                    const hc = new AbortController();
+                    const ht = setTimeout(() => hc.abort(), 10000);
+                    const hres = await fetch(`${BACKEND_URL}/api/health`, { signal: hc.signal });
+                    clearTimeout(ht);
+                    if (hres.ok) { const h = await hres.json(); healthOk = !!h.ok; }
+                } catch {}
+                if (!healthOk) {
+                    setErr('maintenance');
+                    try {
+                        const cached = JSON.parse(localStorage.getItem('magic-cache') || 'null');
+                        if (cached && Array.isArray(cached.matches) && cached.matches.length) {
+                            setMatches(cached.matches);
+                            setUpdatedAt(cached.updatedAt);
+                        } else {
+                            setMatches(list);
+                        }
+                    } catch { setMatches(list); }
+                    return;   // don't cache an empty slate
+                }
+            }
             setMatches(list);
             const stamp = data.updatedAt || new Date().toISOString();
             setUpdatedAt(stamp);
@@ -2534,6 +2566,11 @@ function App() {
                             </div>
                         )}
 
+                        {MAINTENANCE_MODE && (
+                            <div className="err-bar" style={{borderLeftColor:'var(--gold)'}}>
+                                <span className="err-txt">⚠️ Live scores &amp; some data may be delayed or inaccurate right now — we're working to restore full accuracy.</span>
+                            </div>
+                        )}
                         {renderHomeBody()}
 
                         <SocialHome/>
