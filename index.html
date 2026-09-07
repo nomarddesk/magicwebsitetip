@@ -1251,7 +1251,7 @@ const statusBadgeLabel = (m, c, t) => {
         return tr('b_live');
     }
     if (c === 'finished')  return tr('b_ft');
-    if (c === 'upcoming')  return m.time ? `${tr('b_ko')} ${m.time}` : tr('b_upcoming');
+    if (c === 'upcoming')  return m.time ? `${tr('b_ko')} ${localTimeOf(m)}` : tr('b_upcoming');
     if (c === 'cancelled') return statusLabel(m.status) || 'Cancelled';
     return statusLabel(m.status);
 };
@@ -1271,6 +1271,22 @@ const matchTimestamp = (m) => {
     if (!m || !m.date) return 0;
     const t = Date.parse(`${m.date}T${m.time || '00:00'}:00Z`);
     return isNaN(t) ? 0 : t;
+};
+
+// The API returns every match's date + time in UTC. We group and display them in the
+// VIEWER'S LOCAL timezone instead — otherwise users ahead of (or behind) UTC see the
+// wrong "today". e.g. at 23:30 UTC a Nigeria (UTC+1) user is already on the next local
+// day, so their real today's fixtures were being hidden under the "tomorrow" cell.
+const isoLocal = (d) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+const localDateOf = (m) => {
+    if (!m || !m.date) return '';
+    const d = new Date(`${m.date}T${m.time || '00:00'}:00Z`);
+    return isNaN(d) ? m.date : isoLocal(d);
+};
+const localTimeOf = (m) => {
+    if (!m || !m.date || !m.time) return (m && m.time) || '';
+    const d = new Date(`${m.date}T${m.time}:00Z`);
+    return isNaN(d) ? m.time : `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
 };
 
 const matchToPred = m => {
@@ -1776,7 +1792,7 @@ const DetailSheet = ({ match, pred, onClose }) => {
                 </div>
                 <div className="detail-score-box">
                     <div className="detail-score-big">{g ? `${g.h}  —  ${g.a}` : '—  vs  —'}</div>
-                    {c==='upcoming' && match.time && <div className="detail-score-sub">{t('kickoff_at', {t: match.time})}</div>}
+                    {c==='upcoming' && match.time && <div className="detail-score-sub">{t('kickoff_at', {t: localTimeOf(match)})}</div>}
                     {c==='upcoming' && !match.time && <div className="detail-score-sub">{t('not_started')}</div>}
                     {c==='live' && liveMin && <div className="detail-live-min">● {liveMin}</div>}
                     {match.htScore && <div className="detail-score-sub" style={{marginTop:4}}>HT: {match.htScore}</div>}
@@ -1798,7 +1814,7 @@ const DetailSheet = ({ match, pred, onClose }) => {
                     </div>
                     {match.time && (
                         <div className="detail-info-cell">
-                            <div className="detail-info-val">{match.time}</div>
+                            <div className="detail-info-val">{localTimeOf(match)}</div>
                             <div className="detail-info-lbl">{t('kickoff_utc')}</div>
                         </div>
                     )}
@@ -2006,7 +2022,7 @@ function App() {
     const locale = LOCALE[lang] || 'en-US';
     // selectedDate is YYYY-MM-DD (UTC). When equal to today, the Home tab shows
     // Live/Upcoming/Past tabs + stats; for future dates we show only Upcoming.
-    const [selectedDate,   setSelectedDate]   = useState(() => new Date().toISOString().slice(0, 10));
+    const [selectedDate,   setSelectedDate]   = useState(() => isoLocal(new Date()));
 
     useEffect(() => {
         try { localStorage.setItem('magic-favs', JSON.stringify(favs)); } catch {}
@@ -2153,7 +2169,7 @@ function App() {
     //   isViewingToday → show Live / Upcoming / Past tabs
     //   isPastDate     → show only past matches (Live/Upcoming hidden)
     //   isFutureDate   → show only upcoming matches (Live/Past hidden)
-    const todayIso       = new Date().toISOString().slice(0, 10);
+    const todayIso       = isoLocal(new Date());
     const isViewingToday = selectedDate === todayIso;
     const isPastDate     = selectedDate < todayIso;
     const isFutureDate   = selectedDate > todayIso;
@@ -2163,9 +2179,9 @@ function App() {
 
     const liveMatches     = useMemo(() => matches.filter(m => cat(m.status) === 'live')
         .sort((a, b) => matchTimestamp(a) - matchTimestamp(b)), [matches]);
-    const upcomingMatches = useMemo(() => matches.filter(m => cat(m.status) === 'upcoming' && m.date === selectedDate)
+    const upcomingMatches = useMemo(() => matches.filter(m => cat(m.status) === 'upcoming' && localDateOf(m) === selectedDate)
         .sort((a, b) => matchTimestamp(a) - matchTimestamp(b)), [matches, selectedDate]);
-    const pastMatches     = useMemo(() => matches.filter(m => cat(m.status) === 'finished' && getGoals(m) && m.date === selectedDate)
+    const pastMatches     = useMemo(() => matches.filter(m => cat(m.status) === 'finished' && getGoals(m) && localDateOf(m) === selectedDate)
         .sort((a, b) => matchTimestamp(b) - matchTimestamp(a)), [matches, selectedDate]);
     const savedMatches    = useMemo(() => matches.filter(m => favs.includes(fid(m)))
         .sort((a, b) => matchTimestamp(a) - matchTimestamp(b)), [matches, favs]);
@@ -2175,9 +2191,9 @@ function App() {
     // Merged "Today's Matches" = live + today's upcoming + today's finished, in one
     // list (live first, then soonest kickoff, then most-recent results).
     const todaysMatches = useMemo(() => {
-        const upc  = matches.filter(m => cat(m.status) === 'upcoming' && m.date === todayIso)
+        const upc  = matches.filter(m => cat(m.status) === 'upcoming' && localDateOf(m) === todayIso)
             .sort((a, b) => matchTimestamp(a) - matchTimestamp(b));
-        const past = matches.filter(m => cat(m.status) === 'finished' && getGoals(m) && m.date === todayIso)
+        const past = matches.filter(m => cat(m.status) === 'finished' && getGoals(m) && localDateOf(m) === todayIso)
             .sort((a, b) => matchTimestamp(b) - matchTimestamp(a));
         return [...liveMatches, ...upc, ...past];
     }, [matches, liveMatches, todayIso]);
@@ -2203,24 +2219,22 @@ function App() {
     const dateStrip = useMemo(() => {
         const counts = {};
         for (const m of matches) {
-            if (!m.date) continue;
-            counts[m.date] = (counts[m.date] || 0) + 1;
+            const ld = localDateOf(m);
+            if (!ld) continue;
+            counts[ld] = (counts[ld] || 0) + 1;
         }
-        // Anchor the WHOLE strip to UTC midnight so every cell's iso lines up
-        // exactly with selectedDate, todayIso and each match's m.date — all of
-        // which are UTC yyyy-mm-dd. The old code built cells from LOCAL midnight
-        // then called toISOString(), which shifted the date back a day for users
-        // ahead of UTC — so tapping a day loaded the PREVIOUS day's matches.
+        // Build the strip in the viewer's LOCAL timezone so every cell lines up with
+        // localDateOf(match), todayIso and selectedDate — all local yyyy-mm-dd now.
+        // new Date(y, m, date+offset) rolls months + DST over correctly.
         const now = new Date();
-        const todayUTC = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
         return Array.from({length:16}, (_,i) => {
             const offset = i - 5;  // -5..-1 = past, 0 = today, 1..10 = future
-            const d = new Date(todayUTC + offset * 86400000);
-            const iso = d.toISOString().slice(0, 10);
+            const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + offset);
+            const iso = isoLocal(d);
             return {
                 iso,
-                weekday: d.toLocaleDateString(locale, {weekday:'short', timeZone:'UTC'}),
-                day: d.getUTCDate(),
+                weekday: d.toLocaleDateString(locale, {weekday:'short'}),
+                day: d.getDate(),
                 isToday: offset === 0,
                 count: counts[iso] || 0,
             };
@@ -2255,7 +2269,7 @@ function App() {
     const availableCountries = useMemo(() => {
         const pool = matches.filter(m => {
             if (isViewingToday && cat(m.status) === 'live') return true;
-            return m.date === selectedDate;
+            return localDateOf(m) === selectedDate;
         });
         const counts = {};
         for (const m of pool) {
