@@ -2187,6 +2187,14 @@ function App() {
     const isPastDate     = selectedDate < todayIso;
     const isFutureDate   = selectedDate > todayIso;
 
+    // isLiveNow() = a match that is BOTH flagged live AND actually current — it kicked off
+    // today, or yesterday for a game still running past local midnight. The date check is
+    // essential: without it, a match left stuck/mis-flagged as LIVE upstream would sit in
+    // "Today's Matches" on EVERY future day (users were seeing next-week / next-month games
+    // under Today). Server-anchored via serverSkew so a wrong device clock can't skew it.
+    const yesterdayIso = isoLocal(new Date(Date.now() + serverSkew - 86400000));
+    const isLiveNow = m => cat(m.status) === 'live' && (localDateOf(m) === todayIso || localDateOf(m) === yesterdayIso);
+
     // Keep the view pinned to "today" until the user actively picks another date. So when
     // the server clock corrects a wrong device date, the list jumps to the REAL today
     // instead of stranding the user on an empty wrong-day view (it also auto-rolls at
@@ -2199,8 +2207,8 @@ function App() {
     // Country drill-down state. null = country list view; set = detail view.
     const [selectedCountry, setSelectedCountry] = useState(null);
 
-    const liveMatches     = useMemo(() => matches.filter(m => cat(m.status) === 'live')
-        .sort((a, b) => matchTimestamp(a) - matchTimestamp(b)), [matches]);
+    const liveMatches     = useMemo(() => matches.filter(isLiveNow)
+        .sort((a, b) => matchTimestamp(a) - matchTimestamp(b)), [matches, todayIso, yesterdayIso]);
     const upcomingMatches = useMemo(() => matches.filter(m => cat(m.status) === 'upcoming' && localDateOf(m) === selectedDate)
         .sort((a, b) => matchTimestamp(a) - matchTimestamp(b)), [matches, selectedDate]);
     const pastMatches     = useMemo(() => matches.filter(m => cat(m.status) === 'finished' && getGoals(m) && localDateOf(m) === selectedDate)
@@ -2291,7 +2299,7 @@ function App() {
     // active countries float to the front while everything else stays browsable.
     const availableCountries = useMemo(() => {
         const pool = matches.filter(m => {
-            if (isViewingToday && cat(m.status) === 'live') return true;
+            if (isViewingToday && isLiveNow(m)) return true;
             return localDateOf(m) === selectedDate;
         });
         const counts = {};
