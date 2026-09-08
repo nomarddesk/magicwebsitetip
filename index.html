@@ -2007,6 +2007,11 @@ function App() {
     const [showToast,      setShowToast]      = useState(false);
     const [detailMatch,    setDetailMatch]    = useState(null);
     const [updatedAt,      setUpdatedAt]      = useState(null);
+    // serverSkew = (server clock − this device's clock) in ms. We anchor "today", the date
+    // strip and the header to the SERVER's real time instead of the device clock, so a wrong
+    // device date (e.g. a phone set weeks ahead) can't make the whole site show the wrong day.
+    // Filled from the API's serverTime (falls back to updatedAt); stays 0 until first response.
+    const [serverSkew,     setServerSkew]     = useState(0);
 
     const [homeTab,        setHomeTab]        = useState('Today');
     const [tabLoading,     setTabLoading]     = useState(false);
@@ -2071,6 +2076,14 @@ function App() {
             setWaking(false);
             if (!res.ok) throw new Error(`${res.status}`);
             const data = await res.json();
+            // Anchor "today" to the server's real clock so a wrong device date can't mislabel
+            // the site. We trust ONLY serverTime (rebuilt ≤30 s per response) — never the
+            // possibly-stale updatedAt — so a correct device is never shifted, even during an
+            // outage, and older backends without serverTime simply keep the device clock.
+            if (data.serverTime) {
+                const a = Date.parse(data.serverTime);
+                if (!Number.isNaN(a)) { const skew = a - Date.now(); if (Math.abs(skew) > 60000) setServerSkew(skew); }
+            }
             const list = Array.isArray(data.matches) ? data.matches : [];
             // Backend answered 200 but with NOTHING — almost always the upstream feed
             // is blocked/down, not a genuinely empty day. Confirm via /api/health; if the
@@ -2169,10 +2182,19 @@ function App() {
     //   isViewingToday → show Live / Upcoming / Past tabs
     //   isPastDate     → show only past matches (Live/Upcoming hidden)
     //   isFutureDate   → show only upcoming matches (Live/Past hidden)
-    const todayIso       = isoLocal(new Date());
+    const todayIso       = isoLocal(new Date(Date.now() + serverSkew));
     const isViewingToday = selectedDate === todayIso;
     const isPastDate     = selectedDate < todayIso;
     const isFutureDate   = selectedDate > todayIso;
+
+    // Keep the view pinned to "today" until the user actively picks another date. So when
+    // the server clock corrects a wrong device date, the list jumps to the REAL today
+    // instead of stranding the user on an empty wrong-day view (it also auto-rolls at
+    // midnight). userNavRef flips to true in pickDate() once the user chooses a date.
+    const userNavRef = useRef(false);
+    useEffect(() => {
+        if (!userNavRef.current) setSelectedDate(todayIso);
+    }, [todayIso]);
 
     // Country drill-down state. null = country list view; set = detail view.
     const [selectedCountry, setSelectedCountry] = useState(null);
@@ -2226,7 +2248,7 @@ function App() {
         // Build the strip in the viewer's LOCAL timezone so every cell lines up with
         // localDateOf(match), todayIso and selectedDate — all local yyyy-mm-dd now.
         // new Date(y, m, date+offset) rolls months + DST over correctly.
-        const now = new Date();
+        const now = new Date(Date.now() + serverSkew);
         return Array.from({length:16}, (_,i) => {
             const offset = i - 5;  // -5..-1 = past, 0 = today, 1..10 = future
             const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + offset);
@@ -2239,12 +2261,13 @@ function App() {
                 count: counts[iso] || 0,
             };
         });
-    }, [matches, locale]);
+    }, [matches, locale, serverSkew]);
 
     // pickDate is shared by the calendar cards AND the "Back to today" button.
     // When picking Today we auto-select the most useful tab (Live → Upcoming → Past)
     // so the page never lands on an empty tab and looks broken.
     const pickDate = (iso) => {
+        userNavRef.current = (iso !== todayIso);   // picking "today" re-enables auto-pin
         setSelectedDate(iso);
         setSelectedCountry(null);   // reset to "All countries" so the new date lands on a full list
         if (iso === todayIso) {
@@ -2434,7 +2457,7 @@ function App() {
         );
     };
 
-    const today  = new Date().toLocaleDateString(locale, {weekday:'long',month:'long',day:'numeric'});
+    const today  = new Date(Date.now() + serverSkew).toLocaleDateString(locale, {weekday:'long',month:'long',day:'numeric'});
     const sports = [['Football','⚽'],['Basketball','🏀'],['Tennis','🎾'],['Hockey','🏒'],['Baseball','⚾']];
 
     return (
