@@ -918,6 +918,10 @@ const I18N = {
 
 const LangContext = React.createContext({ lang:'en', locale:'en-US', t:(k)=>(I18N.en[k]||k) });
 const useT = () => useContext(LangContext);
+// Auth context — { auth:{token,username,isAdmin}|null, setAuth, openAuth }. Powers the
+// per-match comment gate: anyone reads, only signed-in users post.
+const AuthContext = React.createContext({ auth:null, setAuth:()=>{}, openAuth:()=>{} });
+const useAuth = () => useContext(AuthContext);
 function makeT(lang) {
     return (key, vars) => {
         let s = (I18N[lang] && I18N[lang][key]) || I18N.en[key] || key;
@@ -1893,6 +1897,8 @@ const DetailSheet = ({ match, pred, onClose }) => {
                     </>
                 )}
 
+                <CommentsBlock match={match}/>
+
                 <button className="btn-secondary" style={{marginTop:14}} onClick={onClose}>{({en:'Close',fr:'Fermer',es:'Cerrar',pt:'Fechar',sr:'Zatvori',ar:'إغلاق'})[lang] || 'Close'}</button>
             </div>
         </div>
@@ -1991,6 +1997,170 @@ const OddsCard = ({ match }) => {
     );
 };
 
+/* === Sign in / Sign up modal ========================================== */
+function AuthModal({ open, onClose, onAuth }) {
+  const [mode, setMode] = useState('signin');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [err, setErr] = useState('');
+  const [busy, setBusy] = useState(false);
+  useEffect(() => { if (open) { setErr(''); setBusy(false); } }, [open]);
+  if (!open) return null;
+  const submit = async (e) => {
+    if (e) e.preventDefault();
+    const u = username.trim();
+    if (u.length < 3) { setErr('Username must be at least 3 characters.'); return; }
+    if (password.length < 6) { setErr('Password must be at least 6 characters.'); return; }
+    setErr(''); setBusy(true);
+    try {
+      const path = mode === 'signup' ? '/api/auth/signup' : '/api/auth/login';
+      const r = await fetch(`${BACKEND_URL}${path}`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ username:u, password }) });
+      const d = await r.json().catch(()=>({}));
+      if (!r.ok) { setErr(d.error || 'Something went wrong.'); setBusy(false); return; }
+      onAuth({ token:d.token, username:d.username, isAdmin:!!d.isAdmin });
+      setPassword(''); setBusy(false); onClose();
+    } catch (_) { setErr('Network error — please try again.'); setBusy(false); }
+  };
+  const ip = { width:'100%', padding:'12px 14px', borderRadius:12, border:'1px solid var(--sep)', background:'var(--bg)', color:'var(--t1)', fontSize:15, marginBottom:10, boxSizing:'border-box' };
+  return (
+    <div className="center-overlay" onClick={onClose}>
+      <div className="center-card" style={{maxWidth:350}} onClick={e=>e.stopPropagation()}>
+        <div style={{fontSize:20,fontWeight:800,letterSpacing:'-.4px',marginBottom:4}}>{mode==='signup'?'Create account':'Welcome back'}</div>
+        <div style={{fontSize:13,color:'var(--t3)',marginBottom:18}}>{mode==='signup'?'Pick a username to join the match chat.':'Sign in to join the match chat.'}</div>
+        <form onSubmit={submit}>
+          <input style={ip} placeholder="Username" value={username} autoCapitalize="none" autoCorrect="off" maxLength={20} onChange={e=>setUsername(e.target.value)} />
+          <input style={ip} type="password" placeholder="Password" value={password} maxLength={100} onChange={e=>setPassword(e.target.value)} />
+          {err && <div style={{color:'#e5484d',fontSize:12.5,marginBottom:10}}>{err}</div>}
+          <button className="btn-primary" type="submit" disabled={busy} style={{width:'100%',opacity:busy?0.6:1}}>{busy?'Please wait…':(mode==='signup'?'Sign up':'Sign in')}</button>
+        </form>
+        <div style={{textAlign:'center',fontSize:13,color:'var(--t2)',marginTop:14}}>
+          {mode==='signup'?'Already have an account? ':"Don't have an account? "}
+          <span style={{color:'var(--gold)',fontWeight:700,cursor:'pointer'}} onClick={()=>{setErr('');setMode(mode==='signup'?'signin':'signup');}}>{mode==='signup'?'Sign in':'Sign up'}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* === Per-match comments / live chat =================================== */
+const _actStyle = { fontSize:11.5, color:'var(--t2)', cursor:'pointer', fontWeight:600 };
+function relTime(ts) {
+  const s = Math.floor((Date.now()-ts)/1000);
+  if (s < 60) return 'now';
+  if (s < 3600) return Math.floor(s/60)+'m';
+  if (s < 86400) return Math.floor(s/3600)+'h';
+  return Math.floor(s/86400)+'d';
+}
+function CommentsBlock({ match }) {
+  const { auth, setAuth, openAuth } = useAuth();
+  const id = fid(match);
+  const [comments, setComments] = useState([]);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [text, setText] = useState('');
+  const [err, setErr] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [editId, setEditId] = useState(null);
+  const [editText, setEditText] = useState('');
+  const [filterOn, setFilterOn] = useState(true);
+  const authHdr = auth ? { Authorization:'Bearer '+auth.token } : {};
+
+  const load = useCallback(() => {
+    if (!id) return;
+    fetch(`${BACKEND_URL}/api/matches/${encodeURIComponent(id)}/comments`, { headers: auth?{Authorization:'Bearer '+auth.token}:{} })
+      .then(r=>r.json())
+      .then(d=>{ if (Array.isArray(d.comments)) { setComments(d.comments); setIsAdmin(!!d.isAdmin); setFilterOn(d.filterEnabled !== false); } })
+      .catch(()=>{});
+  }, [id, auth]);
+  useEffect(() => { load(); const iv = setInterval(load, 6000); return ()=>clearInterval(iv); }, [load]);
+
+  const post = async () => {
+    const body = text.trim(); if (!body) return;
+    if (!auth) { openAuth(); return; }
+    setErr(''); setBusy(true);
+    try {
+      const r = await fetch(`${BACKEND_URL}/api/matches/${encodeURIComponent(id)}/comments`, { method:'POST', headers:{'Content-Type':'application/json', ...authHdr}, body: JSON.stringify({ text: body }) });
+      const d = await r.json().catch(()=>({}));
+      if (r.status===401) { setAuth(null); openAuth(); setBusy(false); return; }
+      if (!r.ok) { setErr(d.error || 'Could not post.'); setBusy(false); return; }
+      setText(''); setBusy(false); setComments(cs => [...cs, d.comment]);
+    } catch (_) { setErr('Network error.'); setBusy(false); }
+  };
+  const saveEdit = async (cid) => {
+    const body = editText.trim(); if (!body) return; setErr('');
+    try {
+      const r = await fetch(`${BACKEND_URL}/api/matches/${encodeURIComponent(id)}/comments/${cid}`, { method:'PATCH', headers:{'Content-Type':'application/json', ...authHdr}, body: JSON.stringify({ text: body }) });
+      const d = await r.json().catch(()=>({}));
+      if (!r.ok) { setErr(d.error || 'Could not save.'); return; }
+      setEditId(null); setEditText(''); setComments(cs => cs.map(c => c.id===cid ? d.comment : c));
+    } catch (_) { setErr('Network error.'); }
+  };
+  const del = async (cid) => {
+    try { const r = await fetch(`${BACKEND_URL}/api/matches/${encodeURIComponent(id)}/comments/${cid}`, { method:'DELETE', headers: authHdr }); if (r.ok) setComments(cs => cs.filter(c => c.id!==cid)); } catch (_) {}
+  };
+  const ban = async (user) => {
+    if (!window.confirm(`Ban ${user}? Their comments will be hidden and they can't post again.`)) return;
+    try { await fetch(`${BACKEND_URL}/api/admin/ban`, { method:'POST', headers:{'Content-Type':'application/json', ...authHdr}, body: JSON.stringify({ username:user }) }); load(); } catch (_) {}
+  };
+  const toggleFilter = async () => {
+    try {
+      const r = await fetch(`${BACKEND_URL}/api/admin/filter`, { method:'POST', headers:{'Content-Type':'application/json', ...authHdr}, body: JSON.stringify({ enabled: !filterOn }) });
+      const d = await r.json().catch(()=>({})); if (r.ok) setFilterOn(!!d.filterEnabled);
+    } catch (_) {}
+  };
+
+  return (
+    <div style={{marginTop:18}}>
+      <div className="detail-section-title">💬 Match Chat <span style={{color:'var(--t3)',fontWeight:600}}>({comments.length})</span></div>
+      {isAdmin && (
+        <div style={{display:'flex',alignItems:'center',gap:7,margin:'0 0 8px',fontSize:12,color:'var(--t2)'}}>
+          <span>🛡️ Hide bad/abusive messages:</span>
+          <span onClick={toggleFilter} style={{cursor:'pointer',fontWeight:800,color:filterOn?'var(--green)':'var(--t3)'}}>{filterOn?'ON':'OFF'}</span>
+        </div>
+      )}
+      <div style={{maxHeight:300,overflowY:'auto',display:'flex',flexDirection:'column',gap:8,padding:'2px 0'}}>
+        {comments.length===0 && <div style={{fontSize:13,color:'var(--t3)',textAlign:'center',padding:'14px 0'}}>No comments yet — be the first to talk about this match.</div>}
+        {comments.map(c => (
+          <div key={c.id} style={{background:'var(--bg)',borderRadius:12,padding:'9px 11px'}}>
+            <div style={{display:'flex',alignItems:'center',gap:6,marginBottom:3}}>
+              <span style={{fontWeight:700,fontSize:12.5,color:c.mine?'var(--gold)':'var(--t1)'}}>{c.user}{c.mine?' (you)':''}</span>
+              <span style={{fontSize:11,color:'var(--t3)'}}>· {relTime(c.at)}{c.edited?' · edited':''}</span>
+              <span style={{marginLeft:'auto',display:'flex',gap:10}}>
+                {c.mine && editId!==c.id && <span style={_actStyle} onClick={()=>{setEditId(c.id);setEditText(c.text);}}>Edit</span>}
+                {(c.mine||isAdmin) && <span style={_actStyle} onClick={()=>del(c.id)}>Delete</span>}
+                {isAdmin && !c.mine && <span style={{..._actStyle,color:'#e5484d'}} onClick={()=>ban(c.user)}>Ban</span>}
+              </span>
+            </div>
+            {editId===c.id ? (
+              <div>
+                <input style={{width:'100%',padding:'8px 10px',borderRadius:9,border:'1px solid var(--sep)',background:'var(--surface)',color:'var(--t1)',fontSize:13.5,boxSizing:'border-box'}} value={editText} maxLength={300} autoFocus onChange={e=>setEditText(e.target.value)} onKeyDown={e=>{if(e.key==='Enter')saveEdit(c.id);}} />
+                <div style={{display:'flex',gap:12,marginTop:6}}>
+                  <span style={{..._actStyle,color:'var(--gold)'}} onClick={()=>saveEdit(c.id)}>Save</span>
+                  <span style={_actStyle} onClick={()=>{setEditId(null);setEditText('');}}>Cancel</span>
+                </div>
+              </div>
+            ) : (
+              <div style={{fontSize:13.5,color:'var(--t1)',lineHeight:1.4,wordBreak:'break-word'}}>{c.text}</div>
+            )}
+          </div>
+        ))}
+      </div>
+      {err && <div style={{color:'#e5484d',fontSize:12,margin:'8px 2px'}}>{err}</div>}
+      {auth ? (
+        <>
+          <div style={{display:'flex',gap:8,marginTop:10}}>
+            <input style={{flex:1,padding:'11px 13px',borderRadius:12,border:'1px solid var(--sep)',background:'var(--bg)',color:'var(--t1)',fontSize:14,boxSizing:'border-box'}} placeholder="Add a comment…" value={text} maxLength={300} onChange={e=>setText(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'){e.preventDefault();post();}}} />
+            <button className="btn-primary" style={{padding:'11px 16px',opacity:busy?0.6:1}} disabled={busy} onClick={post}>Send</button>
+          </div>
+          <div style={{fontSize:11.5,color:'var(--t3)',marginTop:8,textAlign:'center'}}>Posting as <b>{auth.username}</b>{isAdmin?' · admin':''} · <span style={{color:'var(--gold)',cursor:'pointer'}} onClick={()=>setAuth(null)}>Sign out</span></div>
+        </>
+      ) : (
+        <button className="btn-primary" style={{width:'100%',marginTop:10}} onClick={openAuth}>Sign in to comment</button>
+      )}
+      <div style={{fontSize:11,color:'var(--t3)',marginTop:6,textAlign:'center'}}>Links & channel promotions are blocked. Keep it respectful.</div>
+    </div>
+  );
+}
+
 function App() {
     const [splash,         setSplash]         = useState(true);
     const [calOpen,        setCalOpen]        = useState(false);
@@ -2006,6 +2176,10 @@ function App() {
     const [err,            setErr]            = useState(null);
     const [showToast,      setShowToast]      = useState(false);
     const [detailMatch,    setDetailMatch]    = useState(null);
+    // Community auth — persisted so users stay signed in across visits.
+    const [auth,           setAuth]           = useState(() => { try { return JSON.parse(localStorage.getItem('magic-auth') || 'null'); } catch { return null; } });
+    const [authOpen,       setAuthOpen]       = useState(false);
+    const openAuth = useCallback(() => setAuthOpen(true), []);
     const [updatedAt,      setUpdatedAt]      = useState(null);
     // serverSkew = (server clock − this device's clock) in ms. We anchor "today", the date
     // strip and the header to the SERVER's real time instead of the device clock, so a wrong
@@ -2032,6 +2206,11 @@ function App() {
     useEffect(() => {
         try { localStorage.setItem('magic-favs', JSON.stringify(favs)); } catch {}
     }, [favs]);
+
+    // Persist / clear the signed-in account.
+    useEffect(() => {
+        try { if (auth) localStorage.setItem('magic-auth', JSON.stringify(auth)); else localStorage.removeItem('magic-auth'); } catch {}
+    }, [auth]);
 
     // Dark mode — apply class to <body> + persist
     useEffect(() => {
@@ -2470,7 +2649,9 @@ function App() {
 
     return (
         <LangContext.Provider value={{ lang, locale, t }}>
+        <AuthContext.Provider value={{ auth, setAuth, openAuth }}>
         <>
+            <AuthModal open={authOpen} onClose={()=>setAuthOpen(false)} onAuth={setAuth}/>
             {splash && (
                 <div className="splash">
                     <div className="splash-inner">
@@ -2773,6 +2954,7 @@ function App() {
                 ))}
             </nav>
         </>
+        </AuthContext.Provider>
         </LangContext.Provider>
     );
 }
