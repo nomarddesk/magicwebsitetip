@@ -9,7 +9,7 @@
     <!-- ===== SEO + social-share meta (added to fix Soft 404 / enable rich link previews) ===== -->
     <meta name="description" content="Free daily football predictions, live scores and match analysis worldwide. 1X2 tips, predicted scores, head-to-head stats, league standings and live odds — updated all day.">
     <meta name="robots" content="index, follow">
-    <link rel="canonical" href="https://magicbettingtips.com/">
+    <link rel="canonical" href="https://magicsportanalysis.com/">
     <meta name="theme-color" content="#0B1929">
 
     <!-- Open Graph — link previews on Facebook, WhatsApp, Telegram, LinkedIn -->
@@ -17,14 +17,14 @@
     <meta property="og:site_name" content="Magic Analysis">
     <meta property="og:title" content="Magic Analysis — Football Predictions, Tips &amp; Live Scores">
     <meta property="og:description" content="Free daily football predictions, live scores and match analysis worldwide — 1X2 tips, predicted scores, H2H, standings and live odds.">
-    <meta property="og:url" content="https://magicbettingtips.com/">
-    <meta property="og:image" content="https://magicbettingtips.com/photo_2026-05-02%2011.59.07.jpeg">
+    <meta property="og:url" content="https://magicsportanalysis.com/">
+    <meta property="og:image" content="https://magicsportanalysis.com/photo_2026-05-02%2011.59.07.jpeg">
 
     <!-- Twitter / X card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Magic Analysis — Football Predictions, Tips &amp; Live Scores">
     <meta name="twitter:description" content="Free daily football predictions, live scores and match analysis worldwide — 1X2 tips, predicted scores, H2H, standings and live odds.">
-    <meta name="twitter:image" content="https://magicbettingtips.com/photo_2026-05-02%2011.59.07.jpeg">
+    <meta name="twitter:image" content="https://magicsportanalysis.com/photo_2026-05-02%2011.59.07.jpeg">
 
     <!-- Structured data (Organization + WebSite) for rich results -->
     <script type="application/ld+json">
@@ -34,8 +34,8 @@
         {
           "@type": "Organization",
           "name": "Magic Analysis",
-          "url": "https://magicbettingtips.com/",
-          "logo": "https://magicbettingtips.com/photo_2026-05-02%2011.59.07.jpeg",
+          "url": "https://magicsportanalysis.com/",
+          "logo": "https://magicsportanalysis.com/photo_2026-05-02%2011.59.07.jpeg",
           "sameAs": [
             "https://t.me/footballinsight01",
             "https://x.com/tipsmagic30849",
@@ -46,7 +46,7 @@
         {
           "@type": "WebSite",
           "name": "Magic Analysis",
-          "url": "https://magicbettingtips.com/"
+          "url": "https://magicsportanalysis.com/"
         }
       ]
     }
@@ -651,6 +651,13 @@ const REFRESH_MS  = 3 * 60 * 1000;
 // Only flip to true to FORCE a banner even while the backend looks healthy — e.g. the
 // upstream live feed is frozen but our scrape still "succeeds".
 const MAINTENANCE_MODE = false;
+// === Domain-move announcement =============================================
+// A dismissible bar telling users the site moved. Keep MOVING_ANNOUNCE = false
+// until the NEW site is fully LIVE (SSL working, it loads) — otherwise you'd send
+// people to a dead address. Then set MOVING_TO to your real new domain and flip
+// MOVING_ANNOUNCE to true. Dismissal is remembered per-domain.
+const MOVING_ANNOUNCE = false;
+const MOVING_TO = "magicsportanalysis.com";
 const TIMER_TICK_MS = 1000;
 const TAB_LOADING_MAX_MS = 3000;
 const PAGE_SIZE = 5;            // matches revealed per infinite-scroll page
@@ -1750,15 +1757,17 @@ const DetailSheet = ({ match, pred, onClose }) => {
     const [details, setDetails]       = useState(null);
     const [detailsErr, setDetailsErr] = useState(null);
     const [detailsLoading, setLoading] = useState(false);
+    const [detailTab, setDetailTab]   = useState('overview');   // 'overview' | 'chat'
+    const [chatCount, setChatCount]   = useState(0);            // drives the red Chat badge
 
     useEffect(() => {
         const id = fid(match);
         if (!id) return;
-        setLoading(true); setDetails(null); setDetailsErr(null);
+        setLoading(true); setDetails(null); setDetailsErr(null); setDetailTab('overview'); setChatCount(0);
         const ctrl = new AbortController();
         fetch(`${BACKEND_URL}/api/match/${encodeURIComponent(id)}/details`, { signal: ctrl.signal })
             .then(r => r.json())
-            .then(d => { if (d.error) setDetailsErr(d.error); else setDetails(d); })
+            .then(d => { if (d.error) setDetailsErr(d.error); else { setDetails(d); if (typeof d.commentCount === 'number') setChatCount(d.commentCount); } })
             .catch(e => { if (e.name !== 'AbortError') setDetailsErr(e.message); })
             .finally(() => setLoading(false));
         return () => ctrl.abort();
@@ -1808,6 +1817,15 @@ const DetailSheet = ({ match, pred, onClose }) => {
                         {statusBadgeLabel(match, c, t)}
                     </span>
                 </div>
+                <div style={{display:'flex',gap:4,borderBottom:'1px solid var(--sep)',marginBottom:14}}>
+                    {[['overview','Overview'],['chat','💬 Chat']].map(([key,lbl])=>(
+                        <button key={key} onClick={()=>setDetailTab(key)} style={{flex:1,padding:'11px 8px',background:'none',border:'none',borderBottom:detailTab===key?'2.5px solid var(--gold)':'2.5px solid transparent',color:detailTab===key?'var(--t1)':'var(--t3)',fontSize:14,fontWeight:700,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:6}}>
+                            {lbl}
+                            {key==='chat' && chatCount>0 && <span style={{background:'var(--live)',color:'#fff',fontSize:10.5,fontWeight:800,borderRadius:100,padding:'1px 6px',minWidth:17,textAlign:'center',lineHeight:'15px'}}>{chatCount>999?'999+':chatCount}</span>}
+                        </button>
+                    ))}
+                </div>
+                <div hidden={detailTab!=='overview'}>
                 <div className="detail-info-grid">
                     <div className="detail-info-cell">
                         <div className="detail-info-val">{match.leagueName||'—'}</div>
@@ -1898,7 +1916,8 @@ const DetailSheet = ({ match, pred, onClose }) => {
                     </>
                 )}
 
-                <CommentsBlock match={match}/>
+                </div>
+                {detailTab==='chat' && <CommentsBlock match={match} onCount={setChatCount}/>}
 
                 <button className="btn-secondary" style={{marginTop:14}} onClick={onClose}>{({en:'Close',fr:'Fermer',es:'Cerrar',pt:'Fechar',sr:'Zatvori',ar:'إغلاق'})[lang] || 'Close'}</button>
             </div>
@@ -2052,7 +2071,7 @@ function relTime(ts) {
   if (s < 86400) return Math.floor(s/3600)+'h';
   return Math.floor(s/86400)+'d';
 }
-function CommentsBlock({ match }) {
+function CommentsBlock({ match, onCount }) {
   const { auth, setAuth, openAuth } = useAuth();
   const id = fid(match);
   const [comments, setComments] = useState([]);
@@ -2073,6 +2092,7 @@ function CommentsBlock({ match }) {
       .catch(()=>{});
   }, [id, auth]);
   useEffect(() => { load(); const iv = setInterval(load, 6000); return ()=>clearInterval(iv); }, [load]);
+  useEffect(() => { if (onCount) onCount(comments.length); }, [comments.length, onCount]);
 
   const post = async () => {
     const body = text.trim(); if (!body) return;
@@ -2182,6 +2202,8 @@ function App() {
     const [authOpen,       setAuthOpen]       = useState(false);
     const [accountOpen,    setAccountOpen]    = useState(false);
     const openAuth = useCallback(() => setAuthOpen(true), []);
+    const [movingDismissed, setMovingDismissed] = useState(() => { try { return localStorage.getItem('magic-moving-dismissed') === MOVING_TO; } catch { return false; } });
+    const dismissMoving = () => { try { localStorage.setItem('magic-moving-dismissed', MOVING_TO); } catch {} setMovingDismissed(true); };
     const [updatedAt,      setUpdatedAt]      = useState(null);
     // serverSkew = (server clock − this device's clock) in ms. We anchor "today", the date
     // strip and the header to the SERVER's real time instead of the device clock, so a wrong
@@ -2672,6 +2694,12 @@ function App() {
                 <div className="toast"><div className="spin"/>{({en:'Fetching latest data…',fr:'Chargement des données…',es:'Cargando datos…',pt:'Carregando dados…',sr:'Učitavanje podataka…',ar:'جارٍ تحميل البيانات…'})[lang]||'Fetching latest data…'}</div>
             )}
 
+            {MOVING_ANNOUNCE && !movingDismissed && (
+                <div style={{background:'linear-gradient(90deg,var(--gold),#ff8a00)',color:'#1a1205',padding:'9px 14px',display:'flex',alignItems:'center',gap:10,fontSize:13,fontWeight:600,lineHeight:1.35}}>
+                    <span style={{flex:1}}>📢 We've moved! Magic Analysis is now at <a href={`https://${MOVING_TO}`} style={{color:'#1a1205',textDecoration:'underline',fontWeight:800}}>{MOVING_TO}</a> — please update your bookmark.</span>
+                    <button onClick={dismissMoving} aria-label="Dismiss" style={{background:'rgba(0,0,0,.15)',border:'none',borderRadius:'50%',width:24,height:24,minWidth:24,cursor:'pointer',color:'#1a1205',fontSize:16,fontWeight:700,display:'flex',alignItems:'center',justifyContent:'center',lineHeight:1}}>×</button>
+                </div>
+            )}
             <header className="hdr">
                 <button className="hdr-btn" onClick={()=>setCalOpen(true)} title="Pick date"><IcoCal/></button>
                 <div className="hdr-center"><MagicLogo size={29}/><span className="hdr-title">Magic Analysis</span></div>
