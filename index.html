@@ -610,6 +610,12 @@
         .stand-form-dot.L { background:var(--live); }
 
         /* (Active-date pill removed — calendar icon in header replaces it.) */
+        /* Glowing red "new feature" dot on the Sports News icon (until first opened) */
+        .news-dot { position:absolute; top:4px; right:4px; width:9px; height:9px; border-radius:50%; background:var(--live); pointer-events:none; animation:newsGlow 1.4s ease-in-out infinite; }
+        @keyframes newsGlow {
+            0%,100% { box-shadow:0 0 0 0 rgba(255,59,48,.6), 0 0 5px 1px rgba(255,59,48,.55); }
+            50%     { box-shadow:0 0 0 5px rgba(255,59,48,0), 0 0 10px 3px rgba(255,59,48,.95); }
+        }
     </style>
 </head>
 <body>
@@ -1416,6 +1422,7 @@ const IcoSun     = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="n
 const IcoMoon    = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>;
 
 const IcoUser = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>;
+const IcoNews = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2h2"/><path d="M18 14h-8M15 18h-5M10 6h8v4h-8z"/></svg>;
 const MagicLogo = ({size=26}) => {
     const [err, setErr] = useState(false);
     const r = Math.round(size * 0.25);
@@ -2204,6 +2211,19 @@ function App() {
     const openAuth = useCallback(() => setAuthOpen(true), []);
     const [movingDismissed, setMovingDismissed] = useState(() => { try { return localStorage.getItem('magic-moving-dismissed') === MOVING_TO; } catch { return false; } });
     const dismissMoving = () => { try { localStorage.setItem('magic-moving-dismissed', MOVING_TO); } catch {} setMovingDismissed(true); };
+    // Sports news (headlines fetched from the backend, opened in a panel from the header)
+    const [newsOpen,    setNewsOpen]    = useState(false);
+    const [news,        setNews]        = useState([]);
+    const [newsLoading, setNewsLoading] = useState(false);
+    const [newsSeen,    setNewsSeen]    = useState(() => { try { return localStorage.getItem('magic-news-seen') === '1'; } catch { return false; } });
+    const openNews = () => { setNewsOpen(true); if (!newsSeen) { setNewsSeen(true); try { localStorage.setItem('magic-news-seen','1'); } catch {} } };
+    useEffect(() => {
+        if (!newsOpen) return;
+        setNewsLoading(true);
+        fetch(`${BACKEND_URL}/api/news`).then(r=>r.json())
+            .then(d => setNews(Array.isArray(d.items) ? d.items : []))
+            .catch(()=>{}).finally(()=>setNewsLoading(false));
+    }, [newsOpen]);
     const [updatedAt,      setUpdatedAt]      = useState(null);
     // serverSkew = (server clock − this device's clock) in ms. We anchor "today", the date
     // strip and the header to the SERVER's real time instead of the device clock, so a wrong
@@ -2702,6 +2722,7 @@ function App() {
             )}
             <header className="hdr">
                 <button className="hdr-btn" onClick={()=>setCalOpen(true)} title="Pick date"><IcoCal/></button>
+                <button className="hdr-btn" style={{position:'relative'}} onClick={openNews} title="Sports News" aria-label="Sports News"><IcoNews/>{!newsSeen && <span className="news-dot"/>}</button>
                 <div className="hdr-center"><MagicLogo size={29}/><span className="hdr-title">Magic Analysis</span></div>
                 <button className="hdr-btn" onClick={()=>{ if (auth) setAccountOpen(true); else openAuth(); }} title={auth?('Account · '+auth.username):'Log in or register'} aria-label="Account">
                     {auth
@@ -2946,6 +2967,32 @@ function App() {
                         <div style={{fontSize:21,fontWeight:700,letterSpacing:'-.4px',marginBottom:8}}>{t('coming_soon')}</div>
                         <div style={{fontSize:14,color:'var(--t2)',lineHeight:1.55,marginBottom:26}}>{t('coming_soon_body', {sport: csSport})}</div>
                         <button className="btn-primary" onClick={()=>setCsSport(null)}>{t('got_it')}</button>
+                    </div>
+                </div>
+            )}
+
+            {newsOpen && (
+                <div className="center-overlay" style={{zIndex:400}} onClick={()=>setNewsOpen(false)}>
+                    <div className="center-card" style={{maxWidth:440,width:'100%',maxHeight:'82vh',display:'flex',flexDirection:'column'}} onClick={e=>e.stopPropagation()}>
+                        <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:14}}>
+                            <div style={{fontSize:19,fontWeight:800,letterSpacing:'-.4px'}}>📰 Sports News</div>
+                            <button onClick={()=>setNewsOpen(false)} aria-label="Close" style={{background:'var(--bg)',border:'none',borderRadius:'50%',width:28,height:28,cursor:'pointer',fontSize:16,color:'var(--t2)',display:'flex',alignItems:'center',justifyContent:'center'}}>×</button>
+                        </div>
+                        <div style={{overflowY:'auto',flex:1}}>
+                            {newsLoading && news.length===0 && <div style={{fontSize:13,color:'var(--t3)',textAlign:'center',padding:'24px 0'}}>Loading headlines…</div>}
+                            {!newsLoading && news.length===0 && <div style={{fontSize:13,color:'var(--t3)',textAlign:'center',padding:'24px 0'}}>No headlines right now — check back soon.</div>}
+                            {news.map((n,i)=>(
+                                <div key={i} style={{padding:'12px 2px',borderBottom:'1px solid var(--sep)'}}>
+                                    {n.image && <img src={n.image} alt="" loading="lazy" onError={e=>{e.target.style.display='none';}} style={{width:'100%',maxHeight:170,objectFit:'cover',borderRadius:10,marginBottom:9}}/>}
+                                    <div style={{fontSize:14.5,fontWeight:700,color:'var(--t1)',lineHeight:1.35,marginBottom:5}}>{n.title}</div>
+                                    {n.summary && <div style={{fontSize:13,color:'var(--t2)',lineHeight:1.45,marginBottom:7}}>{n.summary}</div>}
+                                    <div style={{fontSize:11.5,color:'var(--t3)',display:'flex',gap:8,alignItems:'center'}}>
+                                        <span style={{color:'var(--gold)',fontWeight:700}}>{n.source}</span>
+                                        {n.publishedAt && <span>· {relTime(new Date(n.publishedAt).getTime())}</span>}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
             )}
