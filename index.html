@@ -658,12 +658,14 @@ const REFRESH_MS  = 3 * 60 * 1000;
 // upstream live feed is frozen but our scrape still "succeeds".
 const MAINTENANCE_MODE = false;
 // === Domain-move announcement =============================================
-// A dismissible bar telling users the site moved. Keep MOVING_ANNOUNCE = false
+// A bar telling users we're moving to the new domain. When dismissed it comes back
+// after 3 minutes so it keeps gently reminding them. Keep MOVING_ANNOUNCE = false
 // until the NEW site is fully LIVE (SSL working, it loads) — otherwise you'd send
 // people to a dead address. Then set MOVING_TO to your real new domain and flip
 // MOVING_ANNOUNCE to true. Dismissal is remembered per-domain.
-const MOVING_ANNOUNCE = false;
+const MOVING_ANNOUNCE = true;
 const MOVING_TO = "magicsportanalysis.com";
+const MOVING_REMIND_MS = 3 * 60 * 1000;   // after dismiss, show the moving bar again in 3 min
 const TIMER_TICK_MS = 1000;
 const TAB_LOADING_MAX_MS = 3000;
 const PAGE_SIZE = 5;            // matches revealed per infinite-scroll page
@@ -2209,8 +2211,13 @@ function App() {
     const [authOpen,       setAuthOpen]       = useState(false);
     const [accountOpen,    setAccountOpen]    = useState(false);
     const openAuth = useCallback(() => setAuthOpen(true), []);
-    const [movingDismissed, setMovingDismissed] = useState(() => { try { return localStorage.getItem('magic-moving-dismissed') === MOVING_TO; } catch { return false; } });
-    const dismissMoving = () => { try { localStorage.setItem('magic-moving-dismissed', MOVING_TO); } catch {} setMovingDismissed(true); };
+    const [movingVisible, setMovingVisible] = useState(true);
+    const movingTimerRef = useRef(null);
+    const dismissMoving = () => {
+        setMovingVisible(false);
+        clearTimeout(movingTimerRef.current);
+        movingTimerRef.current = setTimeout(() => setMovingVisible(true), MOVING_REMIND_MS);   // nudge again every 3 min
+    };
     // Sports news (headlines fetched from the backend, opened in a panel from the header)
     const [newsOpen,    setNewsOpen]    = useState(false);
     const [news,        setNews]        = useState([]);
@@ -2714,9 +2721,9 @@ function App() {
                 <div className="toast"><div className="spin"/>{({en:'Fetching latest data…',fr:'Chargement des données…',es:'Cargando datos…',pt:'Carregando dados…',sr:'Učitavanje podataka…',ar:'جارٍ تحميل البيانات…'})[lang]||'Fetching latest data…'}</div>
             )}
 
-            {MOVING_ANNOUNCE && !movingDismissed && (
+            {MOVING_ANNOUNCE && movingVisible && (
                 <div style={{background:'linear-gradient(90deg,var(--gold),#ff8a00)',color:'#1a1205',padding:'9px 14px',display:'flex',alignItems:'center',gap:10,fontSize:13,fontWeight:600,lineHeight:1.35}}>
-                    <span style={{flex:1}}>📢 We've moved! Magic Analysis is now at <a href={`https://${MOVING_TO}`} style={{color:'#1a1205',textDecoration:'underline',fontWeight:800}}>{MOVING_TO}</a> — please update your bookmark.</span>
+                    <span style={{flex:1}}>📢 We're moving! Magic Analysis is moving to <a href={`https://${MOVING_TO}`} style={{color:'#1a1205',textDecoration:'underline',fontWeight:800}}>{MOVING_TO}</a> — visit &amp; bookmark our new home.</span>
                     <button onClick={dismissMoving} aria-label="Dismiss" style={{background:'rgba(0,0,0,.15)',border:'none',borderRadius:'50%',width:24,height:24,minWidth:24,cursor:'pointer',color:'#1a1205',fontSize:16,fontWeight:700,display:'flex',alignItems:'center',justifyContent:'center',lineHeight:1}}>×</button>
                 </div>
             )}
