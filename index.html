@@ -666,6 +666,11 @@ const MAINTENANCE_MODE = false;
 const MOVING_ANNOUNCE = true;
 const MOVING_TO = "magicsportanalysis.com";
 const MOVING_REMIND_MS = 3 * 60 * 1000;   // after dismiss, show the moving bar again in 3 min
+// Comment/login system. Set false to remove ALL login + account forms from the site (the
+// match-chat, the header Login button, and the sign-in modal) — e.g. to defuse a bogus
+// "phishing/fake-login" abuse report. Flip back to true (ideally once on the new domain)
+// to restore comments. Backend endpoints stay but are harmless with no forms to reach them.
+const COMMENTS_ENABLED = false;
 const TIMER_TICK_MS = 1000;
 const TAB_LOADING_MAX_MS = 3000;
 const PAGE_SIZE = 5;            // matches revealed per infinite-scroll page
@@ -1826,6 +1831,7 @@ const DetailSheet = ({ match, pred, onClose }) => {
                         {statusBadgeLabel(match, c, t)}
                     </span>
                 </div>
+                {COMMENTS_ENABLED && (
                 <div style={{display:'flex',gap:4,borderBottom:'1px solid var(--sep)',marginBottom:14}}>
                     {[['overview','Overview'],['chat','💬 Chat']].map(([key,lbl])=>(
                         <button key={key} onClick={()=>setDetailTab(key)} style={{flex:1,padding:'11px 8px',background:'none',border:'none',borderBottom:detailTab===key?'2.5px solid var(--gold)':'2.5px solid transparent',color:detailTab===key?'var(--t1)':'var(--t3)',fontSize:14,fontWeight:700,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:6}}>
@@ -1834,6 +1840,7 @@ const DetailSheet = ({ match, pred, onClose }) => {
                         </button>
                     ))}
                 </div>
+                )}
                 <div hidden={detailTab!=='overview'}>
                 <div className="detail-info-grid">
                     <div className="detail-info-cell">
@@ -1926,7 +1933,7 @@ const DetailSheet = ({ match, pred, onClose }) => {
                 )}
 
                 </div>
-                {detailTab==='chat' && <CommentsBlock match={match} onCount={setChatCount}/>}
+                {COMMENTS_ENABLED && detailTab==='chat' && <CommentsBlock match={match} onCount={setChatCount}/>}
 
                 <button className="btn-secondary" style={{marginTop:14}} onClick={onClose}>{({en:'Close',fr:'Fermer',es:'Cerrar',pt:'Fechar',sr:'Zatvori',ar:'إغلاق'})[lang] || 'Close'}</button>
             </div>
@@ -2702,7 +2709,7 @@ function App() {
         <LangContext.Provider value={{ lang, locale, t }}>
         <AuthContext.Provider value={{ auth, setAuth, openAuth }}>
         <>
-            <AuthModal open={authOpen} onClose={()=>setAuthOpen(false)} onAuth={setAuth}/>
+            {COMMENTS_ENABLED && <AuthModal open={authOpen} onClose={()=>setAuthOpen(false)} onAuth={setAuth}/>}
             {splash && (
                 <div className="splash">
                     <div className="splash-inner">
@@ -2731,11 +2738,13 @@ function App() {
                 <button className="hdr-btn" onClick={()=>setCalOpen(true)} title="Pick date"><IcoCal/></button>
                 <button className="hdr-btn" style={{position:'relative'}} onClick={openNews} title="Sports News" aria-label="Sports News"><IcoNews/>{!newsSeen && <span className="news-dot"/>}</button>
                 <div className="hdr-center"><MagicLogo size={29}/><span className="hdr-title">Magic Analysis</span></div>
+                {COMMENTS_ENABLED && (
                 <button className="hdr-btn" onClick={()=>{ if (auth) setAccountOpen(true); else openAuth(); }} title={auth?('Account · '+auth.username):'Log in or register'} aria-label="Account">
                     {auth
                       ? <span style={{width:23,height:23,borderRadius:'50%',background:'var(--gold)',color:'#1a1205',fontSize:12,fontWeight:800,display:'flex',alignItems:'center',justifyContent:'center'}}>{(auth.username||'?').slice(0,1).toUpperCase()}</span>
                       : <IcoUser/>}
                 </button>
+                )}
                 <button className="hdr-btn" onClick={()=>setLangOpen(true)} title={t('language')} aria-label={t('language')}>
                     <span style={{fontSize:18,lineHeight:1}}>{(LANGS.find(l=>l[0]===lang)||LANGS[0])[2]}</span>
                 </button>
@@ -3004,7 +3013,7 @@ function App() {
                 </div>
             )}
 
-            {accountOpen && auth && (
+            {COMMENTS_ENABLED && accountOpen && auth && (
                 <div className="center-overlay" style={{zIndex:400}} onClick={()=>setAccountOpen(false)}>
                     <div className="center-card" style={{maxWidth:300,textAlign:'center'}} onClick={e=>e.stopPropagation()}>
                         <div style={{width:54,height:54,borderRadius:'50%',background:'var(--gold)',color:'#1a1205',fontSize:23,fontWeight:800,display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 12px'}}>{(auth.username||'?').slice(0,1).toUpperCase()}</div>
