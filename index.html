@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,7 +10,7 @@
     <!-- ===== SEO + social-share meta (added to fix Soft 404 / enable rich link previews) ===== -->
     <meta name="description" content="Free daily football predictions, live scores and match analysis worldwide. 1X2 tips, predicted scores, head-to-head stats, league standings and live odds — updated all day.">
     <meta name="robots" content="index, follow">
-    <link rel="canonical" href="https://magicsportanalysis.com/">
+    <link rel="canonical" href="https://magicsportsanalysis.com/">
     <meta name="theme-color" content="#0B1929">
 
     <!-- Open Graph — link previews on Facebook, WhatsApp, Telegram, LinkedIn -->
@@ -17,14 +18,14 @@
     <meta property="og:site_name" content="Magic Analysis">
     <meta property="og:title" content="Magic Analysis — Football Predictions, Tips &amp; Live Scores">
     <meta property="og:description" content="Free daily football predictions, live scores and match analysis worldwide — 1X2 tips, predicted scores, H2H, standings and live odds.">
-    <meta property="og:url" content="https://magicsportanalysis.com/">
-    <meta property="og:image" content="https://magicsportanalysis.com/photo_2026-05-02%2011.59.07.jpeg">
+    <meta property="og:url" content="https://magicsportsanalysis.com/">
+    <meta property="og:image" content="https://magicsportsanalysis.com/photo_2026-05-02%2011.59.07.jpeg">
 
     <!-- Twitter / X card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Magic Analysis — Football Predictions, Tips &amp; Live Scores">
     <meta name="twitter:description" content="Free daily football predictions, live scores and match analysis worldwide — 1X2 tips, predicted scores, H2H, standings and live odds.">
-    <meta name="twitter:image" content="https://magicsportanalysis.com/photo_2026-05-02%2011.59.07.jpeg">
+    <meta name="twitter:image" content="https://magicsportsanalysis.com/photo_2026-05-02%2011.59.07.jpeg">
 
     <!-- Structured data (Organization + WebSite) for rich results -->
     <script type="application/ld+json">
@@ -34,8 +35,8 @@
         {
           "@type": "Organization",
           "name": "Magic Analysis",
-          "url": "https://magicsportanalysis.com/",
-          "logo": "https://magicsportanalysis.com/photo_2026-05-02%2011.59.07.jpeg",
+          "url": "https://magicsportsanalysis.com/",
+          "logo": "https://magicsportsanalysis.com/photo_2026-05-02%2011.59.07.jpeg",
           "sameAs": [
             "https://t.me/footballinsight01",
             "https://x.com/tipsmagic30849",
@@ -46,7 +47,7 @@
         {
           "@type": "WebSite",
           "name": "Magic Analysis",
-          "url": "https://magicsportanalysis.com/"
+          "url": "https://magicsportsanalysis.com/"
         }
       ]
     }
@@ -168,6 +169,16 @@
         .hdr-title { font-size:20px; font-weight:700; letter-spacing:-.5px; color:#fff; white-space:nowrap; }
 
         .top-ad-banner { width:100%; background:var(--surface); border-bottom:0.5px solid var(--sep); padding:10px 14px; display:flex; align-items:center; justify-content:center; min-height:70px; overflow:hidden; }
+
+        /* Domain-change notice — clear on mobile and both color themes. */
+        .domain-move-banner { background:#FFF0BE; color:#2E250E; border-bottom:1px solid #EAC86D; padding:11px 14px; display:flex; align-items:center; justify-content:center; gap:12px; }
+        .domain-move-message { max-width:800px; flex:1; text-align:center; font-size:13px; line-height:1.5; font-weight:500; }
+        .domain-move-message strong { font-weight:800; }
+        .domain-move-message a { color:#161005; font-weight:800; text-decoration:underline; text-underline-offset:2px; overflow-wrap:anywhere; }
+        .domain-move-message del { color:#755F34; }
+        .domain-move-dismiss { border:none; background:rgba(0,0,0,.10); color:#2E250E; width:28px; height:28px; min-width:28px; border-radius:50%; font-size:19px; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+        .domain-move-dismiss:hover { background:rgba(0,0,0,.2); }
+
 
         .tabs-bar { background:var(--surface); border-bottom:0.5px solid var(--sep); padding:10px 14px; display:flex; gap:7px; overflow-x:auto; }
         .tab { padding:6px 15px; border-radius:100px; font-size:14px; font-weight:500; letter-spacing:-.2px; border:none; cursor:pointer; white-space:nowrap; transition:all .2s; }
@@ -628,6 +639,10 @@
          React replaces everything inside #root the instant it mounts, so real
          users still get the live app; this also shows if JS is disabled/fails. -->
     <div style="max-width:640px;margin:0 auto;padding:40px 22px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;color:#1D1D1F;line-height:1.6;">
+        <p style="background:#FFF0BE;color:#2E250E;padding:12px 14px;border-radius:10px;margin-bottom:16px;font-size:13px;">
+            <strong>📢 We've moved!</strong> Magic Analysis no longer uses <del>magicsportanalysis.com</del>.
+            Our official website is now <a href="https://magicsportsanalysis.com/" style="font-weight:800;color:#161005;">magicsportsanalysis.com</a> — with an extra “s” after “sport”. Please update your bookmark.
+        </p>
         <h1 style="font-size:26px;font-weight:700;letter-spacing:-.5px;margin-bottom:12px;">Magic Analysis — Football Predictions, Tips &amp; Live Scores</h1>
         <p style="font-size:15px;color:#444;margin-bottom:14px;">
             Magic Analysis provides free daily <strong>football predictions</strong>, <strong>live scores</strong>
@@ -658,13 +673,12 @@ const REFRESH_MS  = 3 * 60 * 1000;
 // upstream live feed is frozen but our scrape still "succeeds".
 const MAINTENANCE_MODE = false;
 // === Domain-move announcement =============================================
-// A bar telling users we're moving to the new domain. When dismissed it comes back
-// after 3 minutes so it keeps gently reminding them. Keep MOVING_ANNOUNCE = false
-// until the NEW site is fully LIVE (SSL working, it loads) — otherwise you'd send
-// people to a dead address. Then set MOVING_TO to your real new domain and flip
-// MOVING_ANNOUNCE to true. Dismissal is remembered per-domain.
+// Prominent notice reminding returning users that the former domain is retired.
+// The correct official address contains an extra "s" after "sport".
+// Keep MOVING_ANNOUNCE = true while announcing the change. The visitor can
+// dismiss it temporarily; it reappears after MOVING_REMIND_MS.
 const MOVING_ANNOUNCE = true;
-const MOVING_TO = "magicsportanalysis.com";
+const MOVING_TO = "magicsportsanalysis.com";
 const MOVING_REMIND_MS = 3 * 60 * 1000;   // after dismiss, show the moving bar again in 3 min
 // Comment/login system. Set false to remove ALL login + account forms from the site (the
 // match-chat, the header Login button, and the sign-in modal) — e.g. to defuse a bogus
@@ -2729,9 +2743,14 @@ function App() {
             )}
 
             {MOVING_ANNOUNCE && movingVisible && (
-                <div style={{background:'linear-gradient(90deg,var(--gold),#ff8a00)',color:'#1a1205',padding:'9px 14px',display:'flex',alignItems:'center',gap:10,fontSize:13,fontWeight:600,lineHeight:1.35}}>
-                    <span style={{flex:1}}>📢 We're moving! Magic Analysis is moving to <a href={`https://${MOVING_TO}`} style={{color:'#1a1205',textDecoration:'underline',fontWeight:800}}>{MOVING_TO}</a> — visit &amp; bookmark our new home.</span>
-                    <button onClick={dismissMoving} aria-label="Dismiss" style={{background:'rgba(0,0,0,.15)',border:'none',borderRadius:'50%',width:24,height:24,minWidth:24,cursor:'pointer',color:'#1a1205',fontSize:16,fontWeight:700,display:'flex',alignItems:'center',justifyContent:'center',lineHeight:1}}>×</button>
+                <div className="domain-move-banner" role="status" aria-live="polite">
+                    <div className="domain-move-message">
+                        <strong>📢 We've moved!</strong>{' '}Magic Analysis no longer uses{' '}
+                        <del>magicsportanalysis.com</del>. Our official website is now{' '}
+                        <a href={`https://${MOVING_TO}`} aria-label="Our new official website: magicsportsanalysis.com">{MOVING_TO}</a>
+                        {' '}— with an extra <strong>“s” after “sport”</strong>. Please update your bookmark.
+                    </div>
+                    <button className="domain-move-dismiss" onClick={dismissMoving} aria-label="Dismiss website move announcement">×</button>
                 </div>
             )}
             <header className="hdr">
