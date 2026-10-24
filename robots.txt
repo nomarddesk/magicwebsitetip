@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://magicsportanalysis.com/sitemap.xml
+Sitemap: https://magicsportsanalysis.com/sitemap.xml
